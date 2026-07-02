@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>DODGE!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: #020e1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100svh;
+    font-family: 'Press Start 2P', monospace;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* water caustics overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0,80,120,0.04) 0px,
+      rgba(0,80,120,0.04) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .screen {
+    position: relative;
+    width: min(360px, 56.25svh, 100vw);
+    height: min(640px, 100svh, 177vw);
+    background: #041824;
+    border: 3px solid #00aaff;
+    box-shadow:
+      0 0 20px #00aaff66,
+      0 0 60px #00aaff22;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  /* UI overlay */
+  #ui {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .score-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+    font-size: 7px;
+    color: #00ddff;
+    text-shadow: 0 0 8px #00ddff;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent);
+    letter-spacing: 0.05em;
+  }
+
+  /* Title / start screen */
+  #titleScreen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(2,14,26,0.92);
+    z-index: 20;
+  }
+
+  .game-title {
+    font-size: clamp(22px, 7vw, 32px);
+    color: #00ddff;
+    text-shadow: 0 0 20px #00ddff, 0 0 40px #00ddff66;
+    letter-spacing: 0.12em;
+    animation: titlePulse 1.5s ease-in-out infinite alternate;
+  }
+  @keyframes titlePulse {
+    from { text-shadow: 0 0 10px #00ddff, 0 0 20px #00ddff44; }
+    to   { text-shadow: 0 0 30px #00ddff, 0 0 60px #00ddff88, 0 0 80px #00ddff33; }
+  }
+
+  .subtitle {
+    font-size: 6px;
+    color: #3388aa;
+    letter-spacing: 0.2em;
+    line-height: 2;
+    text-align: center;
+  }
+
+  .hi-display {
+    font-size: 7px;
+    color: #ffcc00;
+    text-shadow: 0 0 8px #ffcc00;
+    letter-spacing: 0.1em;
+  }
+
+  .start-btn {
+    margin-top: 8px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    color: #041824;
+    background: #00ddff;
+    border: none;
+    padding: 12px 28px;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    pointer-events: all;
+    animation: blinkBtn 1s step-end infinite;
+    box-shadow: 0 0 20px #00ddff66;
+  }
+  @keyframes blinkBtn {
+    0%,100% { opacity:1; }
+    50% { opacity:0.3; }
+  }
+  .start-btn:active { transform: scale(0.96); }
+
+  .controls-hint {
+    font-size: 6px;
+    color: #336655;
+    text-align: center;
+    line-height: 2.2;
+    letter-spacing: 0.05em;
+  }
+
+  /* Game over screen */
+  #gameoverScreen {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(2,14,26,0.9);
+    z-index: 20;
+  }
+  #gameoverScreen.show { display: flex; }
+
+  .go-title {
+    font-size: clamp(14px, 5vw, 20px);
+    color: #ff4466;
+    text-shadow: 0 0 20px #ff4466, 0 0 40px #ff446644;
+    letter-spacing: 0.1em;
+  }
+  .go-score {
+    font-size: 8px;
+    color: #00ff88;
+    letter-spacing: 0.1em;
+    line-height: 2.5;
+    text-align: center;
+  }
+  .go-hi {
+    font-size: 7px;
+    color: #ffcc00;
+    text-shadow: 0 0 8px #ffcc00;
+    letter-spacing: 0.1em;
+  }
+  .new-record {
+    font-size: 7px;
+    color: #ffcc00;
+    animation: blinkBtn 0.6s step-end infinite;
+    text-shadow: 0 0 10px #ffcc00;
+    letter-spacing: 0.1em;
+  }
+
+  .retry-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #041824;
+    background: #00ddff;
+    border: none;
+    padding: 10px 24px;
+    cursor: pointer;
+    pointer-events: all;
+    box-shadow: 0 0 15px #00ddff55;
+  }
+  .retry-btn:active { transform: scale(0.96); }
+
+  /* touch zone */
+  #touchZone {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+</style>
+</head>
+<body>
+
+<div class="screen">
+  <canvas id="c"></canvas>
+
+  <div id="ui">
+    <div class="score-bar">
+      <span>SCORE <span id="scoreDisp">00000</span></span>
+      <span>HI <span id="hiDisp">00000</span></span>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div id="titleScreen">
+    <div class="game-title">ESCAPE!</div>
+    <div class="subtitle">
+      深海からの脱出<br>
+      DEEP SEA ESCAPE
+    </div>
+    <div class="hi-display" id="titleHi">HI-SCORE: 00000</div>
+    <button class="start-btn" id="startBtn">▶ START</button>
+    <div class="controls-hint">
+      📱 タップ長押し → 上昇<br>
+      ⌨️ スペース / 上キー → 上昇<br>
+      離すと下降　海草を避けて逃げろ！
+    </div>
+  </div>
+
+  <!-- Game Over -->
+  <div id="gameoverScreen">
+    <div class="go-title">GAME OVER</div>
+    <div class="go-score">
+      SCORE<br><span id="goScore">00000</span>
+    </div>
+    <div class="go-hi" id="goHi">HI: 00000</div>
+    <div class="new-record" id="newRecord" style="display:none">★ NEW RECORD! ★</div>
+    <button class="retry-btn" id="retryBtn">RETRY</button>
+  </div>
+
+  <div id="touchZone"></div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const W = 360, H = 640;
+canvas.width = W; canvas.height = H;
+
+// ── State ──
+let state = 'title'; // 'title' | 'countdown' | 'play' | 'gameover'
+let countdown = 3;
+let countdownTimer = 0;
+let pressing = false;
+let score = 0;
+let hiScore = parseInt(localStorage.getItem('dodgeHi') || '0');
+let frame = 0;
+let speed = 1.8;
+let raf;
+let prevLevel = 0;
+let levelUpTimer = 0;
+
+// ── Player (little rocket/critter shape) ──
+const PLAYER = {
+  x: 70,
+  y: H / 2,
+  w: 28,
+  h: 16,
+  vy: 0,
+  gravity: 0.18,
+  lift: -0.45,
+  maxVy: 4.5,
+};
+
+// ── Obstacles ──
+let obstacles = [];
+const GAP = 200;           // gap between top/bottom wall obstacle
+const OBS_W = 22;
+
+// ── Plankton (BG parallax) ──
+let stars = Array.from({length:40}, () => ({
+  x: Math.random()*W,
+  y: Math.random()*H,
+  s: Math.random()*1.8+0.4,
+  sp: Math.random()*0.5+0.2,
+}));
+
+// ── Particles ──
+let particles = [];
+
+function spawnParticle(x, y, color) {
+  for(let i=0;i<6;i++) particles.push({
+    x, y,
+    vx: (Math.random()-0.5)*4,
+    vy: (Math.random()-0.5)*4,
+    life: 1,
+    color,
+    size: Math.random()*4+2,
+  });
+}
+
+// ── Obstacle spawning ──
+let nextObsDist = 300;
+let obsTicker = 0;
+
+function spawnObstacle(gap) {
+  gap = gap || GAP;
+  const minTop = 40;
+  const maxTop = H - gap - 40;
+  const topH = minTop + Math.random()*(maxTop-minTop);
+  obstacles.push({
+    x: W + 10,
+    topH,
+    btmY: topH + gap,
+    scored: false,
+  });
+}
+
+// ── Reset ──
+function reset() {
+  PLAYER.y = H / 2;
+  PLAYER.vy = 0;
+  obstacles = [];
+  particles = [];
+  score = 0;
+  frame = 0;
+  speed = 1.8;
+  obsTicker = 0;
+  nextObsDist = 300;
+  pressing = false;
+  countdown = 3;
+  countdownTimer = 0;
+  prevLevel = 0;
+  levelUpTimer = 0;
+  cat = null;
+  updateScoreDisp();
+}
+
+// ── Input — document全体で反応 ──
+const tz = document.getElementById('touchZone');
+
+function onDown(e) {
+  if(state==='title') return;
+  if(state==='gameover') return;
+  if(state==='countdown') return;
+  e.preventDefault();
+  pressing = true;
+}
+function onUp(e) {
+  pressing = false;
+}
+
+// touchZoneだけでなくdocument全体で受け取る
+document.addEventListener('pointerdown', onDown);
+document.addEventListener('pointerup', onUp);
+document.addEventListener('pointercancel', onUp);
+
+document.addEventListener('keydown', e => {
+  if(e.code==='Space'||e.code==='ArrowUp') { e.preventDefault(); pressing=true; }
+  if(e.code==='Enter') {
+    if(state==='title') startGame();
+    else if(state==='gameover') retryGame();
+  }
+});
+document.addEventListener('keyup', e => {
+  if(e.code==='Space'||e.code==='ArrowUp') pressing=false;
+});
+
+document.getElementById('startBtn').addEventListener('click', e => { e.stopPropagation(); startGame(); });
+document.getElementById('retryBtn').addEventListener('click', e => { e.stopPropagation(); retryGame(); });
+
+function startGame() {
+  document.getElementById('titleScreen').style.display = 'none';
+  state = 'countdown';
+  reset();
+  loop();
+}
+function retryGame() {
+  document.getElementById('gameoverScreen').classList.remove('show');
+  state = 'countdown';
+  reset();
+}
+
+// ── Draw helpers ──
+function drawPlayer() {
+  const p = PLAYER;
+  const tilt = Math.max(-0.45, Math.min(0.45, p.vy * 0.09));
+  const swimWag = Math.sin(frame * 0.25) * 0.15;
+
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  ctx.rotate(tilt);
+
+  // Body
+  ctx.fillStyle = '#ffdd44';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, p.w/2, p.h/2, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Belly (lighter)
+  ctx.fillStyle = '#fff5aa';
+  ctx.beginPath();
+  ctx.ellipse(2, 3, p.w/2-4, p.h/2-4, 0.1, 0, Math.PI*2);
+  ctx.fill();
+
+  // Dorsal fin
+  ctx.fillStyle = '#ffaa00';
+  ctx.beginPath();
+  ctx.moveTo(0, -p.h/2);
+  ctx.lineTo(-6, -p.h/2-8);
+  ctx.lineTo(8, -p.h/2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Tail fin (wags)
+  ctx.save();
+  ctx.translate(-p.w/2+2, 0);
+  ctx.rotate(swimWag);
+  ctx.fillStyle = '#ffaa00';
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-12, -8);
+  ctx.lineTo(-8, 0);
+  ctx.lineTo(-12, 8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // Pectoral fin
+  ctx.fillStyle = '#ffcc33';
+  ctx.beginPath();
+  ctx.ellipse(2, p.h/2-2, 7, 4, 0.5, 0, Math.PI*2);
+  ctx.fill();
+
+  // Eye
+  ctx.fillStyle = '#222';
+  ctx.beginPath();
+  ctx.arc(p.w/2-7, -2, 3.5, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(p.w/2-6, -3, 1.2, 0, Math.PI*2);
+  ctx.fill();
+
+  // Scared expression when pressing (swimming hard)
+  if(pressing) {
+    // Bubbles from mouth
+    ctx.strokeStyle = 'rgba(150,220,255,0.7)';
+    ctx.lineWidth = 1;
+    for(let i=0;i<3;i++){
+      ctx.beginPath();
+      ctx.arc(p.w/2+4+i*6, -2-i*4, 1.5+i*0.5, 0, Math.PI*2);
+      ctx.stroke();
+    }
+  }
+
+  ctx.restore();
+}
+
+function drawObstacle(ob) {
+  // Top seaweed cluster (hanging from top)
+  drawSeaweed(ctx, ob.x, 0, ob.topH, true);
+  // Bottom seaweed cluster (growing from bottom)
+  drawSeaweed(ctx, ob.x, H, H - ob.btmY, false);
+}
+
+function drawSeaweed(ctx, x, baseY, length, fromTop) {
+  const dir = fromTop ? 1 : -1;
+  const cols = 3;
+  for(let c=0; c<cols; c++) {
+    const cx = x + c * (OBS_W/cols) + OBS_W/cols/2;
+    const segLen = length * (0.85 + c*0.05);
+    ctx.beginPath();
+    ctx.moveTo(cx, baseY);
+    let py = baseY;
+    const segs = Math.max(4, Math.floor(segLen/18));
+    for(let i=1; i<=segs; i++) {
+      const t = i/segs;
+      const wave = Math.sin(frame*0.04 + c*1.2 + i*0.8) * 5;
+      const nx = cx + wave;
+      const ny = baseY + dir * segLen * t;
+      ctx.lineTo(nx, ny);
+      py = ny;
+    }
+    const hue = 130 + c*15;
+    const lightness = 28 + c*8;
+    ctx.strokeStyle = `hsl(${hue},60%,${lightness}%)`;
+    ctx.lineWidth = 5 - c;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+
+    // Leaf blades along stem
+    for(let i=1; i<=segs; i+=2) {
+      const t = i/segs;
+      const wave = Math.sin(frame*0.04 + c*1.2 + i*0.8) * 5;
+      const lx = cx + wave;
+      const ly = baseY + dir * segLen * t;
+      const leafDir = (i%4===1) ? 1 : -1;
+      const lwave = Math.sin(frame*0.05 + c + i) * 3;
+      ctx.beginPath();
+      ctx.moveTo(lx, ly);
+      ctx.quadraticCurveTo(
+        lx + leafDir*(12+lwave), ly + dir*6,
+        lx + leafDir*(8+lwave), ly + dir*14
+      );
+      ctx.strokeStyle = `hsl(${hue+10},65%,${lightness+10}%)`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+}
+
+function drawStars() {
+  ctx.shadowBlur = 0;
+  for(const s of stars) {
+    ctx.fillStyle = `rgba(100,200,255,${0.12+s.s*0.08})`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.s*0.7, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function drawParticles() {
+  for(const p of particles) {
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 6;
+    ctx.fillRect(p.x-p.size/2, p.y-p.size/2, p.size, p.size);
+  }
+  ctx.globalAlpha = 1;
+  ctx.shadowBlur = 0;
+}
+
+// ── Ocean bubbles ──
+let bubbles = Array.from({length:20}, () => ({
+  x: Math.random()*W,
+  y: Math.random()*H,
+  r: Math.random()*3+1,
+  sp: Math.random()*0.4+0.2,
+}));
+
+function drawBg() {
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = 'transparent';
+
+  // Ocean gradient
+  const bg = ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0, '#061e30');
+  bg.addColorStop(0.5, '#042038');
+  bg.addColorStop(1, '#021428');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Caustic light rays from top
+  ctx.save();
+  ctx.globalAlpha = 0.04;
+  for(let i=0;i<6;i++){
+    const rx = W*(0.1+i*0.16) + Math.sin(frame*0.008+i)*20;
+    ctx.fillStyle = '#88ddff';
+    ctx.beginPath();
+    ctx.moveTo(rx, 0);
+    ctx.lineTo(rx-30, H);
+    ctx.lineTo(rx+30, H);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // Bubbles
+  ctx.strokeStyle = 'rgba(150,220,255,0.35)';
+  ctx.lineWidth = 1;
+  for(const b of bubbles) {
+    b.y -= b.sp;
+    b.x += Math.sin(frame*0.02+b.r)*0.3;
+    if(b.y < -10) { b.y = H+5; b.x = Math.random()*W; }
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+    ctx.stroke();
+  }
+}
+
+function drawFloor() {
+  // Surface shimmer (top)
+  const surfaceGrad = ctx.createLinearGradient(0,0,0,8);
+  surfaceGrad.addColorStop(0,'rgba(100,200,255,0.5)');
+  surfaceGrad.addColorStop(1,'rgba(100,200,255,0)');
+  ctx.fillStyle = surfaceGrad;
+  ctx.fillRect(0,0,W,8);
+
+  // Ocean floor (bottom)
+  const floorGrad = ctx.createLinearGradient(0,H-8,0,H);
+  floorGrad.addColorStop(0,'rgba(20,80,60,0)');
+  floorGrad.addColorStop(1,'rgba(20,80,60,0.8)');
+  ctx.fillStyle = floorGrad;
+  ctx.fillRect(0,H-8,W,8);
+}
+
+// ── Score display ──
+function fmt(n) { return String(Math.floor(n)).padStart(5,'0'); }
+function updateScoreDisp() {
+  document.getElementById('scoreDisp').textContent = fmt(score);
+  document.getElementById('hiDisp').textContent = fmt(hiScore);
+}
+
+// ── AABB collision ──
+function hitTest(ob) {
+  const p = PLAYER;
+  const px = p.x - p.w/2 + 4;
+  const py = p.y - p.h/2 + 3;
+  const pw = p.w - 8;
+  const ph = p.h - 6;
+  // Top pillar
+  if(px < ob.x+OBS_W && px+pw > ob.x && py < ob.topH) return true;
+  // Bottom pillar
+  if(px < ob.x+OBS_W && px+pw > ob.x && py+ph > ob.btmY) return true;
+  return false;
+}
+
+
+// ── Shark animation ──
+let cat = null;
+
+function startCatAnimation() {
+  cat = {
+    x: -130,
+    y: H / 2,
+    targetY: PLAYER.y,
+    phase: 'enter',
+    frame: 0,
+    mouthOpen: false,
+    grabX: PLAYER.x - 40,
+  };
+}
+
+function drawCat(s) {
+  const { x, y, mouthOpen, phase } = s;
+  const sf = s.frame;
+  const bodyW = 70, bodyH = 22;
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Body
+  const bodyGrad = ctx.createLinearGradient(-bodyW/2, -bodyH, bodyW/2, bodyH);
+  bodyGrad.addColorStop(0, '#5588aa');
+  bodyGrad.addColorStop(0.5, '#336688');
+  bodyGrad.addColorStop(1, '#224466');
+  ctx.fillStyle = bodyGrad;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, bodyW/2, bodyH/2, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Belly
+  ctx.fillStyle = '#ccddee';
+  ctx.beginPath();
+  ctx.ellipse(5, 6, bodyW/2-12, bodyH/2-7, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Dorsal fin
+  ctx.fillStyle = '#446688';
+  ctx.beginPath();
+  ctx.moveTo(10, -bodyH/2);
+  ctx.lineTo(-2, -bodyH/2-26);
+  ctx.lineTo(-14, -bodyH/2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Pectoral fin
+  ctx.fillStyle = '#446688';
+  ctx.beginPath();
+  ctx.moveTo(8, bodyH/2-2);
+  ctx.lineTo(22, bodyH/2+16);
+  ctx.lineTo(-4, bodyH/2+2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Tail
+  const wagT = Math.sin(sf * 0.18) * 8;
+  ctx.fillStyle = '#446688';
+  ctx.beginPath();
+  ctx.moveTo(-bodyW/2+5, wagT*0.3);
+  ctx.lineTo(-bodyW/2-22, -16+wagT);
+  ctx.lineTo(-bodyW/2-6, wagT*0.3);
+  ctx.lineTo(-bodyW/2-22, 16+wagT);
+  ctx.closePath();
+  ctx.fill();
+
+  // Snout
+  ctx.fillStyle = '#5588aa';
+  ctx.beginPath();
+  ctx.ellipse(bodyW/2+4, 0, 14, 9, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Mouth open/close
+  if(mouthOpen) {
+    ctx.fillStyle = '#cc2222';
+    ctx.beginPath();
+    ctx.moveTo(bodyW/2-6, 0);
+    ctx.lineTo(bodyW/2+16, -10);
+    ctx.lineTo(bodyW/2+16, 12);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    for(let t=0;t<4;t++){
+      ctx.beginPath();
+      ctx.moveTo(bodyW/2+2+t*3.5, -5);
+      ctx.lineTo(bodyW/2+4+t*3.5, 0);
+      ctx.lineTo(bodyW/2+t*3.5, 0);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } else {
+    ctx.strokeStyle = '#224466';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(bodyW/2-2, 3);
+    ctx.quadraticCurveTo(bodyW/2+8, 7, bodyW/2+14, 2);
+    ctx.stroke();
+  }
+
+  // Eye
+  ctx.fillStyle = '#111';
+  ctx.beginPath();
+  ctx.arc(bodyW/2-12, -5, 4, 0, Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(bodyW/2-11, -6, 1.5, 0, Math.PI*2);
+  ctx.fill();
+
+  // Grabbed fish
+  if(phase === 'grab' || phase === 'exit') {
+    ctx.save();
+    ctx.translate(bodyW/2+4, 4);
+    ctx.rotate(0.4);
+    ctx.fillStyle = '#ffdd44';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 10, 6, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#ffaa00';
+    ctx.beginPath();
+    ctx.moveTo(-10, 0); ctx.lineTo(-16, -5); ctx.lineTo(-13, 0); ctx.lineTo(-16, 5); ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Water ripple
+  ctx.strokeStyle = 'rgba(100,180,255,0.15)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.ellipse(0, 0, bodyW/2+12+Math.sin(sf*0.1)*4, bodyH/2+10, 0, 0, Math.PI*2);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+// ── Game Over ──
+function gameOver() {
+  state = 'catscene';
+  pressing = false;
+  spawnParticle(PLAYER.x, PLAYER.y, '#00aaff');
+  startCatAnimation();
+}
+
+function showGameOverScreen() {
+  const isNew = score > hiScore;
+  if(isNew) {
+    hiScore = score;
+    localStorage.setItem('dodgeHi', hiScore);
+  }
+  document.getElementById('goScore').textContent = fmt(score);
+  document.getElementById('goHi').textContent = 'HI: ' + fmt(hiScore);
+  document.getElementById('newRecord').style.display = isNew ? 'block' : 'none';
+  document.getElementById('gameoverScreen').classList.add('show');
+  document.getElementById('titleHi').textContent = 'HI-SCORE: ' + fmt(hiScore);
+  state = 'gameover';
+}
+
+// ── Main loop ──
+function loop() {
+  raf = requestAnimationFrame(loop);
+  frame++;
+
+  // Update stars
+  for(const s of stars) {
+    s.x -= s.sp * (speed/3);
+    if(s.x < 0) { s.x = W; s.y = Math.random()*H; }
+  }
+
+  if(state === 'countdown') {
+    countdownTimer++;
+    // 60fps想定で1秒=60フレーム
+    const elapsed = Math.floor(countdownTimer / 60);
+    const remaining = 3 - elapsed;
+    if(remaining <= 0) {
+      state = 'play';
+    }
+    drawBg(); drawStars(); drawFloor();
+    drawPlayer();
+    // カウントダウン数字（点滅）
+    const blink = Math.floor(countdownTimer / 10) % 2 === 0;
+    if(blink) {
+      const num = remaining <= 0 ? 'GO!' : String(remaining);
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.font = `${num==='GO!'?52:64}px 'Press Start 2P'`;
+      ctx.fillStyle = num==='GO!' ? '#00ff88' : '#ffcc00';
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur = 30;
+      ctx.fillText(num, W/2, H/2 + 20);
+      ctx.restore();
+    }
+    return;
+  }
+
+  if(state === 'catscene' && cat) {
+    drawBg(); drawStars(); drawFloor();
+    // 残った障害物も描画
+    for(const ob of obstacles) drawObstacle(ob);
+    drawParticles();
+
+    cat.frame++;
+    const cf = cat.frame;
+
+    if(cat.phase === 'enter') {
+      // 登場：ゆっくり近づく
+      cat.x += 3.5;
+      cat.y += (cat.targetY - cat.y) * 0.06;
+      cat.mouthOpen = cat.x > cat.grabX - 60;
+      // プレイヤーはまだ普通に描画
+      drawPlayer();
+      if(cat.x >= cat.grabX) {
+        cat.phase = 'grab';
+        cat.frame = 0;
+      }
+    } else if(cat.phase === 'grab') {
+      // 掴んだ！しっかり止まって見せる
+      cat.mouthOpen = cf < 30;
+      if(cf > 80) {
+        cat.phase = 'exit';
+        cat.frame = 0;
+      }
+    } else if(cat.phase === 'exit') {
+      // 右へ加速しながら去っていく
+      cat.x += 4 + cf * 0.1;
+      cat.mouthOpen = false;
+      if(cat.x > W + 150) {
+        cat = null;
+        showGameOverScreen();
+        return;
+      }
+    }
+
+    if(cat) drawCat(cat);
+    return;
+  }
+
+  if(state === 'catscene' && !cat) return;
+
+  if(state !== 'play') {
+    drawBg();
+    drawStars();
+    drawFloor();
+    return;
+  }
+
+  // Speed & difficulty ramp
+  const level = Math.floor(score / 15);
+  if(level > prevLevel) {
+    prevLevel = level;
+    levelUpTimer = 90; // 約1.5秒表示
+  }
+  speed = 1.8 + level * 0.3;
+  if(speed > 7) speed = 7;
+
+  // Gap narrows aggressively with level + ランダム幅（min 70px）
+  const baseGap = Math.max(70, 210 - level * 18);
+  const randomGap = baseGap + (Math.random() - 0.5) * Math.min(80, level * 12);
+  const currentGap = Math.max(70, randomGap);
+
+  // Obstacle interval: slower tightening
+  const minDist = Math.max(200, 280 - level * 6);
+  const maxDist = Math.max(260, 400 - level * 8);
+
+  // Player physics
+  if(pressing) {
+    PLAYER.vy += PLAYER.lift;
+  } else {
+    PLAYER.vy += PLAYER.gravity;
+  }
+  PLAYER.vy = Math.max(-PLAYER.maxVy, Math.min(PLAYER.maxVy, PLAYER.vy));
+  PLAYER.y += PLAYER.vy;
+
+  // Wall collision
+  if(PLAYER.y - PLAYER.h/2 < 4) {
+    PLAYER.y = 4 + PLAYER.h/2;
+    PLAYER.vy = 0;
+  }
+  if(PLAYER.y + PLAYER.h/2 > H - 4) {
+    gameOver(); return;
+  }
+
+  // Obstacles
+  obsTicker += speed;
+  if(obsTicker >= nextObsDist) {
+    spawnObstacle(currentGap);
+    obsTicker = 0;
+    nextObsDist = minDist + Math.random()*(maxDist - minDist);
+  }
+
+  for(let i = obstacles.length-1; i>=0; i--) {
+    const ob = obstacles[i];
+    ob.x -= speed;
+
+    // Score
+    if(!ob.scored && ob.x + OBS_W < PLAYER.x) {
+      ob.scored = true;
+      score++;
+      updateScoreDisp();
+      if(score > hiScore) { hiScore = score; }
+      // tiny flash particle
+      spawnParticle(PLAYER.x+20, PLAYER.y, '#ffcc00');
+    }
+
+    // Collision
+    if(hitTest(ob)) {
+      gameOver(); return;
+    }
+
+    // Remove off-screen
+    if(ob.x + OBS_W < -10) obstacles.splice(i,1);
+  }
+
+  // Particles update
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.1;
+    p.life -= 0.04;
+    if(p.life <= 0) particles.splice(i,1);
+  }
+
+  // ── Draw ──
+  drawBg();
+  drawStars();
+  drawFloor();
+
+  for(const ob of obstacles) drawObstacle(ob);
+
+  drawParticles();
+  drawPlayer();
+
+  // Level up 表示
+  if(levelUpTimer > 0) {
+    levelUpTimer--;
+    const alpha = levelUpTimer < 30 ? levelUpTimer / 30 : 1;
+    const y = H * 0.38 - (90 - levelUpTimer) * 0.3;
+    ctx.save();
+    ctx.globalAlpha = alpha * 0.85;
+    ctx.textAlign = 'center';
+    ctx.font = `9px 'Press Start 2P'`;
+    ctx.fillStyle = '#00ddff';
+    ctx.shadowColor = '#00ddff';
+    ctx.shadowBlur = 12;
+    ctx.fillText(`LEVEL  ${prevLevel}`, W/2, y);
+    ctx.restore();
+  }
+
+  // Score number on canvas (background watermark)
+  ctx.fillStyle = 'rgba(0,170,255,0.06)';
+  ctx.font = `bold 55px 'Press Start 2P'`;
+  ctx.textAlign = 'center';
+  ctx.fillText(String(Math.floor(score)).padStart(3,'0'), W/2, H/2+30);
+  ctx.textAlign = 'left';
+}
+
+// ── Title loop ──
+function titleLoop() {
+  drawBg();
+  drawStars();
+  drawFloor();
+  // Animate a demo player on title
+  const dy = H/2 + Math.sin(Date.now()*0.002)*80;
+  ctx.save();
+  ctx.globalAlpha = 0.4;
+  ctx.translate(100, dy);
+  ctx.fillStyle = '#00ff88';
+  ctx.shadowColor='#00ff88'; ctx.shadowBlur=10;
+  ctx.beginPath(); ctx.ellipse(0,0,14,8,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  if(state==='title') requestAnimationFrame(titleLoop);
+}
+
+// Init hi score display
+document.getElementById('titleHi').textContent = 'HI-SCORE: ' + fmt(hiScore);
+document.getElementById('hiDisp').textContent = fmt(hiScore);
+
+titleLoop();
+</script>
+</body>
+</html>
