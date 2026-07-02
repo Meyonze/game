@@ -387,13 +387,14 @@ function wideMode() { return wideLevel>0; }
 function fullReset() {
   score=0; level=1; lives=3; nextExtend=EXTEND_AT;
   wideLevel=0; throughLevel=0; multiLevel=0; laserLevel=0;
+  chainMult=1; chainCount=0; scoreMult=1;
   catchMode=false; laserPiercing=false; shieldActive=false; magnetMode=0; barrierCount=0; homingMode=false; breakerMode=false;
   ballSpeedMult=1; paddleSizeBonus=0; ballSizeMult=1;
   fireTimer=0; expandTimer=0; slowTimer=0;
   heavyMode=false;
   atkLevel=1;
+  throughHits=0;
   enemyBullets=[]; enemyFireTimer=0; playerHasFired=false;
-  bricks = buildBricks();
   spawnBall(); spawnPaddle();
   drops=[]; lasers=[]; parts=[];
   laserCD=0; balls2=[];
@@ -569,7 +570,6 @@ function syncSpeed() {
     const cur=Math.hypot(b.vx,b.vy); if(!cur) continue;
     b.vx=b.vx/cur*spd; b.vy=b.vy/cur*spd;
   }
-  if(ball) ball.speed=spd;
 }
 
 function spawnExtra(n) {
@@ -650,31 +650,13 @@ function bounceBall(b, isExtra=false) {
   if(b.x+r>FW){b.x=FW-r; b.vx=-Math.abs(b.vx); SFX.wall();}
   if(b.y-r<0){b.y=r; b.vy=Math.abs(b.vy); SFX.wall();}
 
-  // Barrier: パドル前面にシールド
-  if(barrierCount>0){
-    const pw2=paddleW();
-    const pulse=Math.sin(Date.now()*0.008)*0.3+0.7;
-    // シールドライン（パドル上部）
-    ctx.strokeStyle=`rgba(68,255,204,${pulse})`;
-    ctx.lineWidth=2;
-    ctx.shadowColor='#44ffcc'; ctx.shadowBlur=8;
-    ctx.beginPath();
-    ctx.moveTo(paddle.x-2, PY-3);
-    ctx.lineTo(paddle.x+pw2+2, PY-3);
-    ctx.stroke();
-    // 両端のノード
-    ctx.fillStyle=`rgba(68,255,204,${pulse})`;
-    ctx.beginPath(); ctx.arc(paddle.x-2,PY-3,2.5,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(paddle.x+pw2+2,PY-3,2.5,0,Math.PI*2); ctx.fill();
-    ctx.shadowBlur=0;
-  }
   // Paddle
   const pw=paddleW();
   if(b.vy>0 && b.y+r>=PY && b.y+r<=PY+PH0+4 && b.x>=paddle.x-2 && b.x<=paddle.x+pw+2){
     const rel=(b.x-(paddle.x+pw/2))/(pw/2);
     const ang=rel*(Math.PI*0.75/2)-Math.PI/2;
-    // 現在速度を保持（ACCELERATEで蓄積した速度を消さない）
-    const spd=ballSpd();
+    // スロー中は現在の速度を維持、通常は正規速度に戻す
+    const spd = slowTimer>0 ? Math.hypot(b.vx,b.vy) : ballSpd();
     b.vx=Math.cos(ang)*spd; b.vy=Math.sin(ang)*spd;
     b.y=PY-r;
     SFX.paddle();
@@ -688,11 +670,13 @@ function bounceBall(b, isExtra=false) {
     const oL2=(b.x+r)-br.x, oR2=(br.x+br.w)-(b.x-r);
     const oT2=(b.y+r)-br.y, oB2=(br.y+br.h)-(b.y-r);
     if(horizontal){
+      // 左端に当たった → 右向きに反射; 右端に当たった → 左向きに反射
       if(oL2<oR2){ b.vx= Math.abs(b.vx); b.x=br.x-r; }
       else        { b.vx=-Math.abs(b.vx); b.x=br.x+br.w+r; }
     } else {
-      if(oT2<oB2){ b.vy= Math.abs(b.vy); b.y=br.y-r; }
-      else        { b.vy=-Math.abs(b.vy); b.y=br.y+br.h+r; }
+      // 上端に当たった → 上向きに反射; 下端に当たった → 下向きに反射
+      if(oT2<oB2){ b.vy=-Math.abs(b.vy); b.y=br.y-r; }
+      else        { b.vy= Math.abs(b.vy); b.y=br.y+br.h+r; }
     }
   }
   function bestAxis(b, br, r){
@@ -741,11 +725,11 @@ function bounceBall(b, isExtra=false) {
 }
 
 function hitBrick(br, dmg){
-  // CHAIN BONUS: 連続破壊カウント（ミスでリセット）
-  chainCount++;
   // THROUGH ∞: 15hit後に解除
-  if(throughLevel===3){ throughHits++; if(throughHits>=15){ throughLevel=0; throughHits=0; } } // 解除→通常に戻る
+  if(throughLevel===3){ throughHits++; if(throughHits>=15){ throughLevel=0; throughHits=0; } }
   if(br.isMetal && !breakerMode) return; // メタルは無敵（BREAKERなら通過）
+  // CHAIN BONUS: ブロック破壊時のみカウント（メタル反射では増えない）
+  chainCount++;
   br.hp -= dmg; br.shake=5;
   if(br.hp<=0){
     br.alive=false;
@@ -757,8 +741,8 @@ function hitBrick(br, dmg){
     else if(br.isMetal) SFX.metal();
     else SFX.brick();
   } else {
-    // まだ生きている（メタル・アーマーへのダメージ音）
-    SFX.metal();
+    // まだ生きている（アーマーへのダメージ音: メタルは呼び出し元で鳴らす）
+    if(!br.isMetal) SFX.metal();
   }
 }
 
@@ -767,7 +751,8 @@ function addScore(pts, opts={}){
   if(!pts) return;
   const heavy = opts.heavy ? 1.5 : 1;
   const chain = opts.chain ? Math.min(3, 1 + (chainCount-1)*0.05*(chainMult-1)) : 1;
-  score += Math.round(pts * scoreMult * heavy * chain);
+  const atk   = 1 + (atkLevel - 1) * 0.3; // ATK1=x1.0, ATK2=x1.3, ATK4=x1.9, ATK8=x3.1
+  score += Math.round(pts * scoreMult * heavy * chain * atk);
   if(score>hi){hi=score;}
   while(score>=nextExtend){ lives=Math.min(5,lives+1); nextExtend+=EXTEND_AT; showExtend(); updateUI(); }
   updateUI();
@@ -830,7 +815,6 @@ function updatePlay(){
   // Extra balls
   for(let i=balls2.length-1;i>=0;i--){
     const b=balls2[i];
-    const spd2=Math.max(Math.abs(b.vx),Math.abs(b.vy));
     b.x+=b.vx; b.y+=b.vy; bounceBall(b,true);
     if(b.y>FH+10) balls2.splice(i,1);
   }
@@ -996,16 +980,14 @@ function updatePlay(){
   if(fireTimer>0)   fireTimer--;
 
   if(slowTimer>0){  slowTimer--;
-    // スロー中: ボール速度を半減方向に
-    for(const b of [ball,...balls2]){
-      if(!b||b.held) continue;
-      const spd=Math.hypot(b.vx,b.vy);
-      const target=ballSpd()*0.5;
-      if(spd>target){ const f=target/spd; b.vx*=f; b.vy*=f; }
+    if(slowTimer===0){
+      // スロー終了: 速度を正規値に戻す
+      syncSpeed();
     }
   }
   if(expandTimer>0){ expandTimer--;
-    paddleSizeBonus = wideLevel*10 + (expandTimer>0 ? 40 : 0);
+    if(expandTimer>0) paddleSizeBonus = wideLevel*6 + 40; // EXPAND中: +40px
+    else paddleSizeBonus = wideLevel*6; // EXPAND終了: 正規値に戻す
   }
 }
 
@@ -1021,7 +1003,14 @@ function applyDrop(id){
       case 'K': // LASER BURST: 一斉射撃12発
         for(let i=0;i<12;i++) lasers.push({x:BOX+i*(FW-BOX*2)/11, y:PY, vy:-9, burst:true});
         break;
-      case 'W': slowTimer=300; break;   // 5秒 ボール速度0.5倍
+      case 'W': slowTimer=300;
+        for(const b of [ball,...balls2]){
+          if(!b||b.held) continue;
+          const spd=Math.hypot(b.vx,b.vy); if(!spd) continue;
+          const target=ballSpd()*0.5;
+          if(spd>target){ const f=target/spd; b.vx*=f; b.vy*=f; }
+        }
+        break;
     }
   } else {
     showCards();
@@ -1458,7 +1447,10 @@ document.getElementById('btnStart').addEventListener('click', ()=>{
 // CONTINUE: スコアリセット、ビルド引き継ぎ、現在ステージから
 document.getElementById('btnContinue').addEventListener('click', ()=>{
   document.getElementById('ovGameover').classList.add('hide');
-  score=0; scoreMult=1; lives=3; nextExtend=EXTEND_AT; updateUI();
+  score=0; scoreMult=1; lives=3; nextExtend=EXTEND_AT;
+  chainMult=1; chainCount=0; throughHits=0;
+  playerHasFired=false; enemyFireTimer=0; enemyBullets=[];
+  updateUI();
   bricks=buildBricks(); respawn();
   state='roundstart'; stateTimer=90;
   document.getElementById('roundTxt').textContent='ROUND '+level;
