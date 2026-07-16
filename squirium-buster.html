@@ -235,90 +235,129 @@ const Audio2={
     this.seGain=this.ctx.createGain();this.seGain.gain.value=0.24;this.seGain.connect(this.ctx.destination);
   },
   resume(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();},
-  // ─ BGM: ゆったりしたサイン波ループ
+  // ─ BGM: 壮大な4部構成ループ（約46秒 / 124bpm / Eマイナーペンタ）
+  // A:静かな主題 → B:躍動(ベース8分駆動+ハット) → C:クライマックス(高音域+5度下ハモリ+4つ打ち) → D:解決
+  // ノード生成はセクション単位（約11.6秒ごと）に分割スケジュールしてモバイル負荷を平準化
+  _note(freq,t,d,vol,type,vib=0,lp=0){
+    const ac=this.ctx;
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type=type;o.frequency.setValueAtTime(freq,t);
+    if(vib){
+      const lfo=ac.createOscillator();lfo.type='sine';lfo.frequency.value=5.2;
+      const lg=ac.createGain();lg.gain.value=vib;
+      lfo.connect(lg);lg.connect(o.frequency);lfo.start(t);lfo.stop(t+d+0.05);
+    }
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.04);
+    g.gain.setValueAtTime(vol,t+d*0.7);
+    g.gain.exponentialRampToValueAtTime(0.001,t+Math.max(d*0.96,0.05));
+    if(lp){const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.value=lp;o.connect(f);f.connect(g);}
+    else o.connect(g);
+    g.connect(this.bgmGain);
+    o.start(t);o.stop(t+d+0.06);
+  },
+  _kick(t){
+    const ac=this.ctx,o=ac.createOscillator(),g=ac.createGain();
+    o.type='sine';
+    o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(45,t+0.09);
+    g.gain.setValueAtTime(0.5,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.13);
+    o.connect(g);g.connect(this.bgmGain);o.start(t);o.stop(t+0.15);
+  },
+  _hat(t,vol){
+    const ac=this.ctx,src=ac.createBufferSource();src.buffer=this._nbuf;
+    const f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=6500;
+    const g=ac.createGain();
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.045);
+    src.connect(f);f.connect(g);g.connect(this.bgmGain);src.start(t);src.stop(t+0.06);
+  },
   startBGM(){
     if(!this.ctx||this.bgmNode)return;
     const ac=this.ctx;
-    const bpm=118,step=60/bpm/4*1000;
-    // やさしいペンタトニック（サイン波主体）— 16小節構成 A-B-A'-C
-    const melody=[
-      // A (32拍)
-      [392,2],[0,1],[440,2],[0,1],[523,2],[494,1],[0,1],
-      [440,3],[0,1],[392,2],[330,2],
-      [392,2],[0,1],[440,2],[0,1],[523,3],[0,3],
-      // B (32拍)
-      [349,2],[0,1],[392,1],[440,2],[392,1],[0,1],
-      [330,4],[0,2],[294,2],
-      [349,2],[392,2],[440,2],[392,1],[349,1],[330,4],[0,2],
-      // A' (32拍)
-      [392,2],[0,1],[440,2],[523,1],[587,2],[523,1],[0,1],
-      [494,3],[0,1],[440,2],[392,2],
-      [440,2],[494,2],[523,2],[494,1],[440,1],[392,3],[0,1],
-      // C (32拍, 少し上がって解決)
-      [523,2],[494,1],[440,2],[392,1],[349,1],[0,1],
-      [330,2],[392,2],[440,4],
-      [523,2],[587,2],[523,1],[440,1],[392,2],[330,2],[0,4],[0,8],
+    const bpm=124,step=60/bpm/4;   // 1単位=16分音符（秒）
+    // ドラム用ノイズバッファ（共有・初回のみ生成）
+    if(!this._nbuf){
+      const len=Math.floor(ac.sampleRate*0.2);
+      this._nbuf=ac.createBuffer(1,len,ac.sampleRate);
+      const ch=this._nbuf.getChannelData(0);
+      for(let i=0;i<len;i++)ch[i]=Math.random()*2-1;
+    }
+    // 音名（Eマイナーペンタトニック）
+    const D4=293.7,E4=329.6,G4=392,A4=440,B4=493.9,D5=587.3,E5=659.3,G5=784;
+    const bE=82.4,bG=98,bA=110,bB=123.5,bC=130.8,bD=146.8;
+    // 各セクション96単位＝6小節（1小節16単位）
+    const SEC=[
+      { // A: 静かな主題提示
+        mel:[[E4,4],[G4,2],[A4,2],[B4,6],[0,2],[A4,2],[G4,2],[E4,4],[D4,4],[E4,6],[0,2],
+             [E4,4],[G4,2],[A4,2],[B4,4],[D5,4],[B4,2],[A4,2],[G4,4],[A4,6],[0,2],
+             [G4,2],[A4,2],[B4,4],[E4,4],[G4,2],[A4,2],[G4,4],[E4,6],[0,2]],
+        bars:[bE,bC,bG,bD,bE,bB],bass:'long',kick:[],hat:[],
+        melVol:0.16,harm:false,padVol:0.05},
+      { // B: 躍動（ベース8分駆動＋オフビートハット）
+        mel:[[B4,4],[D5,2],[E5,2],[D5,4],[B4,4],[A4,2],[B4,2],[A4,4],[G4,4],[E4,6],[0,2],
+             [G4,4],[A4,2],[B4,2],[D5,4],[E5,4],[D5,2],[B4,2],[A4,4],[B4,6],[0,2],
+             [A4,2],[B4,2],[D5,4],[E5,4],[D5,2],[B4,2],[A4,2],[G4,2],[A4,6],[0,2]],
+        bars:[bE,bC,bG,bD,bA,bB],bass:'pulse',kick:[0,8],hat:[4,12],
+        melVol:0.18,harm:false,padVol:0.06},
+      { // C: クライマックス（高音域主旋律＋5度下ハモリ＋4つ打ち）
+        mel:[[E5,6],[D5,2],[B4,4],[D5,4],[E5,4],[G5,4],[E5,4],[D5,4],
+             [B4,4],[D5,2],[E5,2],[D5,4],[B4,2],[A4,2],[B4,8],[0,4],[D5,2],[E5,2],
+             [G5,4],[E5,4],[D5,4],[B4,4],[D5,4],[E5,2],[D5,2],[B4,4],[A4,2],[G4,2]],
+        bars:[bC,bG,bD,bE,bC,bD],bass:'drive',kick:[0,4,8,12],hat:[2,6,10,14],
+        melVol:0.20,harm:true,padVol:0.08},
+      { // D: 解決・ブリッジ（末尾の上行フレーズでAへ回帰）
+        mel:[[E4,8],[G4,4],[A4,4],[B4,8],[A4,4],[G4,4],
+             [E4,4],[D4,4],[E4,8],[0,4],[G4,2],[A4,2],
+             [B4,4],[A4,4],[G4,4],[A4,4],
+             [B4,2],[D5,2],[E5,4],[B4,4],[A4,2],[B4,2],[0,8]],
+        bars:[bE,bC,bA,bB,bE,bE],bass:'half',kick:[0],hat:[],
+        melVol:0.15,harm:false,padVol:0.07},
     ];
-    const bass=[
-      [98,4],[0,4],[110,4],[0,4],
-      [98,4],[0,4],[87,4],[0,4],
-      [98,4],[0,4],[131,4],[0,4],
-      [110,4],[0,4],[98,4],[0,4],
-      [98,4],[0,4],[110,4],[0,4],
-      [123,4],[0,4],[110,4],[0,4],
-      [131,4],[0,4],[110,4],[0,4],
-      [98,4],[0,4],[110,4],[0,4],
-    ];
-    // コード（やさしいpad）
-    const pad=[
-      [196,8],[220,8],
-      [196,8],[174,8],
-      [196,8],[247,8],
-      [220,8],[196,8],
-      [196,8],[220,8],
-      [247,8],[220,8],
-      [262,8],[220,8],
-      [196,8],[220,8],
-    ];
-    let stopped=false;
-    const playLoop=()=>{
-      if(stopped||!this.bgmNode)return;
-      let t=ac.currentTime+0.03;
-      const playSeq=(seq,vol,vibrato=0)=>{
-        let tt=t;
-        let lastLen=0;
-        for(const[freq,dur]of seq){
-          const d=step*dur/1000;
-          if(freq){
-            const o=ac.createOscillator();
-            const g2=ac.createGain();
-            o.type='sine';
-            o.frequency.setValueAtTime(freq,tt);
-            if(vibrato){
-              // 柔らかいビブラート
-              const lfo=ac.createOscillator();lfo.type='sine';lfo.frequency.value=5.5;
-              const lfog=ac.createGain();lfog.gain.value=vibrato;
-              lfo.connect(lfog);lfog.connect(o.frequency);lfo.start(tt);lfo.stop(tt+d+0.05);
-            }
-            g2.gain.setValueAtTime(0,tt);
-            g2.gain.linearRampToValueAtTime(vol,tt+0.04);
-            g2.gain.setValueAtTime(vol,tt+d*0.7);
-            g2.gain.exponentialRampToValueAtTime(0.001,tt+d*0.96);
-            o.connect(g2);g2.connect(this.bgmGain);
-            o.start(tt);o.stop(tt+d+0.05);
-          }
-          tt+=d;
-          lastLen=d;
+    const secLen=96*step;
+    // ベースの小節パターン（16単位）
+    const bassBar=(style,r)=>{
+      if(style==='long') return[[r,14],[0,2]];
+      if(style==='pulse')return[[r,2],[r,2],[r,2],[r,2],[r,2],[r,2],[r,2],[r,2]];
+      if(style==='drive')return[[r,2],[r,2],[r*2,2],[r,2],[r,2],[r*2,2],[r,2],[r*2,2]];
+      return[[r,7],[0,1],[r,7],[0,1]];  // half
+    };
+    const playSection=(idx,t0)=>{
+      if(!this.bgmNode)return;
+      const S=SEC[idx%4];
+      // メロディ: triangle主体＋微デチューン重ね＋sawtooth倍音層（ローパス）で厚み
+      let tt=t0;
+      for(const[f,du]of S.mel){
+        const d=step*du;
+        if(f){
+          this._note(f,tt,d,S.melVol,'triangle',4);
+          this._note(f*1.005,tt,d,S.melVol*0.5,'triangle');
+          this._note(f,tt,d,S.melVol*0.3,'sawtooth',0,1400);
+          if(S.harm)this._note(f*2/3,tt,d,S.melVol*0.45,'triangle');  // 5度下ハモリ
         }
-        return tt-t;
-      };
-      const melLen=playSeq(melody,0.22,4);
-      playSeq(bass,0.20);
-      playSeq(pad,0.08);
-      this._bgmTimer=setTimeout(playLoop,melLen*1000-100);
+        tt+=d;
+      }
+      // 小節単位: ベース＋パッド＋ドラム
+      for(let bar=0;bar<6;bar++){
+        const bt=t0+bar*16*step,r=S.bars[bar];
+        let bb=bt;
+        for(const[f,du]of bassBar(S.bass,r)){
+          const d=step*du;
+          if(f){
+            this._note(f,bb,d,0.22,'triangle');
+            this._note(f*2,bb,d,0.09,'triangle');  // オクターブ上層（小型スピーカー可聴性）
+          }
+          bb+=d;
+        }
+        // パッド: ルート＋5度のロングトーン
+        this._note(r*2,bt,16*step,S.padVol,'sine');
+        this._note(r*3,bt,16*step,S.padVol*0.8,'sine');
+        for(const u of S.kick)this._kick(bt+u*step);
+        for(const u of S.hat)this._hat(bt+u*step,0.09);
+      }
+      this._bgmTimer=setTimeout(()=>playSection(idx+1,t0+secLen),
+        Math.max(100,(t0+secLen-ac.currentTime-0.4)*1000));
     };
     this.bgmNode={};
-    playLoop();
+    playSection(0,ac.currentTime+0.05);
   },
   stopBGM(){
     this.bgmNode=null;
@@ -437,7 +476,7 @@ const Audio2={
 };
 
 // Lv25以降に加速するスパイク係数（緩やかに）
-function g2(lv){return lv<25?0:Math.pow((lv-24)/8,2);}
+function g2(lv){return lv<25?0:Math.pow((lv-24)/11,2);}  // 緩和済み(/8→/11): Lv30でスパイク成分-47%
 
 // ══ WEAPON DEFS ══
 const WD={
@@ -767,6 +806,10 @@ function makeWorm(type,wave,lane){
   // ウェーブ成長: Wave1は等倍、以降は急峻に。Wave6以降はさらに加速
   let mult=1+1.5*(w-1)+0.55*(w-1)*(w-1);
   if(w>=6)mult*=1+(w-5)*0.15;
+  // 中間ウェーブ底上げ: W1とW10(以降)は変更なし、W2〜9は山型にHPを上乗せ
+  // （道中が楽勝→W10ボスで急激に強くなる「崖」を緩和し、坂を前倒しでなだらかに）
+  const midBoost=1+0.5*Math.max(0,1-(w-1)/9);  // w=1→1.5だが加算対象extraが0なので無効、w=10以降→1(無変化)
+  mult=1+(mult-1)*midBoost;
   shp=Math.round(shp*mult);
   const first=type==='boss'?6:5, step=type==='boss'?12:8;
   const chests=new Set();
@@ -813,7 +856,11 @@ function makeWorm(type,wave,lane){
   const path=[];
   for(let i=0;i<pLen;i++)path.push({x:e0.x-idx*i,y:e0.y-idy*i});
 
-  return{id:G.vid++,segs,face,path,spd,r,gap,pat,wave:w,
+  // 後退バジェット: セグ撃破で顔が後退できる累計距離の上限（俺ツエー対策）
+  // Wave1は実質無制限（元の難易度を維持）、W2以降ウェーブごとに縮小（体長比 1.00→最低0.30）
+  const retreatLeft=w<=1?Infinity:sc*gap*Math.max(0.30,1.10-0.10*(w-1));
+
+  return{id:G.vid++,segs,face,path,spd,r,gap,pat,wave:w,retreatLeft,
          phase:Math.random()*Math.PI*2,done:false,type,
          faceType:Math.floor(Math.random()*5),
          route,wpIdx:1,dirx:idx,diry:idy};
@@ -852,13 +899,31 @@ function compactTargets(v){
   const alive=[];
   for(let i=v.segs.length-1;i>=0;i--)if(!v.segs[i].dead)alive.push(v.segs[i]);
   if(!alive.length)return;
-  // ランク0（最後尾）は現在位置を目標として固定
-  alive[0].td=alive[0].d;
-  for(let r=1;r<alive.length;r++){
-    alive[r].td=alive[0].td-r*v.gap;
+  // 後方アンカーで目標を仮計算
+  let base=alive[0].d;
+  let faceTd=base-alive.length*v.gap;
+  // 顔の後退量（td増加分）をバジェットで制限。
+  // バジェット超過分は隊列全体を前方(d減少)へシフト＝前側アンカーに切替、顔はもう下がらない
+  const retreat=faceTd-v.face.td;
+  if(retreat>0){
+    const allowed=Math.min(retreat,v.retreatLeft===undefined?Infinity:v.retreatLeft);
+    const over=retreat-allowed;
+    if(v.retreatLeft!==undefined)v.retreatLeft-=allowed;
+    if(over>0){
+      base-=over;faceTd-=over;
+      if(!v._retreatOut){  // バジェット枯渇の一度きり演出（軽量）
+        v._retreatOut=true;
+        burstBig(v.face.px,v.face.py,'#d96c5f',v.face.r*0.6,10,0.7);
+        addPopup(v.face.px,v.face.py-v.face.r-8,'怒り!','#d96c5f',13);
+        G.shake=Math.max(G.shake,140);
+      }
+    }
   }
-  // 顔: 先頭生存セグメント（alive末尾）の 1gap 前
-  v.face.td=alive[alive.length-1].td-v.gap;
+  alive[0].td=base;
+  for(let r=1;r<alive.length;r++){
+    alive[r].td=base-r*v.gap;
+  }
+  v.face.td=faceTd;
 }
 // 1回のパス走査で全位置をキャッシュ（性能対策: 弾判定はキャッシュ参照のみ）
 function computePositions(v){
