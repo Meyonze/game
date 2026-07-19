@@ -2651,9 +2651,10 @@ canvas.addEventListener('touchmove',e=>{
 canvas.addEventListener('touchend',e=>{e.preventDefault();lastTX=null;},{passive:false});
 
 // PWA: Service Worker登録（同一ディレクトリのsw.jsが必要。file://直開き時やsw.js未配置時は自動的に無視される）
+// scopeを本ファイル自身に限定: 同じ/game/配下に他のゲーム(HTML)が同居しても影響しない
 if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(()=>{/* sw.js未配置 or file://直開き時は静かに無視 */});
+    navigator.serviceWorker.register('sw.js',{scope:'squirium-buster.html'}).catch(()=>{/* sw.js未配置 or file://直開き時は静かに無視 */});
   });
 }
 </script>
