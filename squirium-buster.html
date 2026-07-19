@@ -282,6 +282,9 @@ const Audio2={
   startBGM(){
     if(!this.ctx||this.bgmNode)return;
     const ac=this.ctx;
+    // stopBGMでミュートしている可能性があるため音量を復帰
+    this.bgmGain.gain.cancelScheduledValues(ac.currentTime);
+    this.bgmGain.gain.setValueAtTime(0.18,ac.currentTime);
     const bpm=124,step=60/bpm/4;   // 1単位=16分音符（秒）
     // ドラム用ノイズバッファ（共有・初回のみ生成）
     if(!this._nbuf){
@@ -371,6 +374,15 @@ const Audio2={
   stopBGM(){
     this.bgmNode=null;
     clearTimeout(this._bgmTimer);
+    // 直前セクションで予約済みのノート（最大約11.6秒分）がclearTimeoutだけでは止まらず
+    // 次回startBGM時に旧ノートと新ノートが重なって二重再生に聞こえるため、
+    // マスターゲインを即ミュートして物理的に音を止める
+    if(this.ctx&&this.bgmGain){
+      const t=this.ctx.currentTime;
+      this.bgmGain.gain.cancelScheduledValues(t);
+      this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value,t);
+      this.bgmGain.gain.linearRampToValueAtTime(0,t+0.05);
+    }
   },
   // ─ SE
   play(type){
@@ -1905,6 +1917,37 @@ function drawWorm(v){
       ctx.beginPath();ctx.moveTo(-R*0.28,ey+R*0.36);ctx.lineTo(R*0.28,ey+R*0.36);ctx.lineTo(R*0.20,ey+R*0.48);ctx.lineTo(R*0.10,ey+R*0.38);ctx.lineTo(0,ey+R*0.50);ctx.lineTo(-R*0.10,ey+R*0.38);ctx.lineTo(-R*0.20,ey+R*0.48);ctx.closePath();ctx.fill();
     }
     ctx.lineCap='butt';
+    ctx.restore();
+  }
+
+  // ── 最終突破フェーズ警告 ──
+  // wpIdxが最終ウェイポイント(最終降下)に達した個体は、途中の「プレイヤー至近通過→上昇」という
+  // フェイントを終え、もう後戻りせず防衛ラインへ向かっている。ここでのみ表示することで
+  // 「近くを通っただけ」と「本当に来る」を明確に区別できるようにする
+  if(v.wpIdx===v.route.length-1){
+    const wp=0.5+0.5*Math.sin(G.t*0.012);
+    // ガイドライン: 顔→着弾予測点（防衛ライン上、同じX座標）
+    ctx.save();
+    ctx.setLineDash([6,6]);
+    ctx.strokeStyle='rgba(217,108,95,'+(0.35+wp*0.25)+')';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(f.px,f.py+f.r);ctx.lineTo(f.px,H-14);ctx.stroke();
+    ctx.restore();
+    // 着弾予測マーカー（防衛ライン上でパルス）
+    ctx.save();
+    ctx.fillStyle='rgba(217,108,95,'+(0.55+wp*0.35)+')';
+    ctx.beginPath();ctx.arc(f.px,H-14,5+wp*3,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+    // 警告矢印（下向きシェブロン、顔の上でバウンド）
+    const ay=f.py-f.r-14-wp*4;
+    ctx.save();
+    ctx.strokeStyle='#d96c5f';ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.globalAlpha=0.7+wp*0.3;
+    ctx.beginPath();ctx.moveTo(f.px-7,ay-5);ctx.lineTo(f.px,ay+3);ctx.lineTo(f.px+7,ay-5);ctx.stroke();
+    ctx.restore();
+    // 顔まわり警告リング
+    ctx.save();
+    ctx.strokeStyle='rgba(217,108,95,'+(0.6+wp*0.4)+')';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.arc(f.px,f.py,f.r*1.25+wp*2,0,Math.PI*2);ctx.stroke();
     ctx.restore();
   }
 
