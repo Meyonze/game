@@ -1,6 +1,6 @@
 // SQUIRIUM BUSTER — Service Worker
 // 更新時はCACHE_NAMEのバージョンを上げること（古いキャッシュは自動削除される）
-const CACHE_NAME = 'squirium-buster-v1';
+const CACHE_NAME = 'squirium-buster-v2';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -14,27 +14,33 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// キャッシュファースト＋バックグラウンド更新（stale-while-revalidate）
-// 本ゲームは外部リソース（フォント/画像/CDN）を一切使わない単一HTMLのため、
-// 初回読み込み時にページ自体がキャッシュされ、以降はオフラインでも起動できる
+// ネットワーク優先＋オフライン時のみキャッシュへフォールバック。
+// 開発中は頻繁に内容を更新するため、以前のキャッシュファースト(stale-while-revalidate)だと
+// 「1回リロードしただけでは新しい版が反映されない」という更新遅延が起きていた。
+// オンライン時は常に最新を取得し、オフライン時のみ直近のキャッシュで起動できるようにする。
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
 
   e.respondWith(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      const cached = await cache.match(e.request);
-      const networkFetch = fetch(e.request)
-        .then((res) => {
-          if (res && res.ok) cache.put(e.request, res.clone());
-          return res;
-        })
-        .catch(() => null);
-      return cached || (await networkFetch) || new Response('オフラインです', {
-        status: 503,
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      });
-    })
+    fetch(e.request)
+      .then((res) => {
+        if (res && res.ok) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(e.request, clone));
+        }
+        return res;
+      })
+      .catch(() =>
+        caches.match(e.request).then(
+          (cached) =>
+            cached ||
+            new Response('オフラインです', {
+              status: 503,
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            })
+        )
+      )
   );
 });

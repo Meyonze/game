@@ -1865,7 +1865,10 @@ function drawWorm(v){
 
   // ── 顔 ──
   {
-    const R=f.r*(1+.04*Math.sin(G.t*.004+v.phase));
+    // 最終突破フェーズ: もう後戻りせず防衛ラインへ向かっている個体は、表情と収縮パルスで一目で分かるようにする
+    const finalApproach=v.wpIdx===v.route.length-1;
+    const panic=finalApproach?(0.5+0.5*Math.sin(G.t*0.02+v.phase)):0;
+    const R=f.r*(1+.04*Math.sin(G.t*.004+v.phase))*(finalApproach?(1-0.14*panic):1);
     const tilt=clamp(v.dirx*0.5,-0.28,0.28);
     const pox=clamp(v.dirx,-1,1)*R*0.05;
     const poy=clamp(v.diry,-1,1)*R*0.05;
@@ -1886,6 +1889,11 @@ function drawWorm(v){
     // ツヤ
     ctx.fillStyle='rgba(255,255,255,0.65)';
     ctx.beginPath();ctx.arc(-R*0.34,-R*0.38,R*0.13,0,Math.PI*2);ctx.fill();
+    // 最終突破フェーズ: 動揺の赤み（パルスで濃淡）
+    if(finalApproach){
+      ctx.fillStyle='rgba(217,108,95,'+(0.16+panic*0.22)+')';
+      ctx.beginPath();ctx.arc(0,0,R*0.98,0,Math.PI*2);ctx.fill();
+    }
     const ey=R*0.06;
     const ft=v.faceType||0;
     ctx.lineCap='round';
@@ -1904,7 +1912,22 @@ function drawWorm(v){
       ctx.beginPath();ctx.moveTo(R*0.14,ey+R*0.02);ctx.lineTo(R*0.38,ey-R*0.02);ctx.lineTo(R*0.28,ey+R*0.12);ctx.closePath();ctx.fill();
     };
 
-    if(ft===0){
+    if(finalApproach){
+      // 最終突破フェーズ専用の動揺顔: 困り眉・丸く見開いた目・パクッと開いた口
+      ctx.strokeStyle=INK;ctx.lineWidth=R*0.09;
+      ctx.beginPath();ctx.moveTo(-R*0.44,ey-R*0.06);ctx.lineTo(-R*0.14,ey-R*0.24);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(R*0.44,ey-R*0.06);ctx.lineTo(R*0.14,ey-R*0.24);ctx.stroke();
+      const eR=R*0.20;
+      ctx.fillStyle='#fffdf7';ctx.strokeStyle=INK;ctx.lineWidth=1.4;
+      ctx.beginPath();ctx.arc(-R*0.28,ey+R*0.08,eR,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.beginPath();ctx.arc(R*0.28,ey+R*0.08,eR,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle=INK;
+      const pd=eR*0.48;
+      ctx.beginPath();ctx.arc(-R*0.28,ey+R*0.08+eR*0.15,pd,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(R*0.28,ey+R*0.08+eR*0.15,pd,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#7a2f28';ctx.strokeStyle=INK;ctx.lineWidth=R*0.06;
+      ctx.beginPath();ctx.ellipse(0,ey+R*0.42,R*0.15,R*0.19+panic*R*0.05,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    }else if(ft===0){
       // ① 定番意地悪（つり目・ギザ口）
       drawBrows(1);triEyes();
       ctx.strokeStyle=INK;ctx.lineWidth=R*0.08;ctx.lineCap='round';
@@ -1941,40 +1964,7 @@ function drawWorm(v){
     ctx.restore();
   }
 
-  // ── 最終突破フェーズ警告 ──
-  // wpIdxが最終ウェイポイント(最終降下)に達した個体は、途中の「プレイヤー至近通過→上昇」という
-  // フェイントを終え、もう後戻りせず防衛ラインへ向かっている。ここでのみ表示することで
-  // 「近くを通っただけ」と「本当に来る」を明確に区別できるようにする
-  if(v.wpIdx===v.route.length-1){
-    const wp=0.5+0.5*Math.sin(G.t*0.012);
-    // ガイドライン: 顔→着弾予測点（防衛ライン上、同じX座標）太め・高不透明度で視認性UP
-    ctx.save();
-    ctx.setLineDash([8,7]);
-    ctx.strokeStyle='rgba(217,108,95,'+(0.5+wp*0.3)+')';ctx.lineWidth=3.5;
-    ctx.beginPath();ctx.moveTo(f.px,f.py+f.r);ctx.lineTo(f.px,H-14);ctx.stroke();
-    ctx.restore();
-    // 着弾予測マーカー（防衛ライン上、白縁取りで背景に埋もれないように）
-    ctx.save();
-    ctx.fillStyle='rgba(217,108,95,'+(0.7+wp*0.3)+')';
-    ctx.beginPath();ctx.arc(f.px,H-14,6+wp*3,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle='rgba(255,253,247,0.9)';ctx.lineWidth=2;ctx.stroke();
-    ctx.restore();
-    // 警告矢印（下向きシェブロン、白縁取り付きで顔の上でバウンド）
-    const ay=f.py-f.r-16-wp*5;
-    ctx.save();
-    ctx.lineCap='round';ctx.lineJoin='round';
-    ctx.strokeStyle='rgba(255,253,247,0.9)';ctx.lineWidth=5.5;
-    ctx.beginPath();ctx.moveTo(f.px-8,ay-6);ctx.lineTo(f.px,ay+4);ctx.lineTo(f.px+8,ay-6);ctx.stroke();
-    ctx.strokeStyle='#d96c5f';ctx.lineWidth=3.5;
-    ctx.globalAlpha=0.8+wp*0.2;
-    ctx.beginPath();ctx.moveTo(f.px-8,ay-6);ctx.lineTo(f.px,ay+4);ctx.lineTo(f.px+8,ay-6);ctx.stroke();
-    ctx.restore();
-    // 顔まわり警告リング（太め）
-    ctx.save();
-    ctx.strokeStyle='rgba(217,108,95,'+(0.65+wp*0.35)+')';ctx.lineWidth=3.5;
-    ctx.beginPath();ctx.arc(f.px,f.py,f.r*1.28+wp*3,0,Math.PI*2);ctx.stroke();
-    ctx.restore();
-  }
+  // 最終突破フェーズの警告は顔の表情変化＋収縮パルスで表現する（下の顔描画ブロック内）
 
   // HP数値（画面内・一定以上のサイズのセグのみ、負荷軽減）
   ctx.textAlign='center';ctx.textBaseline='middle';
@@ -2604,19 +2594,23 @@ function togglePause(){
 }
 // PWA/バックグラウンド対策: 最小化・タブ切替でBGMが鳴り続けるのを防ぐ
 // Web AudioはvisibilitychangeでAudioContextが自動停止しないため明示的に止める。
-// ゲーム自体も自動ポーズし、復帰時に自分がポーズさせた場合のみ自動解除する
-document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){
-    Audio2.stopBGM();
-    if(G&&!G.over&&!G.paused){
-      G._autoPaused=true;G.paused=true;drawPauseIcon(true);
-    }
-  }else if(G&&!G.over){
-    if(G._autoPaused){G._autoPaused=false;G.paused=false;G.lastTime=performance.now();drawPauseIcon(false);}
-    if(!G.paused)Audio2.startBGM();
-  }
-});
-window.addEventListener('pagehide',()=>{Audio2.stopBGM();});
+// ゲイン0だけでなくAudioContext自体もsuspendして二重に確実化。
+// visibilitychangeに加えてblur/focusも監視（端末差でどちらかしか発火しないケースの保険）
+function onBackground(){
+  Audio2.stopBGM();
+  if(Audio2.ctx&&Audio2.ctx.state==='running')Audio2.ctx.suspend();
+  if(G&&!G.over&&!G.paused){G._autoPaused=true;G.paused=true;drawPauseIcon(true);}
+}
+function onForeground(){
+  if(!G||G.over)return;
+  if(Audio2.ctx&&Audio2.ctx.state==='suspended')Audio2.ctx.resume();
+  if(G._autoPaused){G._autoPaused=false;G.paused=false;G.lastTime=performance.now();drawPauseIcon(false);}
+  if(!G.paused)Audio2.startBGM();
+}
+document.addEventListener('visibilitychange',()=>{document.hidden?onBackground():onForeground();});
+window.addEventListener('blur',onBackground);
+window.addEventListener('focus',onForeground);
+window.addEventListener('pagehide',()=>{Audio2.stopBGM();if(Audio2.ctx)Audio2.ctx.suspend();});
 function doReroll(){
   if(!G.rerolls||G.rerolls<=0)return;
   if(!G._curChoices)return;
