@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>けいさんドリル</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Yusei+Magic&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html, body {
+    height:100%;
+    font-family:'Kosugi Maru','Hiragino Sans',sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, #fff3b0 0%, transparent 40%),
+      radial-gradient(circle at 85% 90%, #b0e8ff 0%, transparent 45%),
+      linear-gradient(160deg, #7fd7ff 0%, #a0e9c7 45%, #ffe9a8 100%);
+    background-attachment: fixed;
+    overflow-x:hidden;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+
+  body {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100svh;
+    padding:16px;
+  }
+
+  .app {
+    position:relative;
+    width:100%;
+    max-width:420px;
+    min-height:min(760px, 92svh);
+    background:#fffdf6;
+    border-radius:28px;
+    box-shadow: 0 18px 40px rgba(60,90,60,.25), 0 0 0 6px #ffffffaa inset;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .screen {
+    display:none;
+    flex-direction:column;
+    flex:1;
+    padding:22px 20px 24px;
+    position:relative;
+  }
+  .screen.active { display:flex; }
+
+  /* ---------- common bits ---------- */
+  .top-row {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:8px;
+  }
+  .icon-btn {
+    width:40px; height:40px; border-radius:50%;
+    border:none; background:#fff2cf; color:#8a6a1f;
+    font-size:19px; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 0 #e8d093;
+    cursor:pointer;
+  }
+  .icon-btn:active { transform:translateY(2px); box-shadow:0 1px 0 #e8d093; }
+
+  h1.title {
+    text-align:center; font-family:'Yusei Magic',sans-serif;
+    font-size:30px; color:#ff8a3d; letter-spacing:.04em;
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 #ffcf9e;
+    margin: 10px 0 4px;
+  }
+  .subtitle { text-align:center; color:#5c8a6b; font-size:13px; margin-bottom:18px; }
+
+  .mascot {
+    font-size:80px; text-align:center; margin: 6px 0 10px;
+    filter: drop-shadow(0 6px 6px rgba(0,0,0,.15));
+    animation: float 2.6s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+  .big-btn {
+    display:block; width:100%; padding:16px; margin-top:auto;
+    border:none; border-radius:20px; font-family:'Yusei Magic',sans-serif;
+    font-size:20px; color:#fff; background:linear-gradient(180deg,#ffab5e,#ff7a2f);
+    box-shadow:0 6px 0 #d85f16;
+    cursor:pointer;
+  }
+  .big-btn:active { transform:translateY(4px); box-shadow:0 2px 0 #d85f16; }
+  .big-btn.secondary {
+    background:linear-gradient(180deg,#8fe0c2,#4fbf95);
+    box-shadow:0 6px 0 #338f6b; margin-top:10px;
+  }
+  .big-btn.secondary:active { box-shadow:0 2px 0 #338f6b; }
+  .big-btn.ghost {
+    background:#fff; color:#888; box-shadow:0 4px 0 #ddd; font-size:15px; padding:10px;
+  }
+
+  /* ---------- title screen ---------- */
+  #screen-title { justify-content:center; align-items:center; text-align:center; }
+  #screen-title .mascot { font-size:100px; }
+  .best-summary {
+    margin-top:18px; background:#fff2df; border-radius:16px; padding:12px 16px;
+    font-size:13px; color:#8a6a3f; width:100%;
+  }
+
+  /* ---------- select screen ---------- */
+  .section-label { font-size:13px; color:#6b8f78; font-weight:bold; margin:14px 0 8px; }
+  .grade-row { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; }
+  .chip {
+    flex:0 0 auto; padding:10px 16px; border-radius:14px; border:2px solid #ffd9a0;
+    background:#fff; font-family:'Kosugi Maru'; font-size:15px; color:#a06a1f;
+    cursor:pointer; white-space:nowrap;
+  }
+  .chip.active { background:#ff8a3d; color:#fff; border-color:#ff8a3d; }
+
+  .op-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
+  .op-card {
+    position:relative; border-radius:16px; border:2px solid #d8ecd8; background:#fff;
+    padding:14px 8px 10px; text-align:center; cursor:pointer;
+  }
+  .op-card .op-sym { font-size:26px; color:#4fa07a; font-family:'Yusei Magic'; }
+  .op-card .op-name { font-size:12px; color:#7a8f80; margin-top:2px; }
+  .op-card .stars { font-size:12px; color:#ffb200; margin-top:4px; letter-spacing:1px; min-height:14px; }
+  .op-card.active { border-color:#4fbf95; background:#eafff3; }
+  .op-card.locked { opacity:.4; pointer-events:none; }
+  .op-card.locked::after {
+    content:'🔒'; position:absolute; top:6px; right:8px; font-size:12px;
+  }
+
+  /* ---------- play screen ---------- */
+  .play-header { display:flex; align-items:center; justify-content:space-between; }
+  .progress-wrap { flex:1; margin:0 10px; }
+  .progress-bar-bg { height:10px; background:#eee; border-radius:6px; overflow:hidden; }
+  .progress-bar-fill { height:100%; background:linear-gradient(90deg,#7fd7ff,#4fbf95); width:0%; transition:width .3s; }
+  .meta-row { display:flex; justify-content:space-between; font-size:11px; color:#7a8f80; margin-top:4px; }
+
+  .combo-badge {
+    align-self:center; margin-top:6px; font-size:14px; color:#ff6a3d; font-weight:bold;
+    opacity:0; transform:scale(.6); transition:opacity .2s, transform .2s;
+  }
+  .combo-badge.show { opacity:1; transform:scale(1); }
+
+  .question-box {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+  }
+  .mascot-small { font-size:56px; transition:transform .15s; }
+  .speech {
+    background:#fff; border:2px solid #ffd9a0; border-radius:14px; padding:6px 14px;
+    font-size:13px; color:#a06a1f; margin-top:6px; min-height:18px;
+  }
+  .question-text {
+    font-family:'Yusei Magic'; font-size:38px; color:#374a3f; margin:18px 0 10px;
+    letter-spacing:.03em;
+  }
+  .answer-display {
+    font-family:'Yusei Magic'; font-size:30px; color:#ff7a2f; min-height:42px;
+    border-bottom:4px solid #ffd9a0; min-width:120px; padding:0 10px;
+  }
+  .answer-display.correct { color:#2fae6b; border-color:#2fae6b; }
+  .answer-display.wrong { color:#e14b4b; border-color:#e14b4b; }
+
+  .numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px; }
+  .num-btn {
+    padding:16px 0; font-size:20px; border-radius:14px; border:none;
+    background:#fff; color:#374a3f; box-shadow:0 4px 0 #dfe6e0;
+    font-family:'Kosugi Maru'; cursor:pointer;
+  }
+  .num-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #dfe6e0; }
+  .num-btn.ok { background:#4fbf95; color:#fff; box-shadow:0 4px 0 #338f6b; }
+  .num-btn.del { background:#ffe0e0; color:#c14646; box-shadow:0 4px 0 #e6b3b3; }
+
+  /* ---------- result screen ---------- */
+  #screen-result { align-items:center; text-align:center; justify-content:flex-start; }
+  .stars-row { font-size:44px; margin:14px 0; letter-spacing:6px; }
+  .star { filter: grayscale(1) opacity(.35); transition:transform .3s, filter .3s; display:inline-block; }
+  .star.lit { filter:none; animation:pop .4s ease; }
+  @keyframes pop { 0%{transform:scale(0)} 60%{transform:scale(1.3)} 100%{transform:scale(1)} }
+
+  .result-stats {
+    width:100%; background:#f3fbf6; border-radius:16px; padding:14px; margin-top:10px;
+    display:flex; justify-content:space-around; font-size:13px; color:#4a6a56;
+  }
+  .result-stats b { display:block; font-size:20px; color:#2fae6b; font-family:'Yusei Magic'; }
+  .result-msg { font-size:16px; color:#ff7a2f; margin-top:14px; font-family:'Yusei Magic'; }
+
+  .star-particle {
+    position:fixed; top:50%; left:50%; font-size:20px; pointer-events:none; z-index:50;
+    animation: burst 900ms ease-out forwards;
+  }
+  @keyframes burst {
+    to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0; }
+  }
+
+  .flash-overlay {
+    position:absolute; inset:0; pointer-events:none; opacity:0;
+  }
+  .flash-overlay.go { animation: flash .4s ease; }
+  @keyframes flash { 0%{opacity:.55} 100%{opacity:0} }
+  .flash-overlay.ok { background:#7fe0ab; }
+  .flash-overlay.ng { background:#ff9a9a; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== TITLE ===== -->
+  <section class="screen active" id="screen-title">
+    <div class="mascot" id="title-mascot">🐱</div>
+    <h1 class="title">けいさんドリル</h1>
+    <p class="subtitle">あそんで まなぶ さんすうドリル</p>
+    <button class="big-btn" id="btn-goto-select" style="margin-top:20px">はじめる</button>
+    <div class="best-summary" id="best-summary">まだ きろくが ありません</div>
+    <button class="big-btn ghost" id="btn-mute" style="margin-top:14px">🔊 おと：オン</button>
+  </section>
+
+  <!-- ===== SELECT ===== -->
+  <section class="screen" id="screen-select">
+    <div class="top-row">
+      <button class="icon-btn" id="btn-back-title">←</button>
+      <span style="font-family:'Yusei Magic';color:#4fa07a;font-size:16px">もんだいを えらぶ</span>
+      <span style="width:40px"></span>
+    </div>
+
+    <div class="section-label">がくねん</div>
+    <div class="grade-row" id="grade-row"></div>
+
+    <div class="section-label">けいさんの しゅるい</div>
+    <div class="op-grid" id="op-grid"></div>
+
+    <button class="big-btn" id="btn-start-play" style="margin-top:22px">スタート！</button>
+  </section>
+
+  <!-- ===== PLAY ===== -->
+  <section class="screen" id="screen-play">
+    <div class="flash-overlay" id="flash-overlay"></div>
+    <div class="play-header">
+      <button class="icon-btn" id="btn-quit-play">←</button>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+        <div class="meta-row">
+          <span id="progress-label">1 / 10</span>
+          <span id="timer-label">0:00</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="btn-mute-play">🔊</button>
+    </div>
+    <div class="combo-badge" id="combo-badge">🔥 3れんぞく！</div>
+
+    <div class="question-box">
+      <div class="mascot-small" id="play-mascot">🐱</div>
+      <div class="speech" id="play-speech">がんばって！</div>
+      <div class="question-text" id="question-text">3 + 4</div>
+      <div class="answer-display" id="answer-display">？</div>
+    </div>
+
+    <div class="numpad" id="numpad">
+      <button class="num-btn" data-d="1">1</button>
+      <button class="num-btn" data-d="2">2</button>
+      <button class="num-btn" data-d="3">3</button>
+      <button class="num-btn" data-d="4">4</button>
+      <button class="num-btn" data-d="5">5</button>
+      <button class="num-btn" data-d="6">6</button>
+      <button class="num-btn" data-d="7">7</button>
+      <button class="num-btn" data-d="8">8</button>
+      <button class="num-btn" data-d="9">9</button>
+      <button class="num-btn del" id="btn-del">⌫</button>
+      <button class="num-btn" data-d="0">0</button>
+      <button class="num-btn ok" id="btn-ok">OK</button>
+    </div>
+  </section>
+
+  <!-- ===== RESULT ===== -->
+  <section class="screen" id="screen-result">
+    <div class="mascot" id="result-mascot">🐱</div>
+    <div class="stars-row">
+      <span class="star" id="star-1">★</span><span class="star" id="star-2">★</span><span class="star" id="star-3">★</span>
+    </div>
+    <div class="result-msg" id="result-msg">よくできました！</div>
+    <div class="result-stats">
+      <div><b id="stat-correct">10</b>せいかい</div>
+      <div><b id="stat-time">0:00</b>タイム</div>
+      <div><b id="stat-combo">0</b>さいだいコンボ</div>
+    </div>
+    <button class="big-btn" id="btn-retry" style="margin-top:22px">もういちど</button>
+    <button class="big-btn secondary" id="btn-back-select">もんだいを えらびなおす</button>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------------- data / config ---------------- */
+  const OP_META = {
+    add: { sym:'＋', name:'たしざん' },
+    sub: { sym:'－', name:'ひきざん' },
+    mul: { sym:'×', name:'かけざん' },
+    div: { sym:'÷', name:'わりざん' },
+    mix: { sym:'★', name:'ミックス' },
+  };
+
+  const CONFIG = {
+    1: { ops:['add','sub'], add:{aMax:9,bMax:9}, sub:{topMax:18} },
+    2: { ops:['add','sub','mul'], add:{aMax:99,bMax:99}, sub:{topMax:99}, mul:{aMax:9,bMax:9} },
+    3: { ops:['add','sub','mul','div'], add:{aMax:999,bMax:999}, sub:{topMax:999}, mul:{aMax:99,bMax:9}, div:{divisorMax:9,quotientMax:9} },
+    4: { ops:['add','sub','mul','div'], add:{aMax:9999,bMax:9999}, sub:{topMax:9999}, mul:{aMax:99,bMax:99}, div:{divisorMax:12,quotientMax:99} },
+    5: { ops:['add','sub','mul','div'], add:{aMax:99999,bMax:99999}, sub:{topMax:99999}, mul:{aMax:999,bMax:99}, div:{divisorMax:99,quotientMax:99} },
+    6: { ops:['add','sub','mul','div'], add:{aMax:999999,bMax:999999}, sub:{topMax:999999}, mul:{aMax:9999,bMax:99}, div:{divisorMax:999,quotientMax:99} },
+  };
+
+  const QUESTIONS_PER_SESSION = 10;
+  const STORAGE_KEY = 'meyonze_mathdrill_v1';
+  const MUTE_KEY = 'meyonze_mathdrill_mute';
+
+  const PRAISE = ['せいかい！','やったね！','すごい！','ピンポン！','ばっちり！'];
+  const CONSOLE_WORDS = ['おしい！','どんまい！','つぎがんばろう！'];
+
+  /* ---------------- state ---------------- */
+  const state = {
+    grade: Number(localStorage.getItem('mathdrill_last_grade')) || 1,
+    op: localStorage.getItem('mathdrill_last_op') || 'add',
+    queue: [], idx: 0, correct: 0, combo: 0, maxCombo: 0,
+    startTime: 0, timerHandle: null, input: '', locked: false,
+    muted: localStorage.getItem(MUTE_KEY) === '1',
+  };
+
+  /* ---------------- helpers ---------------- */
+  function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+  function availableOps(grade) { return CONFIG[grade].ops; }
+
+  function genOne(grade, op) {
+    const c = CONFIG[grade];
+    if (op === 'add') {
+      const a = randInt(1, c.add.aMax), b = randInt(1, c.add.bMax);
+      return { text: `${a} ＋ ${b}`, answer: a + b };
+    }
+    if (op === 'sub') {
+      const top = randInt(1, c.sub.topMax);
+      const b = randInt(0, top);
+      return { text: `${top} － ${b}`, answer: top - b };
+    }
+    if (op === 'mul') {
+      const a = randInt(1, c.mul.aMax), b = randInt(1, c.mul.bMax);
+      return { text: `${a} × ${b}`, answer: a * b };
+    }
+    if (op === 'div') {
+      const divisor = randInt(2, c.div.divisorMax);
+      const quotient = randInt(1, c.div.quotientMax);
+      const dividend = divisor * quotient;
+      return { text: `${dividend} ÷ ${divisor}`, answer: quotient };
+    }
+  }
+
+  function genQuestion(grade, op) {
+    if (op === 'mix') {
+      const ops = availableOps(grade);
+      return genOne(grade, ops[randInt(0, ops.length - 1)]);
+    }
+    return genOne(grade, op);
+  }
+
+  function loadRecords() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+    catch (e) { return {}; }
+  }
+  function saveRecords(r) { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); }
+  function recordKey(grade, op) { return grade + '_' + op; }
+
+  function fmtTime(sec) {
+    const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  /* ---------------- sound ---------------- */
+  let audioCtx = null;
+  function ensureAudio() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch (e) { /* no audio available */ }
+    }
+    return audioCtx;
+  }
+  function beep(freq, dur, type) {
+    if (state.muted) return;
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + dur);
+  }
+  function sfxCorrect() { beep(880, 0.15, 'triangle'); setTimeout(() => beep(1320, 0.18, 'triangle'), 90); }
+  function sfxWrong() { beep(180, 0.25, 'sawtooth'); }
+  function sfxTap() { beep(600, 0.05, 'square'); }
+  function sfxClear() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => beep(f, 0.2, 'triangle'), i * 110)); }
+
+  function updateMuteUI() {
+    const label = state.muted ? '🔇 おと：オフ' : '🔊 おと：オン';
+    document.getElementById('btn-mute').textContent = label;
+    document.getElementById('btn-mute-play').textContent = state.muted ? '🔇' : '🔊';
+  }
+
+  /* ---------------- screen management ---------------- */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  /* ---------------- title screen ---------------- */
+  function renderBestSummary() {
+    const records = loadRecords();
+    const keys = Object.keys(records);
+    const el = document.getElementById('best-summary');
+    if (keys.length === 0) { el.textContent = 'まだ きろくが ありません。あそんでみよう！'; return; }
+    let totalStars = 0;
+    keys.forEach(k => totalStars += (records[k].stars || 0));
+    el.textContent = `⭐ あつめた ほしのかず： ${totalStars} こ`;
+  }
+
+  /* ---------------- select screen ---------------- */
+  function renderSelect() {
+    const gradeRow = document.getElementById('grade-row');
+    gradeRow.innerHTML = '';
+    for (let g = 1; g <= 6; g++) {
+      const chip = document.createElement('button');
+      chip.className = 'chip' + (g === state.grade ? ' active' : '');
+      chip.textContent = g + 'ねんせい';
+      chip.addEventListener('click', () => { sfxTap(); state.grade = g; syncOpForGrade(); renderSelect(); });
+      gradeRow.appendChild(chip);
+    }
+
+    const ops = availableOps(state.grade).concat(availableOps(state.grade).length > 1 ? ['mix'] : []);
+    const opGrid = document.getElementById('op-grid');
+    opGrid.innerHTML = '';
+    const records = loadRecords();
+    ops.forEach(op => {
+      const card = document.createElement('div');
+      card.className = 'op-card' + (op === state.op ? ' active' : '');
+      const rec = records[recordKey(state.grade, op)];
+      const stars = rec ? rec.stars : 0;
+      card.innerHTML = `
+        <div class="op-sym">${OP_META[op].sym}</div>
+        <div class="op-name">${OP_META[op].name}</div>
+        <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>`;
+      card.addEventListener('click', () => { sfxTap(); state.op = op; renderSelect(); });
+      opGrid.appendChild(card);
+    });
+  }
+
+  function syncOpForGrade() {
+    const ops = availableOps(state.grade);
+    if (!ops.includes(state.op) && state.op !== 'mix') state.op = ops[0];
+  }
+
+  /* ---------------- play screen ---------------- */
+  function startSession() {
+    state.queue = [];
+    for (let i = 0; i < QUESTIONS_PER_SESSION; i++) state.queue.push(genQuestion(state.grade, state.op));
+    state.idx = 0; state.correct = 0; state.combo = 0; state.maxCombo = 0; state.input = ''; state.locked = false;
+    state.startTime = Date.now();
+    localStorage.setItem('mathdrill_last_grade', state.grade);
+    localStorage.setItem('mathdrill_last_op', state.op);
+
+    showScreen('screen-play');
+    document.getElementById('play-mascot').textContent = '🐱';
+    document.getElementById('play-speech').textContent = 'がんばって！';
+    startTimer();
+    renderQuestion();
+  }
+
+  function startTimer() {
+    clearInterval(state.timerHandle);
+    state.timerHandle = setInterval(() => {
+      const elapsed = (Date.now() - state.startTime) / 1000;
+      document.getElementById('timer-label').textContent = fmtTime(elapsed);
+    }, 250);
+  }
+
+  function renderQuestion() {
+    state.input = '';
+    state.locked = false;
+    const q = state.queue[state.idx];
+    document.getElementById('question-text').textContent = q.text + ' ＝';
+    const disp = document.getElementById('answer-display');
+    disp.textContent = '？';
+    disp.className = 'answer-display';
+    document.getElementById('progress-label').textContent = `${state.idx + 1} / ${QUESTIONS_PER_SESSION}`;
+    document.getElementById('progress-fill').style.width = ((state.idx) / QUESTIONS_PER_SESSION * 100) + '%';
+  }
+
+  function updateAnswerDisplay() {
+    document.getElementById('answer-display').textContent = state.input.length ? state.input : '？';
+  }
+
+  function pressDigit(d) {
+    if (state.locked) return;
+    if (state.input.length >= 7) return;
+    if (state.input === '0') state.input = '';
+    state.input += d;
+    updateAnswerDisplay();
+    sfxTap();
+  }
+  function pressBackspace() {
+    if (state.locked) return;
+    state.input = state.input.slice(0, -1);
+    updateAnswerDisplay();
+    sfxTap();
+  }
+
+  function flashOverlay(kind) {
+    const el = document.getElementById('flash-overlay');
+    el.className = 'flash-overlay go ' + kind;
+    setTimeout(() => { el.className = 'flash-overlay'; }, 400);
+  }
+
+  function showCombo() {
+    const badge = document.getElementById('combo-badge');
+    if (state.combo >= 3) {
+      badge.textContent = `🔥 ${state.combo}れんぞく！`;
+      badge.classList.add('show');
+    } else {
+      badge.classList.remove('show');
+    }
+  }
+
+  function submitAnswer() {
+    if (state.locked || state.input === '') return;
+    state.locked = true;
+    const q = state.queue[state.idx];
+    const userVal = Number(state.input);
+    const isCorrect = userVal === q.answer;
+    const disp = document.getElementById('answer-display');
+    const mascot = document.getElementById('play-mascot');
+    const speech = document.getElementById('play-speech');
+
+    if (isCorrect) {
+      state.correct++; state.combo++; state.maxCombo = Math.max(state.maxCombo, state.combo);
+      disp.className = 'answer-display correct';
+      mascot.textContent = '😻';
+      speech.textContent = PRAISE[randInt(0, PRAISE.length - 1)];
+      flashOverlay('ok'); sfxCorrect();
+    } else {
+      state.combo = 0;
+      disp.className = 'answer-display wrong';
+      disp.textContent = state.input + ' (せいかい: ' + q.answer + ')';
+      mascot.textContent = '😿';
+      speech.textContent = CONSOLE_WORDS[randInt(0, CONSOLE_WORDS.length - 1)];
+      flashOverlay('ng'); sfxWrong();
+    }
+    showCombo();
+
+    setTimeout(() => {
+      mascot.textContent = '🐱';
+      state.idx++;
+      if (state.idx >= QUESTIONS_PER_SESSION) {
+        finishSession();
+      } else {
+        renderQuestion();
+      }
+    }, isCorrect ? 700 : 1300);
+  }
+
+  function finishSession() {
+    clearInterval(state.timerHandle);
+    const totalTime = (Date.now() - state.startTime) / 1000;
+    const avgTime = totalTime / QUESTIONS_PER_SESSION;
+
+    let stars = 0;
+    if (state.correct === QUESTIONS_PER_SESSION && avgTime <= 6) stars = 3;
+    else if (state.correct >= 8) stars = 2;
+    else if (state.correct >= 5) stars = 1;
+
+    const records = loadRecords();
+    const key = recordKey(state.grade, state.op);
+    const prev = records[key] || { stars: 0, bestTime: null };
+    records[key] = {
+      stars: Math.max(prev.stars, stars),
+      bestTime: (state.correct === QUESTIONS_PER_SESSION) ? Math.min(prev.bestTime || Infinity, totalTime) : prev.bestTime,
+    };
+    saveRecords(records);
+
+    renderResult(stars, totalTime);
+  }
+
+  /* ---------------- result screen ---------------- */
+  function renderResult(stars, totalTime) {
+    showScreen('screen-result');
+    document.getElementById('stat-correct').textContent = state.correct + '/' + QUESTIONS_PER_SESSION;
+    document.getElementById('stat-time').textContent = fmtTime(totalTime);
+    document.getElementById('stat-combo').textContent = state.maxCombo;
+
+    const msgs = ['また れんしゅうしよう！', 'よくできました！', 'すばらしい！', 'かんぺき！！'];
+    document.getElementById('result-msg').textContent = msgs[stars];
+    document.getElementById('result-mascot').textContent = stars >= 2 ? '😻' : '🐱';
+
+    for (let i = 1; i <= 3; i++) document.getElementById('star-' + i).classList.remove('lit');
+    [1,2,3].slice(0, stars).forEach((n, i) => {
+      setTimeout(() => {
+        document.getElementById('star-' + n).classList.add('lit');
+      }, i * 250);
+    });
+
+    if (stars === 3) {
+      setTimeout(() => { burstStars(); sfxClear(); }, 700);
+    }
+  }
+
+  function burstStars() {
+    const container = document.querySelector('.app');
+    const rect = container.getBoundingClientRect();
+    for (let i = 0; i < 16; i++) {
+      const el = document.createElement('span');
+      el.className = 'star-particle';
+      el.textContent = ['⭐','✨','🌟'][randInt(0,2)];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 80 + Math.random() * 120;
+      el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      el.style.setProperty('--rot', (Math.random()*360) + 'deg');
+      el.style.left = (rect.left + rect.width / 2) + 'px';
+      el.style.top = (rect.top + rect.height / 2) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 950);
+    }
+  }
+
+  /* ---------------- wiring ---------------- */
+  document.getElementById('btn-goto-select').addEventListener('click', () => {
+    ensureAudio(); sfxTap(); syncOpForGrade(); renderSelect(); showScreen('screen-select');
+  });
+  document.getElementById('btn-back-title').addEventListener('click', () => { sfxTap(); renderBestSummary(); showScreen('screen-title'); });
+  document.getElementById('btn-start-play').addEventListener('click', () => { sfxTap(); startSession(); });
+
+  document.getElementById('numpad').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    if (btn.id === 'btn-ok') { submitAnswer(); return; }
+    if (btn.id === 'btn-del') { pressBackspace(); return; }
+    if (btn.dataset.d !== undefined) pressDigit(btn.dataset.d);
+  });
+
+  document.getElementById('btn-quit-play').addEventListener('click', () => {
+    clearInterval(state.timerHandle);
+    sfxTap();
+    renderSelect();
+    showScreen('screen-select');
+  });
+
+  document.getElementById('btn-retry').addEventListener('click', () => { sfxTap(); startSession(); });
+  document.getElementById('btn-back-select').addEventListener('click', () => { sfxTap(); renderSelect(); showScreen('screen-select'); });
+
+  function toggleMute() {
+    state.muted = !state.muted;
+    localStorage.setItem(MUTE_KEY, state.muted ? '1' : '0');
+    updateMuteUI();
+    if (!state.muted) { ensureAudio(); sfxTap(); }
+  }
+  document.getElementById('btn-mute').addEventListener('click', toggleMute);
+  document.getElementById('btn-mute-play').addEventListener('click', toggleMute);
+
+  window.addEventListener('keydown', (e) => {
+    if (!document.getElementById('screen-play').classList.contains('active')) return;
+    if (e.key >= '0' && e.key <= '9') pressDigit(e.key);
+    else if (e.key === 'Backspace') pressBackspace();
+    else if (e.key === 'Enter') submitAnswer();
+  });
+
+  /* ---------------- init ---------------- */
+  updateMuteUI();
+  renderBestSummary();
+})();
+</script>
+</body>
+</html>
