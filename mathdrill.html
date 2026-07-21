@@ -120,15 +120,9 @@
     display:flex; align-items:center; justify-content:center;
     animation: bob 2.4s ease-in-out infinite;
   }
-  .pet-circle .face { font-size:34px; }
-
-  /* unify the mismatched native emoji colors into one coordinated warm tone */
-  .face, .creature-face, .zface {
-    filter: saturate(.6) sepia(.16) brightness(1.02) contrast(.95);
-  }
-  .battle-boss .face {
-    filter: saturate(.48) sepia(.06) brightness(.88) contrast(1.08) hue-rotate(-6deg);
-  }
+  .face, .creature-face, .zface { display:inline-block; line-height:0; }
+  .face svg, .creature-face svg, .zface svg { display:block; width:100%; height:100%; }
+  .pet-circle .face { width:54px; height:54px; }
   .acc-badge { position:absolute; top:-6px; right:-6px; font-size:20px; }
   @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
   .pet-name { font-family:'Zen Kaku Gothic New'; font-weight:900; font-size:15px; color:#2d3561; margin-top:8px; }
@@ -146,7 +140,7 @@
     box-shadow:0 3px 10px rgba(45,53,97,.06);
   }
   .starter-card:active { transform:translateY(2px); box-shadow:0 1px 4px rgba(45,53,97,.06); }
-  .starter-card .face { font-size:30px; }
+  .starter-card .face { width:42px; height:42px; margin:0 auto; }
   .starter-card .name { font-size:12px; font-weight:700; color:#2d3561; margin-top:6px; }
 
   /* ---------- select screen ---------- */
@@ -208,13 +202,14 @@
     margin-top:6px; padding:4px 0;
   }
   .battle-pet, .battle-boss {
-    width:36px; height:36px; border-radius:50%; flex:0 0 auto;
-    display:flex; align-items:center; justify-content:center; font-size:19px;
+    width:38px; height:38px; border-radius:50%; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
     border:1.5px solid #e2dcc6; box-shadow:0 3px 8px rgba(45,53,97,.08);
     transition: transform .12s;
   }
   .battle-pet { background:#fff9ec; }
   .battle-boss { background:#fff1ee; border-color:#f0c8c2; }
+  .battle-pet .face, .battle-boss .face { width:26px; height:26px; }
   .battle-vs { font-family:'Zen Kaku Gothic New'; font-weight:900; font-size:11px; color:#a9770f; }
   .battle-pet.hit, .battle-boss.hit { animation: battleShake .35s ease; }
   @keyframes battleShake {
@@ -289,7 +284,7 @@
     display:flex; align-items:center; justify-content:center;
     animation: evolveBigPop .8s cubic-bezier(.34,1.56,.64,1);
   }
-  .evolve-big-circle .face { font-size:74px; }
+  .evolve-big-circle .face { width:100px; height:100px; }
   @keyframes evolveBigPop {
     0% { transform:scale(0) rotate(-25deg); }
     55% { transform:scale(1.28) rotate(8deg); }
@@ -325,7 +320,7 @@
     border:1.5px solid #e2dcc6; box-shadow:0 4px 14px rgba(45,53,97,.1);
     display:flex; align-items:center; justify-content:center;
   }
-  .result-creature .creature-face { font-size:44px; }
+  .result-creature .creature-face { width:60px; height:60px; margin:0 auto; }
 
   .result-stats {
     width:100%; display:grid; grid-template-columns:1fr 1fr;
@@ -362,7 +357,7 @@
   .zukan-cell.unlocked { border-color:#e2c98a; background:#fff8e6; }
   .zukan-cell.unlocked.rarity-rare { border-color:#8fc9de; background:#eaf8ff; }
   .zukan-cell.unlocked.rarity-epic { border-color:#c9a3ea; background:#f7ecff; }
-  .zukan-cell .zface { font-size:32px; }
+  .zukan-cell .zface { width:40px; height:40px; margin:0 auto; font-size:32px; }
   .zukan-cell .zname { font-size:11px; color:#5b5b72; font-weight:700; margin-top:5px; }
   .zukan-cell .zcount { font-size:10px; color:#a9770f; font-weight:700; margin-top:2px; }
   .zukan-cell.locked .zface { opacity:.25; }
@@ -576,7 +571,6 @@
 
   const PRAISE = ['せいかい！','やったね！','すごい！','ピンポン！','ばっちり！'];
   const CONSOLE_WORDS = ['おしい！','どんまい！','つぎがんばろう！'];
-  const BOSSES = ['👹','👻','🦂','🕷️','🐙','🦑','🐗'];
 
   const LINES = {
     dino:    { name:'きょうりゅう', rarity:'common', stages:['🥚','🦎','🐊','🦕','🦖'] },
@@ -592,6 +586,105 @@
   const LINE_KEYS = Object.keys(LINES);
   const RARITY_WEIGHT = { common: 15, rare: 8, epic: 3 };
   const STAGE_THRESHOLDS = [0, 10, 25, 50, 90]; // cumulative correct answers
+
+  /* ---------------- creature / boss art (hand-built SVG, shared template) ---------------- */
+  const CREATURE_ART = {
+    dino:    { color:'#7fa15c', belly:'#f4eeda', ear:'spike',  pattern:'scales',  accent:'#5f8a48' },
+    eagle:   { color:'#9c7a56', belly:'#f4eeda', ear:'wing',   pattern:'none',    accent:'#7a5c3e' },
+    wolf:    { color:'#9aa2ab', belly:'#f7f5ef', ear:'pointy', pattern:'none',    accent:'#7c848d' },
+    tiger:   { color:'#e0a05e', belly:'#f7f0dd', ear:'round',  pattern:'stripes', accent:'#b9793a' },
+    shark:   { color:'#87a8b8', belly:'#eef5f7', ear:'fin',    pattern:'none',    accent:'#5f8494' },
+    panda:   { color:'#f5f2e8', belly:'#ffffff', ear:'round',  pattern:'patches', accent:'#33302c' },
+    owl:     { color:'#c9a06e', belly:'#f4ecd8', ear:'tuft',   pattern:'spots',   accent:'#9c7146' },
+    dragon:  { color:'#6fae82', belly:'#eef0d2', ear:'horn',   pattern:'scales',  accent:'#4f8a63' },
+    unicorn: { color:'#e6dcf2', belly:'#ffffff', ear:'horn2',  pattern:'none',    accent:'#c9a0e8' },
+  };
+  const BOSS_ART = {
+    oni:      { color:'#c25c4c', ear:'horn',  pattern:'none',  name:'おに' },
+    ghost:    { color:'#cdd3e6', ear:'none',  pattern:'none',  name:'おばけ' },
+    scorpion: { color:'#8a5ca0', ear:'spike', pattern:'none',  name:'さそり' },
+    spider:   { color:'#3f3a4a', ear:'spike', pattern:'spots', name:'くも' },
+    octopus:  { color:'#7a5ca8', ear:'none',  pattern:'spots', name:'たこ' },
+    squid:    { color:'#6a7bb0', ear:'fin',   pattern:'none',  name:'いか' },
+    boar:     { color:'#8a6a4a', ear:'round', pattern:'none',  name:'いのしし' },
+  };
+  const BOSSES = Object.keys(BOSS_ART);
+
+  function svgWrap(inner) {
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+  }
+
+  function eggSVG(tint) {
+    return svgWrap(`
+      <ellipse cx="50" cy="58" rx="28" ry="34" fill="#fff5de" stroke="${tint}" stroke-width="3.5"/>
+      <path d="M40 38 L46 49 L38 53 L47 66" stroke="${tint}" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+      <ellipse cx="41" cy="45" rx="8" ry="5.5" fill="#ffffff" opacity="0.7"/>
+    `);
+  }
+
+  function earPaths(type, accent, color) {
+    switch (type) {
+      case 'round': return `<circle cx="27" cy="27" r="12" fill="${color}"/><circle cx="73" cy="27" r="12" fill="${color}"/>`;
+      case 'pointy': return `<path d="M19 33 L25 6 L38 29 Z" fill="${color}"/><path d="M81 33 L75 6 L62 29 Z" fill="${color}"/>`;
+      case 'wing': return `<path d="M13 50 Q -2 38 9 17 Q 27 28 27 47 Z" fill="${color}"/><path d="M87 50 Q 102 38 91 17 Q 73 28 73 47 Z" fill="${color}"/>`;
+      case 'fin': return `<path d="M50 2 L63 26 L37 26 Z" fill="${color}"/>`;
+      case 'tuft': return `<path d="M35 21 L40 2 L47 23 Z" fill="${color}"/><path d="M65 21 L60 2 L53 23 Z" fill="${color}"/>`;
+      case 'spike': return `<path d="M29 23 L36 0 L45 21 Z" fill="${accent}"/><path d="M71 23 L64 0 L55 21 Z" fill="${accent}"/>`;
+      case 'horn': return `<path d="M34 21 Q24 2 15 6 Q22 19 34 26 Z" fill="${accent}"/><path d="M66 21 Q76 2 85 6 Q78 19 66 26 Z" fill="${accent}"/>`;
+      case 'horn2': return `<path d="M50 1 Q45 19 50 30 Q55 19 50 1 Z" fill="${accent}"/>`;
+      default: return '';
+    }
+  }
+
+  function patternPaths(type, accent) {
+    switch (type) {
+      case 'stripes': return `<path d="M28 48 Q39 44 46 51" stroke="${accent}" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M54 42 Q65 38 72 45" stroke="${accent}" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M31 66 Q42 63 49 68" stroke="${accent}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      case 'spots': return `<circle cx="33" cy="45" r="3.2" fill="${accent}"/><circle cx="67" cy="47" r="3.2" fill="${accent}"/>
+        <circle cx="45" cy="70" r="2.6" fill="${accent}"/><circle cx="59" cy="68" r="2.6" fill="${accent}"/>`;
+      case 'scales': return `<path d="M37 33 Q41 29 45 33" stroke="${accent}" stroke-width="2.4" fill="none"/>
+        <path d="M50 29 Q54 25 58 29" stroke="${accent}" stroke-width="2.4" fill="none"/>
+        <path d="M63 33 Q67 29 71 33" stroke="${accent}" stroke-width="2.4" fill="none"/>`;
+      case 'patches': return `<ellipse cx="39" cy="52" rx="8.5" ry="9.5" fill="${accent}"/><ellipse cx="61" cy="52" rx="8.5" ry="9.5" fill="${accent}"/>`;
+      default: return '';
+    }
+  }
+
+  function bodySVG({ color, belly, ear, pattern, accent, angry, young }) {
+    const eyeR = young && !angry ? 5.6 : 5;
+    const eyeY = 55;
+    const brows = angry
+      ? `<path d="M31 45 L44 50" stroke="#2d2530" stroke-width="3" stroke-linecap="round"/><path d="M69 45 L56 50" stroke="#2d2530" stroke-width="3" stroke-linecap="round"/>`
+      : '';
+    const mouth = angry
+      ? `<path d="M40 69 L46 65 L52 69 L58 65 L64 69" stroke="#2d2530" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`
+      : `<path d="M44 66 Q50 71 56 66" stroke="#5c4632" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+    const blush = angry ? '' : `<circle cx="31" cy="63" r="4.2" fill="#ff9d8a" opacity="0.45"/><circle cx="69" cy="63" r="4.2" fill="#ff9d8a" opacity="0.45"/>`;
+    const patternBack = pattern === 'patches' ? patternPaths(pattern, accent) : '';
+    const patternFront = pattern !== 'patches' ? patternPaths(pattern, accent) : '';
+    return svgWrap(`
+      ${earPaths(ear, accent, color)}
+      <ellipse cx="50" cy="58" rx="34" ry="30" fill="${color}"/>
+      ${patternBack}
+      <ellipse cx="50" cy="70" rx="19" ry="14" fill="${belly}"/>
+      ${patternFront}
+      ${brows}
+      <circle cx="39" cy="${eyeY}" r="${eyeR}" fill="#2d2530"/><circle cx="37.2" cy="${eyeY - 1.8}" r="1.7" fill="#fff"/>
+      <circle cx="61" cy="${eyeY}" r="${eyeR}" fill="#2d2530"/><circle cx="59.2" cy="${eyeY - 1.8}" r="1.7" fill="#fff"/>
+      ${blush}
+      ${mouth}
+    `);
+  }
+
+  function creatureSVG(key, stage) {
+    const cfg = CREATURE_ART[key];
+    if (stage <= 0) return eggSVG(cfg.color);
+    return bodySVG({ ...cfg, young: stage < 3 });
+  }
+  function bossSVG(bossKey) {
+    return bodySVG({ ...BOSS_ART[bossKey], angry: true, young: false });
+  }
 
   const SHOP_ITEMS = [
     { id:'hat', icon:'🎩', name:'シルクハット', price:50 },
@@ -705,32 +798,107 @@
 
   /* ---------------- sound ---------------- */
   let audioCtx = null;
+  let masterFilter = null, masterGain = null, delayNode = null;
+
   function ensureAudio() {
     if (!audioCtx) {
-      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-      catch (e) { /* no audio available */ }
+      try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        masterFilter = audioCtx.createBiquadFilter();
+        masterFilter.type = 'lowpass';
+        masterFilter.frequency.value = 3800;
+        masterGain = audioCtx.createGain();
+        masterGain.gain.value = 0.9;
+        masterFilter.connect(masterGain);
+        masterGain.connect(audioCtx.destination);
+
+        delayNode = audioCtx.createDelay();
+        delayNode.delayTime.value = 0.14;
+        const delayFeedback = audioCtx.createGain();
+        delayFeedback.gain.value = 0.24;
+        const delayWet = audioCtx.createGain();
+        delayWet.gain.value = 0.18;
+        delayNode.connect(delayFeedback);
+        delayFeedback.connect(delayNode);
+        delayNode.connect(delayWet);
+        delayWet.connect(masterFilter);
+      } catch (e) { /* no audio available */ }
     }
     return audioCtx;
   }
-  function beep(freq, dur, type) {
+
+  function tone({ freq, dur = 0.15, type = 'sine', gain = 0.14, attack = 0.008, slideTo = null, delaySend = 0 }) {
     if (state.muted) return;
     const ctx = ensureAudio();
     if (!ctx) return;
     const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = type || 'sine';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(); osc.stop(ctx.currentTime + dur);
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, ctx.currentTime + dur);
+    g.gain.setValueAtTime(0.0001, ctx.currentTime);
+    g.gain.linearRampToValueAtTime(gain, ctx.currentTime + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    osc.connect(g);
+    g.connect(masterFilter);
+    if (delaySend > 0 && delayNode) {
+      const send = ctx.createGain();
+      send.gain.value = delaySend;
+      g.connect(send);
+      send.connect(delayNode);
+    }
+    osc.start();
+    osc.stop(ctx.currentTime + dur + 0.05);
   }
-  function sfxCorrect() { beep(880, 0.15, 'triangle'); setTimeout(() => beep(1320, 0.18, 'triangle'), 90); }
-  function sfxWrong() { beep(180, 0.25, 'sawtooth'); }
-  function sfxTap() { beep(600, 0.05, 'square'); }
-  function sfxClear() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => beep(f, 0.2, 'triangle'), i * 110)); }
-  function sfxEvolve() { [392, 523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => beep(f, 0.17, 'sine'), i * 70)); }
-  function sfxCoin() { beep(1046, 0.08, 'square'); setTimeout(() => beep(1568, 0.1, 'square'), 60); }
+
+  function noiseBurst({ dur = 0.09, gain = 0.16, filterFreq = 1400 }) {
+    if (state.muted) return;
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * dur));
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const filt = ctx.createBiquadFilter();
+    filt.type = 'bandpass';
+    filt.frequency.value = filterFreq;
+    const g = ctx.createGain();
+    g.gain.value = gain;
+    src.connect(filt); filt.connect(g); g.connect(masterFilter);
+    src.start();
+  }
+
+  function sfxTap() { tone({ freq: 640, dur: 0.05, type: 'square', gain: 0.07, attack: 0.002 }); }
+  function sfxCorrect() {
+    tone({ freq: 660, dur: 0.13, type: 'triangle', gain: 0.13, attack: 0.004 });
+    tone({ freq: 990, dur: 0.16, type: 'sine', gain: 0.06, attack: 0.004 });
+    setTimeout(() => {
+      tone({ freq: 880, dur: 0.16, type: 'triangle', gain: 0.13, attack: 0.004 });
+      tone({ freq: 1320, dur: 0.18, type: 'sine', gain: 0.07, attack: 0.004 });
+    }, 85);
+  }
+  function sfxWrong() {
+    tone({ freq: 300, dur: 0.28, type: 'sine', gain: 0.13, attack: 0.01, slideTo: 165 });
+    tone({ freq: 190, dur: 0.28, type: 'triangle', gain: 0.06, attack: 0.01, slideTo: 110 });
+  }
+  function sfxHit() {
+    noiseBurst({ dur: 0.07, gain: 0.14, filterFreq: 1600 });
+    tone({ freq: 170, dur: 0.07, type: 'square', gain: 0.05, attack: 0.001 });
+  }
+  function sfxCoin() {
+    tone({ freq: 1046, dur: 0.09, type: 'square', gain: 0.09, attack: 0.002, slideTo: 1568 });
+    setTimeout(() => tone({ freq: 1568, dur: 0.15, type: 'triangle', gain: 0.11, attack: 0.002, delaySend: 0.2 }), 55);
+  }
+  function sfxClear() {
+    [523, 659, 784].forEach(f => tone({ freq: f, dur: 0.5, type: 'triangle', gain: 0.09, attack: 0.01, delaySend: 0.25 }));
+    setTimeout(() => [659, 830, 988].forEach(f => tone({ freq: f, dur: 0.6, type: 'triangle', gain: 0.1, attack: 0.01, delaySend: 0.3 })), 160);
+  }
+  function sfxEvolve() {
+    [392, 523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => tone({ freq: f, dur: 0.22, type: 'sine', gain: 0.12, attack: 0.005, delaySend: 0.2 }), i * 70));
+    setTimeout(() => [523, 659, 784, 1046].forEach(f => tone({ freq: f, dur: 0.6, type: 'triangle', gain: 0.09, attack: 0.01, delaySend: 0.35 })), 420);
+  }
 
   function updateMuteUI() {
     const label = state.muted ? '🔇 おと：オフ' : '🔊 おと：オン';
@@ -776,7 +944,7 @@
     pickStarterOptions().forEach(key => {
       const card = document.createElement('div');
       card.className = 'starter-card';
-      card.innerHTML = `<div class="face">${LINES[key].stages[4]}</div><div class="name">${LINES[key].name}</div>`;
+      card.innerHTML = `<div class="face">${creatureSVG(key, 4)}</div><div class="name">${LINES[key].name}</div>`;
       card.addEventListener('click', () => {
         sfxTap();
         pet = { line: key, totalCorrect: 0, accessory: null };
@@ -815,7 +983,7 @@
 
     const stage = stageForTotal(pet.totalCorrect);
     currentPetStage = stage;
-    document.getElementById('pet-face').textContent = LINES[pet.line].stages[stage];
+    document.getElementById('pet-face').innerHTML = creatureSVG(pet.line, stage);
     document.getElementById('pet-name').textContent = LINES[pet.line].name;
     document.getElementById('pet-acc').textContent = pet.accessory ? ITEM_MAP[pet.accessory].icon : '';
 
@@ -842,19 +1010,19 @@
 
   function playHatchReveal(oldLine) {
     const overlay = document.getElementById('evolve-overlay');
-    document.getElementById('evolve-big-face').textContent = LINES[oldLine].stages[4];
+    document.getElementById('evolve-big-face').innerHTML = creatureSVG(oldLine, 4);
     document.getElementById('evolve-overlay-label').textContent = 'そつぎょう！';
     document.getElementById('evolve-overlay-sub').textContent = `${LINES[oldLine].name}が ずかんに のった！`;
     overlay.classList.add('show');
     sfxEvolve();
     confettiBurst(16);
     setTimeout(() => {
-      document.getElementById('evolve-big-face').textContent = '🥚';
+      document.getElementById('evolve-big-face').innerHTML = eggSVG('#c9a878');
       document.getElementById('evolve-overlay-label').textContent = 'あたらしい たまごが…';
       document.getElementById('evolve-overlay-sub').textContent = 'やってきた！';
     }, 1300);
     setTimeout(() => {
-      document.getElementById('evolve-big-face').textContent = LINES[pet.line].stages[0];
+      document.getElementById('evolve-big-face').innerHTML = creatureSVG(pet.line, 0);
       document.getElementById('evolve-overlay-label').textContent = `${LINES[pet.line].name}の たまご！`;
       document.getElementById('evolve-overlay-sub').textContent = 'これから いっしょに そだてよう';
       confettiBurst(10);
@@ -946,8 +1114,8 @@
     localStorage.setItem('mathdrill_last_mode', state.mode);
 
     showScreen('screen-play');
-    document.getElementById('battle-pet-face').textContent = LINES[pet.line].stages[currentPetStage];
-    document.getElementById('battle-boss-face').textContent = state.boss;
+    document.getElementById('battle-pet-face').innerHTML = creatureSVG(pet.line, currentPetStage);
+    document.getElementById('battle-boss-face').innerHTML = bossSVG(state.boss);
     document.getElementById('play-speech').textContent = 'がんばって！';
     renderStones();
     startTimer();
@@ -1057,7 +1225,7 @@
   function playEvolveCelebration(callback) {
     const overlay = document.getElementById('evolve-overlay');
     const isMax = currentPetStage >= 4;
-    document.getElementById('evolve-big-face').textContent = LINES[pet.line].stages[currentPetStage];
+    document.getElementById('evolve-big-face').innerHTML = creatureSVG(pet.line, currentPetStage);
     document.getElementById('evolve-overlay-label').textContent = isMax ? 'さいだいしんか！' : 'しんか！';
     document.getElementById('evolve-overlay-sub').textContent = isMax
       ? `${LINES[pet.line].name}が かんぜんに そだった！`
@@ -1087,7 +1255,7 @@
       slot.classList.remove('empty'); slot.classList.add('correct');
       speech.textContent = PRAISE[randInt(0, PRAISE.length - 1)];
       if (stone) { stone.classList.remove('current'); stone.classList.add('ok'); stone.textContent = '◯'; }
-      flashOverlay('ok'); sfxCorrect();
+      flashOverlay('ok'); sfxCorrect(); sfxHit();
       hitEffect('battle-boss', '💥');
 
       pet.totalCorrect++;
@@ -1095,7 +1263,7 @@
       const newStage = stageForTotal(pet.totalCorrect);
       if (newStage !== currentPetStage) {
         currentPetStage = newStage;
-        document.getElementById('battle-pet-face').textContent = LINES[pet.line].stages[currentPetStage];
+        document.getElementById('battle-pet-face').innerHTML = creatureSVG(pet.line, currentPetStage);
         evolved = true;
       }
     } else {
@@ -1187,7 +1355,7 @@
     document.getElementById('stat-time').textContent = fmtTime(totalTime);
     document.getElementById('stat-combo').textContent = state.maxCombo;
     document.getElementById('stat-coins').textContent = '+' + coinsEarned;
-    document.getElementById('result-creature-face').textContent = LINES[pet.line].stages[currentPetStage];
+    document.getElementById('result-creature-face').innerHTML = creatureSVG(pet.line, currentPetStage);
 
     const reachedFinal = currentPetStage === 4;
     const msgs = reachedFinal
@@ -1201,7 +1369,8 @@
     });
 
     const events = [];
-    events.push(bossDefeated ? `${state.boss} ボスを たおした！ (+15コイン)` : `${state.boss} ボスに にげられた…`);
+    const bossName = BOSS_ART[state.boss].name;
+    events.push(bossDefeated ? `${bossName}ボスを たおした！ (+15コイン)` : `${bossName}ボスに にげられた…`);
     if (streakResult.isNewDay) events.push(`🔥 ${streakResult.count}にち れんぞく！ (+${streakResult.bonus}コイン)`);
     if (gift) {
       events.push(gift.type === 'coins'
@@ -1228,7 +1397,7 @@
       const has = count > 0;
       const cell = document.createElement('div');
       cell.className = 'zukan-cell ' + (has ? 'unlocked' : 'locked') + ' rarity-' + LINES[key].rarity;
-      cell.innerHTML = `<div class="zface">${has ? LINES[key].stages[4] : '？'}</div><div class="zname">${has ? LINES[key].name : '？？？'}</div>${has && count > 1 ? `<div class="zcount">×${count}</div>` : ''}`;
+      cell.innerHTML = `<div class="zface">${has ? creatureSVG(key, 4) : '？'}</div><div class="zname">${has ? LINES[key].name : '？？？'}</div>${has && count > 1 ? `<div class="zcount">×${count}</div>` : ''}`;
       grid.appendChild(cell);
     });
   }
