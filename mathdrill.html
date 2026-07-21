@@ -65,25 +65,19 @@
   }
   .icon-btn:active { transform:translateY(3px); box-shadow:0 0 0 #2d3561; }
 
+  .stat-chip {
+    background:#fff2da; border:2px solid #2d3561; border-radius:10px;
+    padding:4px 10px; font-size:12px; font-weight:900; color:#2d3561;
+    font-family:'Zen Maru Gothic';
+  }
+  .stat-chip.coin { background:#fff8de; }
+
   h1.title {
     text-align:center; font-family:'Zen Maru Gothic',sans-serif; font-weight:900;
-    font-size:26px; color:#2d3561; letter-spacing:.02em;
-    margin: 4px 0 2px;
+    font-size:21px; color:#2d3561; letter-spacing:.02em;
+    margin: 2px 0;
   }
   h1.title .accent { color:#ff6b5b; }
-  .subtitle { text-align:center; color:#8a8aa0; font-size:12px; margin-bottom:10px; font-weight:500; }
-
-  .egg-badge {
-    position:relative; width:88px; height:88px; margin:2px auto 8px;
-    display:flex; align-items:center; justify-content:center;
-    border-radius:50%;
-    background:#fff2da;
-    border:3px solid #2d3561;
-    box-shadow: 0 5px 0 #2d3561;
-    animation: bob 2.4s ease-in-out infinite;
-  }
-  .egg-badge .face { font-size:44px; }
-  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 
   .big-btn {
     display:block; width:100%; padding:12px; margin-top:auto;
@@ -104,50 +98,80 @@
   }
 
   /* ---------- title screen ---------- */
-  #screen-title { justify-content:center; align-items:center; text-align:center; }
+  #screen-title { overflow-y:auto; }
+  .title-row-btns { display:flex; gap:8px; width:100%; margin-top:8px; }
+  .title-row-btns .big-btn { margin-top:0; flex:1; width:auto; }
   .best-summary {
     margin-top:10px; background:#fff2da; border:2px solid #2d3561; border-radius:12px; padding:9px 12px;
-    font-size:12px; color:#2d3561; width:100%; font-weight:700;
+    font-size:12px; color:#2d3561; width:100%; font-weight:700; text-align:center;
   }
-  .title-row-btns { display:flex; gap:8px; width:100%; margin-top:8px; }
-  .title-row-btns .big-btn { margin-top:0; }
+
+  .pet-card {
+    background:#fff; border:2px solid #eee5d0; border-radius:16px;
+    padding:10px 14px; margin-bottom:8px; text-align:center;
+  }
+  .pet-circle-wrap { position:relative; width:74px; height:74px; margin:0 auto; }
+  .pet-circle {
+    width:74px; height:74px; border-radius:50%;
+    background:#fff2da; border:3px solid #2d3561;
+    display:flex; align-items:center; justify-content:center;
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  .pet-circle .face { font-size:38px; }
+  .acc-badge { position:absolute; top:-6px; right:-6px; font-size:20px; }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  .pet-name { font-family:'Zen Maru Gothic'; font-weight:900; font-size:14px; color:#2d3561; margin-top:6px; }
+  .pet-progress-label { font-size:11px; color:#a9770f; font-weight:700; margin-top:2px; }
+  .pet-card .xp-bar-bg { margin-top:4px; }
+  .graduate-confirm { margin-top:8px; font-size:12px; color:#2d3561; font-weight:700; display:none; }
+  .graduate-confirm .confirm-row { display:flex; gap:8px; margin-top:6px; }
+  .graduate-confirm .confirm-row .big-btn { flex:1; width:auto; padding:8px; font-size:12px; margin-top:0; }
+
+  .starter-hint { text-align:center; font-size:13px; color:#2d3561; font-weight:900; margin:6px 0 10px; }
+  .starter-grid { display:flex; gap:8px; }
+  .starter-card {
+    flex:1; background:#fff; border:2px solid #2d3561; border-radius:14px;
+    padding:10px 4px; text-align:center; cursor:pointer;
+  }
+  .starter-card:active { transform:translateY(2px); }
+  .starter-card .face { font-size:32px; }
+  .starter-card .name { font-size:11px; font-weight:700; color:#2d3561; margin-top:4px; }
 
   /* ---------- select screen ---------- */
-  .section-label { font-size:11px; color:#8a8aa0; font-weight:700; margin:9px 0 5px; letter-spacing:.05em; }
+  .section-label { font-size:12px; color:#8a8aa0; font-weight:700; margin:9px 0 5px; letter-spacing:.05em; }
   .grade-row { display:flex; gap:6px; overflow-x:auto; padding-bottom:3px; }
   .chip {
-    flex:0 0 auto; padding:7px 13px; border-radius:11px; border:2px solid #2d3561;
-    background:#fff; font-family:'Zen Maru Gothic'; font-weight:700; font-size:13px; color:#2d3561;
+    flex:0 0 auto; padding:9px 15px; border-radius:11px; border:2px solid #2d3561;
+    background:#fff; font-family:'Zen Maru Gothic'; font-weight:700; font-size:15px; color:#2d3561;
     cursor:pointer; white-space:nowrap;
   }
   .chip.active { background:#2d3561; color:#fff; }
 
   .mode-row { display:flex; gap:7px; }
   .mode-btn {
-    flex:1; padding:7px 4px; border-radius:11px; border:2px solid #2d3561;
-    background:#fff; color:#2d3561; font-family:'Zen Maru Gothic'; font-size:12px; font-weight:700;
+    flex:1; padding:8px 4px; border-radius:11px; border:2px solid #2d3561;
+    background:#fff; color:#2d3561; font-family:'Zen Maru Gothic'; font-size:14px; font-weight:700;
     cursor:pointer; text-align:center; line-height:1.3;
   }
-  .mode-btn small { display:block; font-size:9px; font-weight:500; color:#9494ab; margin-top:1px; }
+  .mode-btn small { display:block; font-size:11px; font-weight:500; color:#9494ab; margin-top:1px; }
   .mode-btn.active { background:#2d3561; color:#fff; }
   .mode-btn.active small { color:#c7cbe8; }
 
   .op-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:1px; }
   .op-card {
     position:relative; border-radius:13px; border:2px solid #e5e1d3; background:#fff;
-    padding:8px 8px 6px; text-align:center; cursor:pointer;
+    padding:10px 8px 8px; text-align:center; cursor:pointer;
   }
-  .op-card .op-sym { font-size:20px; color:#ff6b5b; font-family:'Zen Maru Gothic'; font-weight:900; }
-  .op-card .op-name { font-size:11px; color:#5b5b72; margin-top:1px; font-weight:700; }
-  .op-card .stars { font-size:10px; color:#f5b942; margin-top:2px; letter-spacing:1px; min-height:12px; }
+  .op-card .op-sym { font-size:23px; color:#ff6b5b; font-family:'Zen Maru Gothic'; font-weight:900; }
+  .op-card .op-name { font-size:13px; color:#5b5b72; margin-top:1px; font-weight:700; }
+  .op-card .stars { font-size:11px; color:#f5b942; margin-top:2px; letter-spacing:1px; min-height:13px; }
   .op-card.active { border-color:#2d3561; background:#f4f2ff; }
   .op-card.locked { opacity:.4; pointer-events:none; }
   .op-card.locked::after {
-    content:'🔒'; position:absolute; top:5px; right:7px; font-size:10px;
+    content:'🔒'; position:absolute; top:5px; right:7px; font-size:11px;
   }
 
   /* ---------- play screen ---------- */
-  .play-header { display:flex; align-items:center; justify-content:space-between; gap:6px; }
   .stones-wrap { flex:1; overflow-x:auto; }
   .stones-row { display:flex; gap:3px; padding:2px; width:max-content; margin:0 auto; }
   .stone {
@@ -160,24 +184,27 @@
   .stone.ng { background:#ff6b5b; border-color:#2d3561; color:#fff; }
   .meta-row { display:flex; justify-content:center; font-size:10px; color:#8a8aa0; margin-top:2px; font-weight:700; }
 
-  /* compact growth status strip (kept small so numbers stay the focus) */
-  .growth-strip {
-    display:flex; align-items:center; gap:8px;
-    background:#fff; border:2px solid #eee5d0; border-radius:12px;
-    padding:5px 10px; margin-top:6px;
+  .battle-strip {
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    margin-top:6px; padding:4px 0;
   }
-  .mini-creature {
-    width:30px; height:30px; border-radius:50%; flex:0 0 auto;
-    background:#fff2da; border:2px solid #2d3561;
-    display:flex; align-items:center; justify-content:center; font-size:17px;
+  .battle-pet, .battle-boss {
+    width:36px; height:36px; border-radius:50%; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    border:2px solid #2d3561; transition: transform .12s;
   }
-  .growth-mid { flex:1; min-width:0; }
-  .xp-bar-bg { width:100%; height:6px; background:#eee8d6; border:2px solid #2d3561; border-radius:5px; overflow:hidden; }
-  .xp-bar-fill { height:100%; width:0%; background:#f5b942; transition:width .3s ease; }
-  .growth-label { font-size:9px; color:#a9770f; font-weight:700; margin-top:2px; }
+  .battle-pet { background:#fff2da; }
+  .battle-boss { background:#ffe4e0; border-color:#c0392b; }
+  .battle-vs { font-family:'Zen Maru Gothic'; font-weight:900; font-size:11px; color:#a9770f; }
+  .battle-pet.hit, .battle-boss.hit { animation: battleShake .35s ease; }
+  @keyframes battleShake {
+    0%,100% { transform:translateX(0) rotate(0); }
+    25% { transform:translateX(-5px) rotate(-8deg); }
+    75% { transform:translateX(5px) rotate(8deg); }
+  }
   .combo-chip {
-    flex:0 0 auto; font-size:10px; color:#fff; font-weight:900; background:#ff6b5b;
-    border:2px solid #2d3561; border-radius:9px; padding:2px 6px;
+    flex:0 0 auto; font-size:11px; color:#fff; font-weight:900; background:#ff6b5b;
+    border:2px solid #2d3561; border-radius:9px; padding:2px 7px;
     opacity:0; transform:scale(.6); transition:opacity .15s, transform .15s;
   }
   .combo-chip.show { opacity:1; transform:scale(1); }
@@ -224,12 +251,13 @@
   .num-btn.del { background:#ffe4e0; color:#ff6b5b; border-color:#ffc9c2; box-shadow:0 3px 0 #ffc9c2; font-size:19px; }
   .num-btn.del:active { box-shadow:0 0 0 #ffc9c2; }
 
-  /* ---------- evolution celebration overlay ---------- */
+  /* ---------- evolution / hatch celebration overlay (app-level, reusable) ---------- */
   .evolve-overlay {
     position:absolute; inset:0; z-index:30;
-    background:rgba(24,28,54,.82);
+    background:rgba(24,28,54,.85);
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     opacity:0; pointer-events:none; transition:opacity .2s ease;
+    padding:20px; text-align:center;
   }
   .evolve-overlay.show { opacity:1; }
   .evolve-big-circle {
@@ -246,7 +274,7 @@
     100% { transform:scale(1) rotate(0); }
   }
   .evolve-overlay-label {
-    margin-top:16px; font-family:'Zen Maru Gothic'; font-weight:900; font-size:26px; color:#fff2da;
+    margin-top:16px; font-family:'Zen Maru Gothic'; font-weight:900; font-size:24px; color:#fff2da;
     text-shadow:0 3px 0 #2d3561;
     animation: evolveLabelIn .5s ease .15s backwards;
   }
@@ -270,24 +298,25 @@
   @keyframes pop { 0%{transform:scale(0)} 60%{transform:scale(1.3)} 100%{transform:scale(1)} }
 
   .result-creature {
-    width:96px; height:96px; border-radius:50%; margin:2px auto 2px;
+    width:90px; height:90px; border-radius:50%; margin:2px auto 2px;
     background:#fff2da; border:3px solid #2d3561; box-shadow:0 5px 0 #2d3561;
     display:flex; align-items:center; justify-content:center;
   }
-  .result-creature .creature-face { font-size:50px; }
+  .result-creature .creature-face { font-size:46px; }
 
   .result-stats {
-    width:100%; background:#f4f2ff; border:2px solid #2d3561; border-radius:13px; padding:9px; margin-top:8px;
-    display:flex; justify-content:space-around; font-size:10px; color:#5b5b72;
+    width:100%; display:grid; grid-template-columns:1fr 1fr;
+    background:#f4f2ff; border:2px solid #2d3561; border-radius:13px; padding:9px; margin-top:8px; gap:6px;
+    font-size:10px; color:#5b5b72;
   }
-  .result-stats b { display:block; font-size:18px; color:#2d3561; font-family:'Baloo 2'; font-weight:800; }
+  .result-stats b { display:block; font-size:17px; color:#2d3561; font-family:'Baloo 2'; font-weight:800; }
   .result-msg { font-size:14px; color:#2d3561; margin-top:8px; font-weight:900; }
 
-  .evolve-banner {
-    width:100%; background:#fff2da; border:2px solid #f5b942; border-radius:13px; padding:8px; margin-top:8px;
-    display:none; font-size:11px; color:#a9770f; font-weight:700;
+  .result-events { width:100%; display:flex; flex-direction:column; gap:5px; margin-top:8px; }
+  .result-event {
+    background:#fff2da; border:2px solid #f5b942; border-radius:11px; padding:6px 10px;
+    font-size:11px; color:#a9770f; font-weight:700; text-align:left;
   }
-  .evolve-banner.show { display:block; }
 
   .flash-overlay {
     position:absolute; inset:0; pointer-events:none; opacity:0; border-radius:17px;
@@ -297,6 +326,9 @@
   .flash-overlay.ok { background:#4fc2a1; }
   .flash-overlay.ng { background:#ff6b5b; }
 
+  .xp-bar-bg { width:100%; height:7px; background:#eee8d6; border:2px solid #2d3561; border-radius:5px; overflow:hidden; }
+  .xp-bar-fill { height:100%; width:0%; background:#f5b942; transition:width .3s ease; }
+
   /* ---------- zukan (creature encyclopedia) ---------- */
   .zukan-count { text-align:center; font-size:12px; color:#5b5b72; font-weight:700; margin-bottom:10px; }
   .zukan-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; overflow-y:auto; }
@@ -304,10 +336,31 @@
     border-radius:14px; background:#fff; border:2px solid #e5e1d3; padding:12px 8px; text-align:center;
   }
   .zukan-cell.unlocked { border-color:#2d3561; background:#fff2da; }
+  .zukan-cell.unlocked.rarity-rare { border-color:#3f9cbd; background:#eaf8ff; }
+  .zukan-cell.unlocked.rarity-epic { border-color:#a960ff; background:#f7ecff; }
   .zukan-cell .zface { font-size:32px; }
   .zukan-cell .zname { font-size:11px; color:#5b5b72; font-weight:700; margin-top:5px; }
+  .zukan-cell .zcount { font-size:10px; color:#a9770f; font-weight:700; margin-top:2px; }
   .zukan-cell.locked .zface { opacity:.25; }
   .zukan-cell.locked .zname { color:#b8b8c8; }
+
+  /* ---------- shop ---------- */
+  .shop-list { overflow-y:auto; }
+  .shop-item {
+    display:flex; align-items:center; gap:10px;
+    background:#fff; border:2px solid #e5e1d3; border-radius:13px; padding:8px 10px; margin-bottom:8px;
+  }
+  .shop-item .icon { font-size:26px; flex:0 0 auto; width:32px; text-align:center; }
+  .shop-item .info { flex:1; min-width:0; }
+  .shop-item .name { font-size:13px; font-weight:700; color:#2d3561; }
+  .shop-item .price { font-size:11px; color:#a9770f; font-weight:700; }
+  .shop-btn {
+    flex:0 0 auto; border:2px solid #2d3561; border-radius:10px; padding:7px 10px;
+    font-family:'Zen Maru Gothic'; font-weight:900; font-size:11px; color:#fff; background:#4fc2a1;
+    cursor:pointer;
+  }
+  .shop-btn:disabled { background:#e5e1d3; border-color:#d3cec0; color:#a9a396; cursor:default; }
+  .shop-btn.equipped { background:#2d3561; }
 </style>
 </head>
 <body>
@@ -315,22 +368,51 @@
 
   <!-- ===== TITLE ===== -->
   <section class="screen active" id="screen-title">
-    <div class="egg-badge"><span class="face">🥚</span></div>
-    <h1 class="title">けいさん<span class="accent">ドリル</span></h1>
-    <p class="subtitle">こたえると たまごが そだつよ</p>
-    <button class="big-btn" id="btn-goto-select" style="margin-top:10px">あそぶ</button>
-    <div class="title-row-btns">
-      <button class="big-btn secondary" id="btn-goto-album">📖 ずかん</button>
+    <div class="top-row">
+      <div class="stat-chip" id="streak-chip">🔥 0にち</div>
+      <h1 class="title">けいさん<span class="accent">ドリル</span></h1>
+      <div class="stat-chip coin" id="coin-chip">💰 0</div>
     </div>
-    <div class="best-summary" id="best-summary">まだ きろくが ありません</div>
-    <button class="big-btn ghost" id="btn-mute" style="margin-top:8px">🔊 おと：オン</button>
+
+    <div id="title-onboarding" style="display:none">
+      <div class="starter-hint">さいしょの あいぼうを えらんでね！</div>
+      <div class="starter-grid" id="starter-grid"></div>
+    </div>
+
+    <div id="title-dashboard">
+      <div class="pet-card">
+        <div class="pet-circle-wrap">
+          <div class="pet-circle"><span class="face" id="pet-face">🥚</span></div>
+          <span class="acc-badge" id="pet-acc"></span>
+        </div>
+        <div class="pet-name" id="pet-name">たまご</div>
+        <div class="pet-progress-label" id="pet-progress-label">つぎまで あと 10もん</div>
+        <div class="xp-bar-bg"><div class="xp-bar-fill" id="pet-xp-fill"></div></div>
+        <button class="big-btn secondary" id="btn-graduate" style="display:none;margin-top:8px">🎓 そつぎょうさせる</button>
+        <div class="graduate-confirm" id="graduate-confirm">
+          <p>「<span id="graduate-name"></span>」を ずかんに のせて、あたらしい たまごを むかえる？</p>
+          <div class="confirm-row">
+            <button class="big-btn secondary" id="btn-graduate-yes">はい！</button>
+            <button class="big-btn ghost" id="btn-graduate-no">まだ いっしょにいる</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="big-btn" id="btn-goto-select">あそぶ</button>
+      <div class="title-row-btns">
+        <button class="big-btn secondary" id="btn-goto-album">📖 ずかん</button>
+        <button class="big-btn secondary" id="btn-goto-shop">🛍️ ショップ</button>
+      </div>
+      <div class="best-summary" id="best-summary">まだ きろくが ありません</div>
+      <button class="big-btn ghost" id="btn-mute" style="margin-top:8px">🔊 おと：オン</button>
+    </div>
   </section>
 
   <!-- ===== SELECT ===== -->
   <section class="screen" id="screen-select">
     <div class="top-row">
       <button class="icon-btn" id="btn-back-title">←</button>
-      <span style="font-family:'Zen Maru Gothic';font-weight:900;color:#2d3561;font-size:14px">もんだいを えらぶ</span>
+      <span style="font-family:'Zen Maru Gothic';font-weight:900;color:#2d3561;font-size:15px">もんだいを えらぶ</span>
       <span style="width:36px"></span>
     </div>
 
@@ -353,18 +435,18 @@
   <section class="screen" id="screen-play">
     <div class="flash-overlay" id="flash-overlay"></div>
     <div class="play-header">
-      <button class="icon-btn" id="btn-quit-play">←</button>
-      <div class="stones-wrap"><div class="stones-row" id="stones-row"></div></div>
-      <button class="icon-btn" id="btn-mute-play">🔊</button>
-    </div>
-    <div class="meta-row"><span id="timer-label">0:00</span></div>
-
-    <div class="growth-strip">
-      <div class="mini-creature" id="mini-creature">🥚</div>
-      <div class="growth-mid">
-        <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar-fill"></div></div>
-        <div class="growth-label" id="growth-label">つぎまで あと 2もん</div>
+      <div class="top-row" style="margin-bottom:0">
+        <button class="icon-btn" id="btn-quit-play">←</button>
+        <div class="stones-wrap"><div class="stones-row" id="stones-row"></div></div>
+        <button class="icon-btn" id="btn-mute-play">🔊</button>
       </div>
+      <div class="meta-row"><span id="timer-label">0:00</span></div>
+    </div>
+
+    <div class="battle-strip">
+      <div class="battle-pet" id="battle-pet">🥚</div>
+      <div class="battle-vs">VS</div>
+      <div class="battle-boss" id="battle-boss">👹</div>
       <div class="combo-chip" id="combo-badge">🔥3</div>
     </div>
 
@@ -387,12 +469,6 @@
       <button class="num-btn" data-d="0">0</button>
       <button class="num-btn ok" id="btn-ok">OK</button>
     </div>
-
-    <div class="evolve-overlay" id="evolve-overlay">
-      <div class="evolve-big-circle"><span class="face" id="evolve-big-face">🥚</span></div>
-      <div class="evolve-overlay-label" id="evolve-overlay-label">しんか！</div>
-      <div class="evolve-overlay-sub" id="evolve-overlay-sub"></div>
-    </div>
   </section>
 
   <!-- ===== RESULT ===== -->
@@ -406,8 +482,9 @@
       <div><b id="stat-correct">10</b>せいかい</div>
       <div><b id="stat-time">0:00</b>タイム</div>
       <div><b id="stat-combo">0</b>さいだいコンボ</div>
+      <div><b id="stat-coins">0</b>コイン</div>
     </div>
-    <div class="evolve-banner" id="evolve-banner"></div>
+    <div class="result-events" id="result-events"></div>
     <button class="big-btn" id="btn-retry" style="margin-top:12px">もういちど</button>
     <button class="big-btn secondary" id="btn-back-select">もんだいを えらびなおす</button>
   </section>
@@ -416,12 +493,28 @@
   <section class="screen" id="screen-album">
     <div class="top-row">
       <button class="icon-btn" id="btn-back-title-2">←</button>
-      <span style="font-family:'Zen Maru Gothic';font-weight:900;color:#2d3561;font-size:14px">ずかん</span>
+      <span style="font-family:'Zen Maru Gothic';font-weight:900;color:#2d3561;font-size:15px">ずかん</span>
       <span style="width:36px"></span>
     </div>
-    <div class="zukan-count" id="album-count">0 / 4 はっけん</div>
+    <div class="zukan-count" id="album-count">0 / 9 はっけん</div>
     <div class="zukan-grid" id="album-grid"></div>
   </section>
+
+  <!-- ===== SHOP ===== -->
+  <section class="screen" id="screen-shop">
+    <div class="top-row">
+      <button class="icon-btn" id="btn-back-title-3">←</button>
+      <span style="font-family:'Zen Maru Gothic';font-weight:900;color:#2d3561;font-size:15px">ショップ</span>
+      <div class="stat-chip coin" id="shop-coin-chip">💰 0</div>
+    </div>
+    <div class="shop-list" id="shop-list"></div>
+  </section>
+
+  <div class="evolve-overlay" id="evolve-overlay">
+    <div class="evolve-big-circle"><span class="face" id="evolve-big-face">🥚</span></div>
+    <div class="evolve-overlay-label" id="evolve-overlay-label">しんか！</div>
+    <div class="evolve-overlay-sub" id="evolve-overlay-sub"></div>
+  </div>
 
 </div>
 
@@ -448,21 +541,63 @@
   };
 
   const QUESTIONS_PER_SESSION = 10;
-  const STORAGE_KEY = 'meyonze_mathdrill_v2';
+  const RECORDS_KEY = 'meyonze_mathdrill_v2';
   const MUTE_KEY = 'meyonze_mathdrill_mute';
-  const ZUKAN_KEY = 'meyonze_mathdrill_zukan';
+  const PET_KEY = 'mathdrill_pet_v3';
+  const COINS_KEY = 'mathdrill_coins_v3';
+  const STREAK_KEY = 'mathdrill_streak_v3';
+  const ITEMS_KEY = 'mathdrill_items_v3';
+  const ZUKAN_KEY = 'mathdrill_zukan_v3';
 
   const PRAISE = ['せいかい！','やったね！','すごい！','ピンポン！','ばっちり！'];
   const CONSOLE_WORDS = ['おしい！','どんまい！','つぎがんばろう！'];
+  const BOSSES = ['👹','👻','🦂','🕷️','🐙','🦑','🐗'];
 
   const LINES = {
-    dino:   { name:'きょうりゅう', stages:['🥚','🦎','🐊','🦕','🦖'] },
-    bird:   { name:'とり',         stages:['🥚','🐣','🐥','🦆','🦅'] },
-    animal: { name:'どうぶつ',     stages:['🥚','🐭','🐱','🐺','🦁'] },
-    dragon: { name:'ドラゴン',     stages:['🥚','🦎','🐍','🐲','🐉'] },
+    dino:    { name:'きょうりゅう', rarity:'common', stages:['🥚','🦎','🐊','🦕','🦖'] },
+    eagle:   { name:'わし',         rarity:'common', stages:['🥚','🐣','🐥','🦆','🦅'] },
+    wolf:    { name:'おおかみ',     rarity:'common', stages:['🥚','🐶','🐕','🦊','🐺'] },
+    tiger:   { name:'とら',         rarity:'common', stages:['🥚','🐱','🐈','🐆','🐯'] },
+    shark:   { name:'さめ',         rarity:'rare',   stages:['🥚','🐟','🐡','🐬','🦈'] },
+    panda:   { name:'ぱんだ',       rarity:'rare',   stages:['🥚','🐹','🐰','🐨','🐼'] },
+    owl:     { name:'ふくろう',     rarity:'rare',   stages:['🥚','🐤','🦜','🦢','🦉'] },
+    dragon:  { name:'ドラゴン',     rarity:'epic',   stages:['🥚','🦎','🐍','🐲','🐉'] },
+    unicorn: { name:'ユニコーン',   rarity:'epic',   stages:['🥚','🐴','🦓','🦄','🦄'] },
   };
   const LINE_KEYS = Object.keys(LINES);
-  const STAGE_STEP = 2; // correct answers needed per stage
+  const RARITY_WEIGHT = { common: 15, rare: 8, epic: 3 };
+  const STAGE_THRESHOLDS = [0, 10, 25, 50, 90]; // cumulative correct answers
+
+  const SHOP_ITEMS = [
+    { id:'hat', icon:'🎩', name:'シルクハット', price:50 },
+    { id:'ribbon', icon:'🎀', name:'リボン', price:40 },
+    { id:'glasses', icon:'🕶️', name:'サングラス', price:60 },
+    { id:'crown', icon:'👑', name:'かんむり', price:120 },
+    { id:'scarf', icon:'🧣', name:'マフラー', price:45 },
+    { id:'balloon', icon:'🎈', name:'ふうせん', price:30 },
+  ];
+  const ITEM_MAP = {};
+  SHOP_ITEMS.forEach(it => { ITEM_MAP[it.id] = it; });
+
+  /* ---------------- persistent data ---------------- */
+  let pet = loadPet();
+  let ownedItems = loadOwnedItems();
+  let currentPetStage = pet ? stageForTotal(pet.totalCorrect) : 0;
+
+  function loadPet() { try { return JSON.parse(localStorage.getItem(PET_KEY)); } catch (e) { return null; } }
+  function savePet(p) { localStorage.setItem(PET_KEY, JSON.stringify(p)); }
+  function loadCoins() { return Number(localStorage.getItem(COINS_KEY)) || 0; }
+  function saveCoins(n) { localStorage.setItem(COINS_KEY, String(n)); }
+  function addCoins(n) { saveCoins(Math.max(0, loadCoins() + n)); }
+  function loadStreak() { try { return JSON.parse(localStorage.getItem(STREAK_KEY)) || { count: 0, lastDate: '' }; } catch (e) { return { count: 0, lastDate: '' }; } }
+  function saveStreak(s) { localStorage.setItem(STREAK_KEY, JSON.stringify(s)); }
+  function loadOwnedItems() { try { return JSON.parse(localStorage.getItem(ITEMS_KEY)) || []; } catch (e) { return []; } }
+  function saveOwnedItems(a) { localStorage.setItem(ITEMS_KEY, JSON.stringify(a)); }
+  function loadZukan() { try { return JSON.parse(localStorage.getItem(ZUKAN_KEY)) || {}; } catch (e) { return {}; } }
+  function saveZukanMap(z) { localStorage.setItem(ZUKAN_KEY, JSON.stringify(z)); }
+  function loadRecords() { try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || {}; } catch (e) { return {}; } }
+  function saveRecords(r) { localStorage.setItem(RECORDS_KEY, JSON.stringify(r)); }
+  function recordKey(grade, op, mode) { return grade + '_' + op + '_' + mode; }
 
   /* ---------------- state ---------------- */
   const state = {
@@ -472,12 +607,34 @@
     queue: [], idx: 0, correct: 0, combo: 0, maxCombo: 0,
     startTime: 0, timerHandle: null, input: '', locked: false,
     muted: localStorage.getItem(MUTE_KEY) === '1',
-    line: null, stage: 0,
+    boss: '👹',
   };
 
   /* ---------------- helpers ---------------- */
   function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
   function availableOps(grade) { return CONFIG[grade].ops; }
+
+  function stageForTotal(total) {
+    let s = 0;
+    for (let i = 0; i < STAGE_THRESHOLDS.length; i++) { if (total >= STAGE_THRESHOLDS[i]) s = i; }
+    return s;
+  }
+
+  function pickWeightedLine() {
+    const pool = [];
+    LINE_KEYS.forEach(k => { const w = RARITY_WEIGHT[LINES[k].rarity]; for (let i = 0; i < w; i++) pool.push(k); });
+    return pool[randInt(0, pool.length - 1)];
+  }
+
+  function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function yesterdayStr() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
 
   function genRaw(grade, op) {
     const c = CONFIG[grade];
@@ -511,34 +668,14 @@
         b: slot === 'b' ? '□' : raw.b,
         c: slot === 'c' ? '□' : raw.c,
       };
-      return {
-        text: `${parts.a} ${raw.sym} ${parts.b} ＝ ${parts.c}`,
-        answer: raw[slot],
-      };
+      return { text: `${parts.a} ${raw.sym} ${parts.b} ＝ ${parts.c}`, answer: raw[slot] };
     }
     return { text: `${raw.a} ${raw.sym} ${raw.b} ＝ □`, answer: raw.c };
   }
 
-  function loadRecords() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-    catch (e) { return {}; }
-  }
-  function saveRecords(r) { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); }
-  function recordKey(grade, op, mode) { return grade + '_' + op + '_' + mode; }
-
-  function loadZukan() {
-    try { return JSON.parse(localStorage.getItem(ZUKAN_KEY)) || []; }
-    catch (e) { return []; }
-  }
-  function saveZukan(arr) { localStorage.setItem(ZUKAN_KEY, JSON.stringify(arr)); }
-
   function fmtTime(sec) {
     const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
     return m + ':' + String(s).padStart(2, '0');
-  }
-
-  function stageForCount(c) {
-    return Math.min(4, Math.floor(c / STAGE_STEP));
   }
 
   /* ---------------- sound ---------------- */
@@ -568,6 +705,7 @@
   function sfxTap() { beep(600, 0.05, 'square'); }
   function sfxClear() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => beep(f, 0.2, 'triangle'), i * 110)); }
   function sfxEvolve() { [392, 523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => beep(f, 0.17, 'sine'), i * 70)); }
+  function sfxCoin() { beep(1046, 0.08, 'square'); setTimeout(() => beep(1568, 0.1, 'square'), 60); }
 
   function updateMuteUI() {
     const label = state.muted ? '🔇 おと：オフ' : '🔊 おと：オン';
@@ -579,19 +717,152 @@
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.confetti-particle').forEach(p => p.remove());
+  }
+
+  function confettiBurst(count) {
+    const container = document.querySelector('.app');
+    const rect = container.getBoundingClientRect();
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('span');
+      el.className = 'confetti-particle';
+      el.textContent = ['✨','⭐','🎉','💫'][randInt(0,3)];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * (rect.width * 0.42);
+      el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      el.style.setProperty('--rot', (Math.random()*360) + 'deg');
+      el.style.left = (rect.left + rect.width / 2) + 'px';
+      el.style.top = (rect.top + rect.height / 2) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1050);
+    }
   }
 
   /* ---------------- title screen ---------------- */
+  function pickStarterOptions() {
+    const commons = LINE_KEYS.filter(k => LINES[k].rarity === 'common');
+    return commons.slice().sort(() => Math.random() - 0.5).slice(0, 3);
+  }
+
+  function renderStarterOptions() {
+    const grid = document.getElementById('starter-grid');
+    grid.innerHTML = '';
+    pickStarterOptions().forEach(key => {
+      const card = document.createElement('div');
+      card.className = 'starter-card';
+      card.innerHTML = `<div class="face">${LINES[key].stages[4]}</div><div class="name">${LINES[key].name}</div>`;
+      card.addEventListener('click', () => {
+        sfxTap();
+        pet = { line: key, totalCorrect: 0, accessory: null };
+        currentPetStage = 0;
+        savePet(pet);
+        renderTitleDashboard();
+      });
+      grid.appendChild(card);
+    });
+  }
+
   function renderBestSummary() {
     const records = loadRecords();
     const keys = Object.keys(records);
     const el = document.getElementById('best-summary');
-    const zukanCount = loadZukan().length;
     if (keys.length === 0) { el.textContent = 'まだ きろくが ありません。あそんでみよう！'; return; }
     let totalStars = 0;
     keys.forEach(k => totalStars += (records[k].stars || 0));
-    el.textContent = `⭐ ほし ${totalStars}こ　📖 ずかん ${zukanCount}/${LINE_KEYS.length}`;
+    el.textContent = `⭐ がくしゅうの ほし ${totalStars}こ`;
   }
+
+  function renderTitleDashboard() {
+    const dash = document.getElementById('title-dashboard');
+    const onboarding = document.getElementById('title-onboarding');
+    document.getElementById('streak-chip').textContent = `🔥 ${loadStreak().count}にち`;
+    document.getElementById('coin-chip').textContent = `💰 ${loadCoins()}`;
+
+    if (!pet) {
+      onboarding.style.display = 'block';
+      dash.style.display = 'none';
+      renderStarterOptions();
+      return;
+    }
+    onboarding.style.display = 'none';
+    dash.style.display = 'block';
+
+    const stage = stageForTotal(pet.totalCorrect);
+    currentPetStage = stage;
+    document.getElementById('pet-face').textContent = LINES[pet.line].stages[stage];
+    document.getElementById('pet-name').textContent = LINES[pet.line].name;
+    document.getElementById('pet-acc').textContent = pet.accessory ? ITEM_MAP[pet.accessory].icon : '';
+
+    const graduateBtn = document.getElementById('btn-graduate');
+    const confirmBox = document.getElementById('graduate-confirm');
+    confirmBox.style.display = 'none';
+
+    if (stage >= 4) {
+      document.getElementById('pet-progress-label').textContent = '✨ さいだいしんか！';
+      document.getElementById('pet-xp-fill').style.width = '100%';
+      graduateBtn.style.display = 'block';
+    } else {
+      const next = STAGE_THRESHOLDS[stage + 1];
+      const prev = STAGE_THRESHOLDS[stage];
+      const remain = next - pet.totalCorrect;
+      document.getElementById('pet-progress-label').textContent = `つぎまで あと ${remain}もん`;
+      const pct = Math.min(100, Math.round((pet.totalCorrect - prev) / (next - prev) * 100));
+      document.getElementById('pet-xp-fill').style.width = pct + '%';
+      graduateBtn.style.display = 'none';
+    }
+
+    renderBestSummary();
+  }
+
+  function playHatchReveal(oldLine) {
+    const overlay = document.getElementById('evolve-overlay');
+    document.getElementById('evolve-big-face').textContent = LINES[oldLine].stages[4];
+    document.getElementById('evolve-overlay-label').textContent = 'そつぎょう！';
+    document.getElementById('evolve-overlay-sub').textContent = `${LINES[oldLine].name}が ずかんに のった！`;
+    overlay.classList.add('show');
+    sfxEvolve();
+    confettiBurst(16);
+    setTimeout(() => {
+      document.getElementById('evolve-big-face').textContent = '🥚';
+      document.getElementById('evolve-overlay-label').textContent = 'あたらしい たまごが…';
+      document.getElementById('evolve-overlay-sub').textContent = 'やってきた！';
+    }, 1300);
+    setTimeout(() => {
+      document.getElementById('evolve-big-face').textContent = LINES[pet.line].stages[0];
+      document.getElementById('evolve-overlay-label').textContent = `${LINES[pet.line].name}の たまご！`;
+      document.getElementById('evolve-overlay-sub').textContent = 'これから いっしょに そだてよう';
+      confettiBurst(10);
+    }, 2400);
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      renderTitleDashboard();
+    }, 3800);
+  }
+
+  document.getElementById('btn-graduate').addEventListener('click', () => {
+    sfxTap();
+    document.getElementById('graduate-name').textContent = LINES[pet.line].name;
+    document.getElementById('graduate-confirm').style.display = 'block';
+    document.getElementById('btn-graduate').style.display = 'none';
+  });
+  document.getElementById('btn-graduate-no').addEventListener('click', () => {
+    sfxTap();
+    document.getElementById('graduate-confirm').style.display = 'none';
+    document.getElementById('btn-graduate').style.display = 'block';
+  });
+  document.getElementById('btn-graduate-yes').addEventListener('click', () => {
+    sfxTap();
+    const zukan = loadZukan();
+    zukan[pet.line] = (zukan[pet.line] || 0) + 1;
+    saveZukanMap(zukan);
+    const oldLine = pet.line;
+    const newLine = pickWeightedLine();
+    pet = { line: newLine, totalCorrect: 0, accessory: pet.accessory };
+    currentPetStage = 0;
+    savePet(pet);
+    playHatchReveal(oldLine);
+  });
 
   /* ---------------- select screen ---------------- */
   function renderSelect() {
@@ -637,30 +908,20 @@
   });
 
   /* ---------------- play screen ---------------- */
-  function updateGrowthLabel() {
-    const label = document.getElementById('growth-label');
-    if (state.stage >= 4) { label.textContent = '✨ さいだいしんか！'; return; }
-    const nextThreshold = (state.stage + 1) * STAGE_STEP;
-    const remain = Math.max(1, nextThreshold - state.correct);
-    label.textContent = `つぎまで あと ${remain}もん`;
-  }
-
   function startSession() {
     state.queue = [];
     for (let i = 0; i < QUESTIONS_PER_SESSION; i++) state.queue.push(genQuestion(state.grade, state.op, state.mode));
     state.idx = 0; state.correct = 0; state.combo = 0; state.maxCombo = 0; state.input = ''; state.locked = false;
     state.startTime = Date.now();
-    state.line = LINE_KEYS[randInt(0, LINE_KEYS.length - 1)];
-    state.stage = 0;
+    state.boss = BOSSES[randInt(0, BOSSES.length - 1)];
     localStorage.setItem('mathdrill_last_grade', state.grade);
     localStorage.setItem('mathdrill_last_op', state.op);
     localStorage.setItem('mathdrill_last_mode', state.mode);
 
     showScreen('screen-play');
-    document.getElementById('mini-creature').textContent = LINES[state.line].stages[0];
-    document.getElementById('xp-bar-fill').style.width = '0%';
+    document.getElementById('battle-pet').textContent = LINES[pet.line].stages[currentPetStage];
+    document.getElementById('battle-boss').textContent = state.boss;
     document.getElementById('play-speech').textContent = 'がんばって！';
-    updateGrowthLabel();
     renderStones();
     startTimer();
     renderQuestion();
@@ -749,33 +1010,31 @@
     }
   }
 
-  function confettiBurst(count) {
-    const container = document.querySelector('.app');
-    const rect = container.getBoundingClientRect();
-    for (let i = 0; i < count; i++) {
-      const el = document.createElement('span');
-      el.className = 'confetti-particle';
-      el.textContent = ['✨','⭐','🎉','💫'][randInt(0,3)];
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 40 + Math.random() * (rect.width * 0.42);
-      el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-      el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-      el.style.setProperty('--rot', (Math.random()*360) + 'deg');
-      el.style.left = (rect.left + rect.width / 2) + 'px';
-      el.style.top = (rect.top + rect.height / 2) + 'px';
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1050);
-    }
+  function hitEffect(elId, symbol) {
+    const el = document.getElementById(elId);
+    el.classList.remove('hit'); void el.offsetWidth; el.classList.add('hit');
+    const rect = el.getBoundingClientRect();
+    const particle = document.createElement('span');
+    particle.className = 'confetti-particle';
+    particle.textContent = symbol;
+    particle.style.fontSize = '15px';
+    particle.style.left = (rect.left + rect.width / 2) + 'px';
+    particle.style.top = (rect.top + rect.height / 2) + 'px';
+    particle.style.setProperty('--dx', randInt(-16, 16) + 'px');
+    particle.style.setProperty('--dy', (-28 - randInt(0, 16)) + 'px');
+    particle.style.setProperty('--rot', '0deg');
+    document.body.appendChild(particle);
+    setTimeout(() => particle.remove(), 700);
   }
 
   function playEvolveCelebration(callback) {
     const overlay = document.getElementById('evolve-overlay');
-    const isMax = state.stage >= 4;
-    document.getElementById('evolve-big-face').textContent = LINES[state.line].stages[state.stage];
+    const isMax = currentPetStage >= 4;
+    document.getElementById('evolve-big-face').textContent = LINES[pet.line].stages[currentPetStage];
     document.getElementById('evolve-overlay-label').textContent = isMax ? 'さいだいしんか！' : 'しんか！';
     document.getElementById('evolve-overlay-sub').textContent = isMax
-      ? `${LINES[state.line].name}が かんぜんに そだった！`
-      : `${LINES[state.line].name}が おおきく なった！`;
+      ? `${LINES[pet.line].name}が かんぜんに そだった！`
+      : `${LINES[pet.line].name}が おおきく なった！`;
     overlay.classList.add('show');
     sfxEvolve();
     confettiBurst(isMax ? 20 : 14);
@@ -802,15 +1061,16 @@
       speech.textContent = PRAISE[randInt(0, PRAISE.length - 1)];
       if (stone) { stone.classList.remove('current'); stone.classList.add('ok'); stone.textContent = '◯'; }
       flashOverlay('ok'); sfxCorrect();
+      hitEffect('battle-boss', '💥');
 
-      document.getElementById('xp-bar-fill').style.width = (state.correct / QUESTIONS_PER_SESSION * 100) + '%';
-      const newStage = stageForCount(state.correct);
-      if (newStage !== state.stage) {
-        state.stage = newStage;
-        document.getElementById('mini-creature').textContent = LINES[state.line].stages[state.stage];
+      pet.totalCorrect++;
+      savePet(pet);
+      const newStage = stageForTotal(pet.totalCorrect);
+      if (newStage !== currentPetStage) {
+        currentPetStage = newStage;
+        document.getElementById('battle-pet').textContent = LINES[pet.line].stages[currentPetStage];
         evolved = true;
       }
-      updateGrowthLabel();
     } else {
       state.combo = 0;
       slot.classList.remove('empty'); slot.classList.add('wrong');
@@ -819,6 +1079,7 @@
       speech.textContent = CONSOLE_WORDS[randInt(0, CONSOLE_WORDS.length - 1)];
       if (stone) { stone.classList.remove('current'); stone.classList.add('ng'); stone.textContent = '✗'; }
       flashOverlay('ng'); sfxWrong();
+      hitEffect('battle-pet', '💦');
     }
     showCombo();
 
@@ -836,6 +1097,26 @@
     } else {
       setTimeout(advance, isCorrect ? 650 : 1300);
     }
+  }
+
+  function updateStreakIfNewDay() {
+    const streak = loadStreak();
+    const today = todayStr();
+    if (streak.lastDate === today) return { count: streak.count, isNewDay: false, bonus: 0 };
+    const newCount = (streak.lastDate === yesterdayStr()) ? streak.count + 1 : 1;
+    const bonus = 5 + Math.min(newCount, 10) * 3;
+    saveStreak({ count: newCount, lastDate: today });
+    return { count: newCount, isNewDay: true, bonus };
+  }
+
+  function rollGift() {
+    if (Math.random() < 0.7) return { type: 'coins', amount: 10 + randInt(0, 20) };
+    const unowned = SHOP_ITEMS.filter(it => !ownedItems.includes(it.id));
+    if (unowned.length === 0) return { type: 'coins', amount: 20 };
+    const item = unowned[randInt(0, unowned.length - 1)];
+    ownedItems.push(item.id);
+    saveOwnedItems(ownedItems);
+    return { type: 'item', itemId: item.id };
   }
 
   function finishSession() {
@@ -857,46 +1138,51 @@
     };
     saveRecords(records);
 
-    let newlyUnlocked = false;
-    if (state.correct >= 8) {
-      const zukan = loadZukan();
-      if (!zukan.includes(state.line)) { zukan.push(state.line); saveZukan(zukan); newlyUnlocked = true; }
-    }
+    const bossDefeated = state.correct >= 8;
+    const starBonus = [0, 10, 20, 35][stars];
+    const streakResult = updateStreakIfNewDay();
+    let coinsEarned = state.correct * 2 + starBonus + (bossDefeated ? 15 : 0) + (streakResult.isNewDay ? streakResult.bonus : 0);
 
-    renderResult(stars, totalTime, newlyUnlocked);
+    const giftEligible = stars === 3 || (streakResult.isNewDay && [3,7,14,30].includes(streakResult.count));
+    const gift = giftEligible ? rollGift() : null;
+    if (gift && gift.type === 'coins') coinsEarned += gift.amount;
+
+    addCoins(coinsEarned);
+    if (coinsEarned > 0) sfxCoin();
+
+    renderResult(stars, totalTime, coinsEarned, bossDefeated, streakResult, gift);
   }
 
   /* ---------------- result screen ---------------- */
-  function renderResult(stars, totalTime, newlyUnlocked) {
+  function renderResult(stars, totalTime, coinsEarned, bossDefeated, streakResult, gift) {
     showScreen('screen-result');
     document.getElementById('stat-correct').textContent = state.correct + '/' + QUESTIONS_PER_SESSION;
     document.getElementById('stat-time').textContent = fmtTime(totalTime);
     document.getElementById('stat-combo').textContent = state.maxCombo;
-    document.getElementById('result-creature-face').textContent = LINES[state.line].stages[state.stage];
+    document.getElementById('stat-coins').textContent = '+' + coinsEarned;
+    document.getElementById('result-creature-face').textContent = LINES[pet.line].stages[currentPetStage];
 
-    const reachedFinal = state.stage === 4;
+    const reachedFinal = currentPetStage === 4;
     const msgs = reachedFinal
-      ? [`${LINES[state.line].name}が しんかした！`]
+      ? [`${LINES[pet.line].name}が だいしんか中！`]
       : ['また れんしゅうしよう！', 'よくできました！', 'すばらしい！'];
     document.getElementById('result-msg').textContent = reachedFinal ? msgs[0] : msgs[Math.min(stars, msgs.length - 1)];
 
     for (let i = 1; i <= 3; i++) document.getElementById('star-' + i).classList.remove('lit');
     [1,2,3].slice(0, stars).forEach((n, i) => {
-      setTimeout(() => {
-        document.getElementById('star-' + n).classList.add('lit');
-      }, i * 250);
+      setTimeout(() => { document.getElementById('star-' + n).classList.add('lit'); }, i * 250);
     });
 
-    const banner = document.getElementById('evolve-banner');
-    if (reachedFinal) {
-      banner.textContent = newlyUnlocked
-        ? `📖 「${LINES[state.line].name}」を ずかんに とうろくしました！`
-        : `${LINES[state.line].name}は もう ずかんに あるよ`;
-      banner.classList.add('show');
-    } else {
-      banner.textContent = 'もっと せいかいすると しんかするよ！';
-      banner.classList.add('show');
+    const events = [];
+    events.push(bossDefeated ? `${state.boss} ボスを たおした！ (+15コイン)` : `${state.boss} ボスに にげられた…`);
+    if (streakResult.isNewDay) events.push(`🔥 ${streakResult.count}にち れんぞく！ (+${streakResult.bonus}コイン)`);
+    if (gift) {
+      events.push(gift.type === 'coins'
+        ? `🎁 ふしぎな プレゼント！ +${gift.amount}コイン`
+        : `🎁 ふしぎな プレゼント！「${ITEM_MAP[gift.itemId].icon} ${ITEM_MAP[gift.itemId].name}」を もらった！`);
     }
+    const eventsBox = document.getElementById('result-events');
+    eventsBox.innerHTML = events.map(t => `<div class="result-event">${t}</div>`).join('');
 
     if (stars === 3) {
       setTimeout(() => { confettiBurst(18); sfxClear(); }, 500);
@@ -905,18 +1191,62 @@
 
   /* ---------------- zukan screen ---------------- */
   function renderAlbum() {
-    const collected = loadZukan();
-    document.getElementById('album-count').textContent = `${collected.length} / ${LINE_KEYS.length} はっけん`;
+    const zukan = loadZukan();
+    const total = Object.keys(zukan).length;
+    document.getElementById('album-count').textContent = `${total} / ${LINE_KEYS.length} はっけん`;
     const grid = document.getElementById('album-grid');
     grid.innerHTML = '';
     LINE_KEYS.forEach(key => {
-      const has = collected.includes(key);
+      const count = zukan[key] || 0;
+      const has = count > 0;
       const cell = document.createElement('div');
-      cell.className = 'zukan-cell' + (has ? ' unlocked' : ' locked');
-      cell.innerHTML = `<div class="zface">${has ? LINES[key].stages[4] : '？'}</div><div class="zname">${has ? LINES[key].name : '？？？'}</div>`;
+      cell.className = 'zukan-cell ' + (has ? 'unlocked' : 'locked') + ' rarity-' + LINES[key].rarity;
+      cell.innerHTML = `<div class="zface">${has ? LINES[key].stages[4] : '？'}</div><div class="zname">${has ? LINES[key].name : '？？？'}</div>${has && count > 1 ? `<div class="zcount">×${count}</div>` : ''}`;
       grid.appendChild(cell);
     });
   }
+
+  /* ---------------- shop screen ---------------- */
+  function renderShop() {
+    document.getElementById('shop-coin-chip').textContent = `💰 ${loadCoins()}`;
+    const list = document.getElementById('shop-list');
+    list.innerHTML = '';
+    SHOP_ITEMS.forEach(item => {
+      const owned = ownedItems.includes(item.id);
+      const equipped = pet && pet.accessory === item.id;
+      const row = document.createElement('div');
+      row.className = 'shop-item';
+      let btnHtml;
+      if (!owned) {
+        const afford = loadCoins() >= item.price;
+        btnHtml = `<button class="shop-btn" data-id="${item.id}" data-action="buy" ${afford ? '' : 'disabled'}>${item.price}💰</button>`;
+      } else {
+        btnHtml = `<button class="shop-btn ${equipped ? 'equipped' : ''}" data-id="${item.id}" data-action="equip">${equipped ? 'そうびちゅう' : 'そうびする'}</button>`;
+      }
+      row.innerHTML = `<div class="icon">${item.icon}</div><div class="info"><div class="name">${item.name}</div>${owned ? '' : `<div class="price">${item.price} コイン</div>`}</div>${btnHtml}`;
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById('shop-list').addEventListener('click', (e) => {
+    const btn = e.target.closest('button.shop-btn');
+    if (!btn || btn.disabled) return;
+    const id = btn.dataset.id;
+    if (btn.dataset.action === 'equip') {
+      sfxTap();
+      pet.accessory = (pet.accessory === id) ? null : id;
+      savePet(pet);
+    } else {
+      const item = ITEM_MAP[id];
+      if (loadCoins() < item.price) return;
+      sfxTap();
+      addCoins(-item.price);
+      ownedItems.push(id);
+      saveOwnedItems(ownedItems);
+      if (!pet.accessory) { pet.accessory = id; savePet(pet); }
+    }
+    renderShop();
+  });
 
   /* ---------------- wiring ---------------- */
   document.getElementById('btn-goto-select').addEventListener('click', () => {
@@ -925,8 +1255,12 @@
   document.getElementById('btn-goto-album').addEventListener('click', () => {
     ensureAudio(); sfxTap(); renderAlbum(); showScreen('screen-album');
   });
-  document.getElementById('btn-back-title').addEventListener('click', () => { sfxTap(); renderBestSummary(); showScreen('screen-title'); });
-  document.getElementById('btn-back-title-2').addEventListener('click', () => { sfxTap(); renderBestSummary(); showScreen('screen-title'); });
+  document.getElementById('btn-goto-shop').addEventListener('click', () => {
+    ensureAudio(); sfxTap(); renderShop(); showScreen('screen-shop');
+  });
+  document.getElementById('btn-back-title').addEventListener('click', () => { sfxTap(); renderTitleDashboard(); showScreen('screen-title'); });
+  document.getElementById('btn-back-title-2').addEventListener('click', () => { sfxTap(); renderTitleDashboard(); showScreen('screen-title'); });
+  document.getElementById('btn-back-title-3').addEventListener('click', () => { sfxTap(); renderTitleDashboard(); showScreen('screen-title'); });
   document.getElementById('btn-start-play').addEventListener('click', () => { sfxTap(); startSession(); });
 
   document.getElementById('numpad').addEventListener('click', (e) => {
@@ -944,7 +1278,7 @@
     showScreen('screen-select');
   });
 
-  document.getElementById('btn-retry').addEventListener('click', () => { sfxTap(); startSession(); });
+  document.getElementById('btn-retry').addEventListener('click', () => { sfxTap(); renderTitleDashboard(); startSession(); });
   document.getElementById('btn-back-select').addEventListener('click', () => { sfxTap(); renderSelect(); showScreen('screen-select'); });
 
   function toggleMute() {
@@ -965,7 +1299,7 @@
 
   /* ---------------- init ---------------- */
   updateMuteUI();
-  renderBestSummary();
+  renderTitleDashboard();
 })();
 </script>
 </body>
