@@ -121,6 +121,14 @@
     animation: bob 2.4s ease-in-out infinite;
   }
   .pet-circle .face { font-size:34px; }
+
+  /* unify the mismatched native emoji colors into one coordinated warm tone */
+  .face, .creature-face, .zface {
+    filter: saturate(.6) sepia(.16) brightness(1.02) contrast(.95);
+  }
+  .battle-boss .face {
+    filter: saturate(.48) sepia(.06) brightness(.88) contrast(1.08) hue-rotate(-6deg);
+  }
   .acc-badge { position:absolute; top:-6px; right:-6px; font-size:20px; }
   @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
   .pet-name { font-family:'Zen Kaku Gothic New'; font-weight:900; font-size:15px; color:#2d3561; margin-top:8px; }
@@ -461,9 +469,9 @@
     </div>
 
     <div class="battle-strip">
-      <div class="battle-pet" id="battle-pet">🥚</div>
+      <div class="battle-pet" id="battle-pet"><span class="face" id="battle-pet-face">🥚</span></div>
       <div class="battle-vs">VS</div>
-      <div class="battle-boss" id="battle-boss">👹</div>
+      <div class="battle-boss" id="battle-boss"><span class="face" id="battle-boss-face">👹</span></div>
       <div class="combo-chip" id="combo-badge">🔥3</div>
     </div>
 
@@ -938,8 +946,8 @@
     localStorage.setItem('mathdrill_last_mode', state.mode);
 
     showScreen('screen-play');
-    document.getElementById('battle-pet').textContent = LINES[pet.line].stages[currentPetStage];
-    document.getElementById('battle-boss').textContent = state.boss;
+    document.getElementById('battle-pet-face').textContent = LINES[pet.line].stages[currentPetStage];
+    document.getElementById('battle-boss-face').textContent = state.boss;
     document.getElementById('play-speech').textContent = 'がんばって！';
     renderStones();
     startTimer();
@@ -1087,7 +1095,7 @@
       const newStage = stageForTotal(pet.totalCorrect);
       if (newStage !== currentPetStage) {
         currentPetStage = newStage;
-        document.getElementById('battle-pet').textContent = LINES[pet.line].stages[currentPetStage];
+        document.getElementById('battle-pet-face').textContent = LINES[pet.line].stages[currentPetStage];
         evolved = true;
       }
     } else {
