@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>けいさんドリル</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Yusei+Magic&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Yusei+Magic&family=Mochiy+Pop+One&display=swap');
 
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
@@ -13,16 +13,18 @@
     height:100%;
     font-family:'Kosugi Maru','Hiragino Sans',sans-serif;
     background:
-      radial-gradient(circle at 15% 10%, #fff3b0 0%, transparent 40%),
-      radial-gradient(circle at 85% 90%, #b0e8ff 0%, transparent 45%),
-      linear-gradient(160deg, #7fd7ff 0%, #a0e9c7 45%, #ffe9a8 100%);
+      radial-gradient(circle at 12% 8%, #ffe1f3 0%, transparent 38%),
+      radial-gradient(circle at 88% 92%, #d6f5ff 0%, transparent 42%),
+      radial-gradient(circle at 90% 10%, #fff6c9 0%, transparent 35%),
+      linear-gradient(160deg, #ffd6ec 0%, #ffe9c9 40%, #d3f3ff 100%);
     background-attachment: fixed;
-    overflow-x:hidden;
+    overflow:hidden;
     user-select:none;
     -webkit-user-select:none;
   }
 
   body {
+    position:relative;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -30,14 +32,31 @@
     padding:16px;
   }
 
+  /* floating background decorations */
+  .deco {
+    position:fixed; pointer-events:none; z-index:0; opacity:.8;
+    animation: drift 14s ease-in-out infinite;
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,.06));
+  }
+  @keyframes drift {
+    0%,100% { transform: translateY(0) translateX(0) rotate(0deg); }
+    50% { transform: translateY(-22px) translateX(10px) rotate(6deg); }
+  }
+  .d1{top:6%;left:6%;font-size:38px;animation-duration:13s}
+  .d2{top:14%;right:8%;font-size:28px;animation-duration:16s;animation-delay:1s}
+  .d3{bottom:10%;left:9%;font-size:30px;animation-duration:15s;animation-delay:2s}
+  .d4{bottom:16%;right:7%;font-size:34px;animation-duration:18s;animation-delay:.5s}
+  .d5{top:45%;left:3%;font-size:22px;animation-duration:12s;animation-delay:1.5s}
+  .d6{top:50%;right:3%;font-size:24px;animation-duration:17s;animation-delay:2.5s}
+
   .app {
-    position:relative;
+    position:relative; z-index:1;
     width:100%;
     max-width:420px;
-    min-height:min(760px, 92svh);
-    background:#fffdf6;
-    border-radius:28px;
-    box-shadow: 0 18px 40px rgba(60,90,60,.25), 0 0 0 6px #ffffffaa inset;
+    min-height:min(780px, 94svh);
+    background:#fffdf9;
+    border-radius:32px;
+    box-shadow: 0 20px 44px rgba(150,90,140,.28), 0 0 0 7px #ffffffcc inset, 0 0 0 10px #ffd3ec66 inset;
     overflow:hidden;
     display:flex;
     flex-direction:column;
@@ -47,7 +66,7 @@
     display:none;
     flex-direction:column;
     flex:1;
-    padding:22px 20px 24px;
+    padding:20px 18px 22px;
     position:relative;
   }
   .screen.active { display:flex; }
@@ -55,137 +74,189 @@
   /* ---------- common bits ---------- */
   .top-row {
     display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:8px;
+    margin-bottom:6px;
   }
   .icon-btn {
-    width:40px; height:40px; border-radius:50%;
-    border:none; background:#fff2cf; color:#8a6a1f;
+    width:42px; height:42px; border-radius:50%; flex:0 0 auto;
+    border:none; background:#fff0c4; color:#a9770f;
     font-size:19px; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 3px 0 #e8d093;
+    box-shadow:0 3px 0 #edcd7f;
     cursor:pointer;
   }
-  .icon-btn:active { transform:translateY(2px); box-shadow:0 1px 0 #e8d093; }
+  .icon-btn:active { transform:translateY(2px); box-shadow:0 1px 0 #edcd7f; }
 
   h1.title {
-    text-align:center; font-family:'Yusei Magic',sans-serif;
-    font-size:30px; color:#ff8a3d; letter-spacing:.04em;
-    text-shadow: 2px 2px 0 #fff, 4px 4px 0 #ffcf9e;
-    margin: 10px 0 4px;
+    text-align:center; font-family:'Mochiy Pop One',sans-serif;
+    font-size:32px; color:#ff6fa5; letter-spacing:.03em;
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 #ffc9e2, 5px 5px 10px rgba(255,111,165,.25);
+    margin: 8px 0 2px;
   }
-  .subtitle { text-align:center; color:#5c8a6b; font-size:13px; margin-bottom:18px; }
+  .subtitle { text-align:center; color:#8a7aa8; font-size:13px; margin-bottom:14px; }
 
-  .mascot {
-    font-size:80px; text-align:center; margin: 6px 0 10px;
-    filter: drop-shadow(0 6px 6px rgba(0,0,0,.15));
-    animation: float 2.6s ease-in-out infinite;
+  .mascot-badge {
+    position:relative; width:132px; height:132px; margin:4px auto 8px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff6d0 0%, #ffd9ef 55%, #ffc2e6 100%);
+    box-shadow: 0 10px 0 #ffb3da, 0 14px 20px rgba(255,140,190,.35), 0 0 0 6px #fff inset;
+    animation: bob 2.4s ease-in-out infinite;
   }
-  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .mascot-badge .face { font-size:70px; filter: drop-shadow(0 4px 3px rgba(0,0,0,.12)); }
+  @keyframes bob { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-10px) rotate(2deg)} }
 
   .big-btn {
     display:block; width:100%; padding:16px; margin-top:auto;
-    border:none; border-radius:20px; font-family:'Yusei Magic',sans-serif;
-    font-size:20px; color:#fff; background:linear-gradient(180deg,#ffab5e,#ff7a2f);
-    box-shadow:0 6px 0 #d85f16;
+    border:none; border-radius:22px; font-family:'Mochiy Pop One',sans-serif;
+    font-size:19px; color:#fff; background:linear-gradient(180deg,#ff9fc0,#ff5f9c);
+    box-shadow:0 6px 0 #e2417f;
     cursor:pointer;
   }
-  .big-btn:active { transform:translateY(4px); box-shadow:0 2px 0 #d85f16; }
+  .big-btn:active { transform:translateY(4px); box-shadow:0 2px 0 #e2417f; }
   .big-btn.secondary {
-    background:linear-gradient(180deg,#8fe0c2,#4fbf95);
-    box-shadow:0 6px 0 #338f6b; margin-top:10px;
+    background:linear-gradient(180deg,#9fe4ff,#5cc3f2);
+    box-shadow:0 6px 0 #2f96c9; margin-top:10px;
   }
-  .big-btn.secondary:active { box-shadow:0 2px 0 #338f6b; }
+  .big-btn.secondary:active { box-shadow:0 2px 0 #2f96c9; }
   .big-btn.ghost {
-    background:#fff; color:#888; box-shadow:0 4px 0 #ddd; font-size:15px; padding:10px;
+    background:#fff; color:#9a8ab0; box-shadow:0 4px 0 #e8e0f0; font-size:14px; padding:10px;
+    font-family:'Kosugi Maru';
   }
 
   /* ---------- title screen ---------- */
   #screen-title { justify-content:center; align-items:center; text-align:center; }
-  #screen-title .mascot { font-size:100px; }
+  #screen-title .mascot-badge { width:150px; height:150px; }
+  #screen-title .mascot-badge .face { font-size:80px; }
   .best-summary {
-    margin-top:18px; background:#fff2df; border-radius:16px; padding:12px 16px;
-    font-size:13px; color:#8a6a3f; width:100%;
+    margin-top:16px; background:linear-gradient(180deg,#fff4da,#ffe9bd); border-radius:18px; padding:12px 16px;
+    font-size:13px; color:#9a6b1f; width:100%; font-weight:bold;
   }
+  .title-row-btns { display:flex; gap:8px; width:100%; margin-top:12px; }
+  .title-row-btns .big-btn { margin-top:0; }
 
   /* ---------- select screen ---------- */
-  .section-label { font-size:13px; color:#6b8f78; font-weight:bold; margin:14px 0 8px; }
+  .section-label { font-size:13px; color:#c26fa0; font-weight:bold; margin:12px 0 6px; }
   .grade-row { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; }
   .chip {
-    flex:0 0 auto; padding:10px 16px; border-radius:14px; border:2px solid #ffd9a0;
-    background:#fff; font-family:'Kosugi Maru'; font-size:15px; color:#a06a1f;
-    cursor:pointer; white-space:nowrap;
+    flex:0 0 auto; padding:10px 16px; border-radius:16px; border:2px solid #ffcbe4;
+    background:#fff; font-family:'Kosugi Maru'; font-size:15px; color:#c26fa0;
+    cursor:pointer; white-space:nowrap; font-weight:bold;
   }
-  .chip.active { background:#ff8a3d; color:#fff; border-color:#ff8a3d; }
+  .chip.active { background:linear-gradient(180deg,#ff9fc0,#ff6fa5); color:#fff; border-color:#ff6fa5; }
 
-  .op-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
-  .op-card {
-    position:relative; border-radius:16px; border:2px solid #d8ecd8; background:#fff;
-    padding:14px 8px 10px; text-align:center; cursor:pointer;
+  .mode-row { display:flex; gap:8px; }
+  .mode-btn {
+    flex:1; padding:10px 4px; border-radius:16px; border:2px solid #bfe6f5;
+    background:#fff; color:#3f9cbd; font-family:'Kosugi Maru'; font-size:13px; font-weight:bold;
+    cursor:pointer; text-align:center; line-height:1.3;
   }
-  .op-card .op-sym { font-size:26px; color:#4fa07a; font-family:'Yusei Magic'; }
-  .op-card .op-name { font-size:12px; color:#7a8f80; margin-top:2px; }
+  .mode-btn small { display:block; font-size:10px; font-weight:normal; color:#7fb8cc; margin-top:2px; }
+  .mode-btn.active { background:linear-gradient(180deg,#9fe4ff,#5cc3f2); color:#fff; border-color:#5cc3f2; }
+  .mode-btn.active small { color:#eaf8ff; }
+
+  .op-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-top:2px; }
+  .op-card {
+    position:relative; border-radius:18px; border:2px solid #ffe1c8; background:#fff;
+    padding:12px 8px 8px; text-align:center; cursor:pointer;
+  }
+  .op-card .op-sym { font-size:26px; color:#ff8a3d; font-family:'Mochiy Pop One'; }
+  .op-card .op-name { font-size:12px; color:#a98a63; margin-top:2px; font-weight:bold; }
   .op-card .stars { font-size:12px; color:#ffb200; margin-top:4px; letter-spacing:1px; min-height:14px; }
-  .op-card.active { border-color:#4fbf95; background:#eafff3; }
+  .op-card.active { border-color:#ff6fa5; background:#fff2f8; }
   .op-card.locked { opacity:.4; pointer-events:none; }
   .op-card.locked::after {
     content:'🔒'; position:absolute; top:6px; right:8px; font-size:12px;
   }
 
   /* ---------- play screen ---------- */
-  .play-header { display:flex; align-items:center; justify-content:space-between; }
-  .progress-wrap { flex:1; margin:0 10px; }
-  .progress-bar-bg { height:10px; background:#eee; border-radius:6px; overflow:hidden; }
-  .progress-bar-fill { height:100%; background:linear-gradient(90deg,#7fd7ff,#4fbf95); width:0%; transition:width .3s; }
-  .meta-row { display:flex; justify-content:space-between; font-size:11px; color:#7a8f80; margin-top:4px; }
+  .play-header { display:flex; align-items:center; justify-content:space-between; gap:6px; }
+  .stones-wrap { flex:1; overflow-x:auto; }
+  .stones-row { display:flex; gap:4px; padding:2px; width:max-content; margin:0 auto; }
+  .stone {
+    width:22px; height:22px; border-radius:50%; background:#f0eaf5; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center; font-size:11px;
+    border:2px solid #e4dcee; transition: all .2s;
+  }
+  .stone.current { border-color:#ff9fc0; box-shadow:0 0 0 3px #ffe1ee; animation:pulse 1s ease-in-out infinite; }
+  .stone.ok { background:#8fe0b6; border-color:#4fbf95; color:#fff; }
+  .stone.ng { background:#ffaba0; border-color:#e14b4b; color:#fff; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.18)} }
+  .meta-row { display:flex; justify-content:center; font-size:12px; color:#b09ac2; margin-top:4px; font-weight:bold; }
 
   .combo-badge {
-    align-self:center; margin-top:6px; font-size:14px; color:#ff6a3d; font-weight:bold;
+    align-self:center; margin-top:4px; font-size:15px; color:#ff5fa0; font-weight:bold;
     opacity:0; transform:scale(.6); transition:opacity .2s, transform .2s;
+    font-family:'Mochiy Pop One';
   }
-  .combo-badge.show { opacity:1; transform:scale(1); }
+  .combo-badge.show { opacity:1; transform:scale(1); animation:comboPop .3s ease; }
+  @keyframes comboPop { 0%{transform:scale(.5) rotate(-8deg)} 60%{transform:scale(1.25) rotate(4deg)} 100%{transform:scale(1) rotate(0)} }
 
   .question-box {
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center;
   }
-  .mascot-small { font-size:56px; transition:transform .15s; }
+  .mascot-small-wrap {
+    width:84px; height:84px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff6d0 0%, #ffe0f0 60%, #ffcbe6 100%);
+    box-shadow:0 5px 0 #ffb3da, 0 0 0 4px #fff inset;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .mascot-small { font-size:48px; transition:transform .15s; }
   .speech {
-    background:#fff; border:2px solid #ffd9a0; border-radius:14px; padding:6px 14px;
-    font-size:13px; color:#a06a1f; margin-top:6px; min-height:18px;
+    background:#fff; border:2px solid #ffcbe4; border-radius:14px; padding:6px 14px;
+    font-size:13px; color:#c26fa0; margin-top:8px; min-height:18px; font-weight:bold;
+  }
+  .equation-plate {
+    background:#fff; border-radius:22px; padding:18px 22px; margin:16px 0 12px;
+    box-shadow: 0 6px 0 #ffe1c8, 0 8px 18px rgba(255,140,80,.12);
+    border:3px solid #ffe9d6;
   }
   .question-text {
-    font-family:'Yusei Magic'; font-size:38px; color:#374a3f; margin:18px 0 10px;
-    letter-spacing:.03em;
+    font-family:'Mochiy Pop One'; font-size:clamp(30px,9vw,42px); color:#4a3a63;
+    letter-spacing:.02em; font-variant-numeric:tabular-nums; white-space:nowrap;
   }
+  .question-text .blank { color:#ff6fa5; }
   .answer-display {
-    font-family:'Yusei Magic'; font-size:30px; color:#ff7a2f; min-height:42px;
-    border-bottom:4px solid #ffd9a0; min-width:120px; padding:0 10px;
+    font-family:'Mochiy Pop One'; font-size:30px; color:#ff8a3d; min-height:44px;
+    background:#fff8ef; border:3px solid #ffd9a0; border-radius:16px;
+    min-width:140px; padding:4px 14px; font-variant-numeric:tabular-nums;
   }
-  .answer-display.correct { color:#2fae6b; border-color:#2fae6b; }
-  .answer-display.wrong { color:#e14b4b; border-color:#e14b4b; }
+  .answer-display.correct { color:#2fae6b; border-color:#4fbf95; background:#f1fff6; }
+  .answer-display.wrong { color:#e14b4b; border-color:#e14b4b; background:#fff2f1; font-size:20px; }
 
-  .numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:16px; }
+  .numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:16px; }
   .num-btn {
-    padding:16px 0; font-size:20px; border-radius:14px; border:none;
-    background:#fff; color:#374a3f; box-shadow:0 4px 0 #dfe6e0;
+    padding:17px 0; font-size:22px; font-weight:bold; border-radius:16px; border:none;
+    background:#fff; color:#4a3a63; box-shadow:0 4px 0 #e9e1f0;
     font-family:'Kosugi Maru'; cursor:pointer;
   }
-  .num-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #dfe6e0; }
-  .num-btn.ok { background:#4fbf95; color:#fff; box-shadow:0 4px 0 #338f6b; }
+  .num-btn:active { transform:translateY(3px); box-shadow:0 1px 0 #e9e1f0; }
+  .num-btn.ok { background:linear-gradient(180deg,#9fe4ff,#5cc3f2); color:#fff; box-shadow:0 4px 0 #2f96c9; }
   .num-btn.del { background:#ffe0e0; color:#c14646; box-shadow:0 4px 0 #e6b3b3; }
 
   /* ---------- result screen ---------- */
   #screen-result { align-items:center; text-align:center; justify-content:flex-start; }
-  .stars-row { font-size:44px; margin:14px 0; letter-spacing:6px; }
-  .star { filter: grayscale(1) opacity(.35); transition:transform .3s, filter .3s; display:inline-block; }
+  .stars-row { font-size:46px; margin:10px 0; letter-spacing:6px; }
+  .star { filter: grayscale(1) opacity(.3); transition:transform .3s, filter .3s; display:inline-block; }
   .star.lit { filter:none; animation:pop .4s ease; }
   @keyframes pop { 0%{transform:scale(0)} 60%{transform:scale(1.3)} 100%{transform:scale(1)} }
 
   .result-stats {
-    width:100%; background:#f3fbf6; border-radius:16px; padding:14px; margin-top:10px;
-    display:flex; justify-content:space-around; font-size:13px; color:#4a6a56;
+    width:100%; background:#fff3f8; border-radius:18px; padding:14px; margin-top:8px;
+    display:flex; justify-content:space-around; font-size:12px; color:#a06b8f;
   }
-  .result-stats b { display:block; font-size:20px; color:#2fae6b; font-family:'Yusei Magic'; }
-  .result-msg { font-size:16px; color:#ff7a2f; margin-top:14px; font-family:'Yusei Magic'; }
+  .result-stats b { display:block; font-size:19px; color:#ff5fa0; font-family:'Mochiy Pop One'; }
+  .result-msg { font-size:17px; color:#ff8a3d; margin-top:12px; font-family:'Mochiy Pop One'; }
+
+  .sticker-reveal {
+    width:100%; background:linear-gradient(180deg,#fff8e0,#ffedc0); border-radius:18px; padding:12px; margin-top:12px;
+    display:none;
+  }
+  .sticker-reveal.show { display:block; }
+  .sticker-reveal .label { font-size:12px; color:#a9770f; font-weight:bold; margin-bottom:6px; }
+  .sticker-reveal .items { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .sticker-reveal .items span { font-size:34px; animation:stickerPop .5s ease backwards; }
+
+  @keyframes stickerPop { 0%{transform:scale(0) rotate(-30deg)} 70%{transform:scale(1.2) rotate(8deg)} 100%{transform:scale(1) rotate(0)} }
 
   .star-particle {
     position:fixed; top:50%; left:50%; font-size:20px; pointer-events:none; z-index:50;
@@ -196,42 +267,67 @@
   }
 
   .flash-overlay {
-    position:absolute; inset:0; pointer-events:none; opacity:0;
+    position:absolute; inset:0; pointer-events:none; opacity:0; border-radius:32px;
   }
   .flash-overlay.go { animation: flash .4s ease; }
-  @keyframes flash { 0%{opacity:.55} 100%{opacity:0} }
+  @keyframes flash { 0%{opacity:.5} 100%{opacity:0} }
   .flash-overlay.ok { background:#7fe0ab; }
   .flash-overlay.ng { background:#ff9a9a; }
+
+  /* ---------- sticker album ---------- */
+  .album-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; overflow-y:auto; padding:4px 2px; }
+  .album-cell {
+    aspect-ratio:1; border-radius:14px; background:#fff; border:2px solid #ffe1c8;
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+  }
+  .album-cell.locked { background:#f3eef7; color:#cfc3dd; border-style:dashed; }
+  .album-count { text-align:center; font-size:13px; color:#a06b8f; font-weight:bold; margin-bottom:10px; }
 </style>
 </head>
 <body>
+<span class="deco d1">☁️</span>
+<span class="deco d2">⭐</span>
+<span class="deco d3">✨</span>
+<span class="deco d4">☁️</span>
+<span class="deco d5">💗</span>
+<span class="deco d6">🌟</span>
+
 <div class="app">
 
   <!-- ===== TITLE ===== -->
   <section class="screen active" id="screen-title">
-    <div class="mascot" id="title-mascot">🐱</div>
+    <div class="mascot-badge"><span class="face" id="title-mascot">🐱</span></div>
     <h1 class="title">けいさんドリル</h1>
     <p class="subtitle">あそんで まなぶ さんすうドリル</p>
-    <button class="big-btn" id="btn-goto-select" style="margin-top:20px">はじめる</button>
+    <button class="big-btn" id="btn-goto-select" style="margin-top:16px">あそぶ！</button>
+    <div class="title-row-btns">
+      <button class="big-btn secondary" id="btn-goto-album">📔 シールちょう</button>
+    </div>
     <div class="best-summary" id="best-summary">まだ きろくが ありません</div>
-    <button class="big-btn ghost" id="btn-mute" style="margin-top:14px">🔊 おと：オン</button>
+    <button class="big-btn ghost" id="btn-mute" style="margin-top:12px">🔊 おと：オン</button>
   </section>
 
   <!-- ===== SELECT ===== -->
   <section class="screen" id="screen-select">
     <div class="top-row">
       <button class="icon-btn" id="btn-back-title">←</button>
-      <span style="font-family:'Yusei Magic';color:#4fa07a;font-size:16px">もんだいを えらぶ</span>
-      <span style="width:40px"></span>
+      <span style="font-family:'Mochiy Pop One';color:#ff6fa5;font-size:16px">もんだいを えらぶ</span>
+      <span style="width:42px"></span>
     </div>
 
     <div class="section-label">がくねん</div>
     <div class="grade-row" id="grade-row"></div>
 
+    <div class="section-label">もんだいの けいしき</div>
+    <div class="mode-row" id="mode-row">
+      <button class="mode-btn" data-mode="normal">ふつう<small>7 ＋ 5 ＝ ？</small></button>
+      <button class="mode-btn" data-mode="missing">むしくい<small>7 ＋ □ ＝ 12</small></button>
+    </div>
+
     <div class="section-label">けいさんの しゅるい</div>
     <div class="op-grid" id="op-grid"></div>
 
-    <button class="big-btn" id="btn-start-play" style="margin-top:22px">スタート！</button>
+    <button class="big-btn" id="btn-start-play" style="margin-top:18px">スタート！</button>
   </section>
 
   <!-- ===== PLAY ===== -->
@@ -239,21 +335,16 @@
     <div class="flash-overlay" id="flash-overlay"></div>
     <div class="play-header">
       <button class="icon-btn" id="btn-quit-play">←</button>
-      <div class="progress-wrap">
-        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
-        <div class="meta-row">
-          <span id="progress-label">1 / 10</span>
-          <span id="timer-label">0:00</span>
-        </div>
-      </div>
+      <div class="stones-wrap"><div class="stones-row" id="stones-row"></div></div>
       <button class="icon-btn" id="btn-mute-play">🔊</button>
     </div>
+    <div class="meta-row"><span id="timer-label">0:00</span></div>
     <div class="combo-badge" id="combo-badge">🔥 3れんぞく！</div>
 
     <div class="question-box">
-      <div class="mascot-small" id="play-mascot">🐱</div>
+      <div class="mascot-small-wrap"><span class="mascot-small" id="play-mascot">🐱</span></div>
       <div class="speech" id="play-speech">がんばって！</div>
-      <div class="question-text" id="question-text">3 + 4</div>
+      <div class="equation-plate"><div class="question-text" id="question-text">3 ＋ 4 ＝</div></div>
       <div class="answer-display" id="answer-display">？</div>
     </div>
 
@@ -275,7 +366,7 @@
 
   <!-- ===== RESULT ===== -->
   <section class="screen" id="screen-result">
-    <div class="mascot" id="result-mascot">🐱</div>
+    <div class="mascot-badge"><span class="face" id="result-mascot">🐱</span></div>
     <div class="stars-row">
       <span class="star" id="star-1">★</span><span class="star" id="star-2">★</span><span class="star" id="star-3">★</span>
     </div>
@@ -285,8 +376,23 @@
       <div><b id="stat-time">0:00</b>タイム</div>
       <div><b id="stat-combo">0</b>さいだいコンボ</div>
     </div>
-    <button class="big-btn" id="btn-retry" style="margin-top:22px">もういちど</button>
+    <div class="sticker-reveal" id="sticker-reveal">
+      <div class="label">ごほうびシールを ゲット！</div>
+      <div class="items" id="sticker-items"></div>
+    </div>
+    <button class="big-btn" id="btn-retry" style="margin-top:18px">もういちど</button>
     <button class="big-btn secondary" id="btn-back-select">もんだいを えらびなおす</button>
+  </section>
+
+  <!-- ===== ALBUM ===== -->
+  <section class="screen" id="screen-album">
+    <div class="top-row">
+      <button class="icon-btn" id="btn-back-title-2">←</button>
+      <span style="font-family:'Mochiy Pop One';color:#ff6fa5;font-size:16px">シールちょう</span>
+      <span style="width:42px"></span>
+    </div>
+    <div class="album-count" id="album-count">0 / 30 あつめた</div>
+    <div class="album-grid" id="album-grid"></div>
   </section>
 
 </div>
@@ -314,16 +420,24 @@
   };
 
   const QUESTIONS_PER_SESSION = 10;
-  const STORAGE_KEY = 'meyonze_mathdrill_v1';
+  const STORAGE_KEY = 'meyonze_mathdrill_v2';
   const MUTE_KEY = 'meyonze_mathdrill_mute';
+  const STICKER_KEY = 'meyonze_mathdrill_stickers';
 
   const PRAISE = ['せいかい！','やったね！','すごい！','ピンポン！','ばっちり！'];
   const CONSOLE_WORDS = ['おしい！','どんまい！','つぎがんばろう！'];
+
+  const STICKERS = [
+    '🍓','🍉','🍩','🍭','🧁','🍦','🍎','🍰','🍪','🍬',
+    '🐰','🐱','🐶','🐻','🦊','🐼','🐨','🐣','🐤','🐢',
+    '🦄','🌈','🌸','🍀','🌻','🎀','👑','💎','🦋','🐬',
+  ];
 
   /* ---------------- state ---------------- */
   const state = {
     grade: Number(localStorage.getItem('mathdrill_last_grade')) || 1,
     op: localStorage.getItem('mathdrill_last_op') || 'add',
+    mode: localStorage.getItem('mathdrill_last_mode') || 'normal',
     queue: [], idx: 0, correct: 0, combo: 0, maxCombo: 0,
     startTime: 0, timerHandle: null, input: '', locked: false,
     muted: localStorage.getItem(MUTE_KEY) === '1',
@@ -331,38 +445,48 @@
 
   /* ---------------- helpers ---------------- */
   function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
   function availableOps(grade) { return CONFIG[grade].ops; }
 
-  function genOne(grade, op) {
+  // returns the raw triple for an operation: a (sym) b = c
+  function genRaw(grade, op) {
     const c = CONFIG[grade];
     if (op === 'add') {
       const a = randInt(1, c.add.aMax), b = randInt(1, c.add.bMax);
-      return { text: `${a} ＋ ${b}`, answer: a + b };
+      return { a, b, c: a + b, sym: '＋' };
     }
     if (op === 'sub') {
       const top = randInt(1, c.sub.topMax);
       const b = randInt(0, top);
-      return { text: `${top} － ${b}`, answer: top - b };
+      return { a: top, b, c: top - b, sym: '－' };
     }
     if (op === 'mul') {
       const a = randInt(1, c.mul.aMax), b = randInt(1, c.mul.bMax);
-      return { text: `${a} × ${b}`, answer: a * b };
+      return { a, b, c: a * b, sym: '×' };
     }
     if (op === 'div') {
       const divisor = randInt(2, c.div.divisorMax);
       const quotient = randInt(1, c.div.quotientMax);
-      const dividend = divisor * quotient;
-      return { text: `${dividend} ÷ ${divisor}`, answer: quotient };
+      return { a: divisor * quotient, b: divisor, c: quotient, sym: '÷' };
     }
   }
 
-  function genQuestion(grade, op) {
-    if (op === 'mix') {
-      const ops = availableOps(grade);
-      return genOne(grade, ops[randInt(0, ops.length - 1)]);
+  function genQuestion(grade, op, mode) {
+    const actualOp = op === 'mix' ? availableOps(grade)[randInt(0, availableOps(grade).length - 1)] : op;
+    const raw = genRaw(grade, actualOp);
+    if (mode === 'missing') {
+      const slot = ['a', 'b', 'c'][randInt(0, 2)];
+      const parts = {
+        a: slot === 'a' ? '□' : raw.a,
+        b: slot === 'b' ? '□' : raw.b,
+        c: slot === 'c' ? '□' : raw.c,
+      };
+      return {
+        text: `${parts.a} ${raw.sym} ${parts.b} ＝ ${parts.c}`,
+        answer: raw[slot],
+        blank: true,
+      };
     }
-    return genOne(grade, op);
+    return { text: `${raw.a} ${raw.sym} ${raw.b} ＝`, answer: raw.c, blank: false };
   }
 
   function loadRecords() {
@@ -370,7 +494,13 @@
     catch (e) { return {}; }
   }
   function saveRecords(r) { localStorage.setItem(STORAGE_KEY, JSON.stringify(r)); }
-  function recordKey(grade, op) { return grade + '_' + op; }
+  function recordKey(grade, op, mode) { return grade + '_' + op + '_' + mode; }
+
+  function loadStickers() {
+    try { return JSON.parse(localStorage.getItem(STICKER_KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function saveStickers(arr) { localStorage.setItem(STICKER_KEY, JSON.stringify(arr)); }
 
   function fmtTime(sec) {
     const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
@@ -403,6 +533,7 @@
   function sfxWrong() { beep(180, 0.25, 'sawtooth'); }
   function sfxTap() { beep(600, 0.05, 'square'); }
   function sfxClear() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => beep(f, 0.2, 'triangle'), i * 110)); }
+  function sfxSticker() { [660, 990].forEach((f, i) => setTimeout(() => beep(f, 0.16, 'square'), i * 90)); }
 
   function updateMuteUI() {
     const label = state.muted ? '🔇 おと：オフ' : '🔊 おと：オン';
@@ -421,10 +552,11 @@
     const records = loadRecords();
     const keys = Object.keys(records);
     const el = document.getElementById('best-summary');
+    const stickerCount = loadStickers().length;
     if (keys.length === 0) { el.textContent = 'まだ きろくが ありません。あそんでみよう！'; return; }
     let totalStars = 0;
     keys.forEach(k => totalStars += (records[k].stars || 0));
-    el.textContent = `⭐ あつめた ほしのかず： ${totalStars} こ`;
+    el.textContent = `⭐ ほし ${totalStars}こ　📔 シール ${stickerCount}/${STICKERS.length}`;
   }
 
   /* ---------------- select screen ---------------- */
@@ -439,6 +571,10 @@
       gradeRow.appendChild(chip);
     }
 
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === state.mode);
+    });
+
     const ops = availableOps(state.grade).concat(availableOps(state.grade).length > 1 ? ['mix'] : []);
     const opGrid = document.getElementById('op-grid');
     opGrid.innerHTML = '';
@@ -446,7 +582,7 @@
     ops.forEach(op => {
       const card = document.createElement('div');
       card.className = 'op-card' + (op === state.op ? ' active' : '');
-      const rec = records[recordKey(state.grade, op)];
+      const rec = records[recordKey(state.grade, op, state.mode)];
       const stars = rec ? rec.stars : 0;
       card.innerHTML = `
         <div class="op-sym">${OP_META[op].sym}</div>
@@ -462,20 +598,38 @@
     if (!ops.includes(state.op) && state.op !== 'mix') state.op = ops[0];
   }
 
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => { sfxTap(); state.mode = btn.dataset.mode; renderSelect(); });
+  });
+
   /* ---------------- play screen ---------------- */
   function startSession() {
     state.queue = [];
-    for (let i = 0; i < QUESTIONS_PER_SESSION; i++) state.queue.push(genQuestion(state.grade, state.op));
+    for (let i = 0; i < QUESTIONS_PER_SESSION; i++) state.queue.push(genQuestion(state.grade, state.op, state.mode));
     state.idx = 0; state.correct = 0; state.combo = 0; state.maxCombo = 0; state.input = ''; state.locked = false;
     state.startTime = Date.now();
     localStorage.setItem('mathdrill_last_grade', state.grade);
     localStorage.setItem('mathdrill_last_op', state.op);
+    localStorage.setItem('mathdrill_last_mode', state.mode);
 
     showScreen('screen-play');
     document.getElementById('play-mascot').textContent = '🐱';
     document.getElementById('play-speech').textContent = 'がんばって！';
+    renderStones();
     startTimer();
     renderQuestion();
+  }
+
+  function renderStones() {
+    const row = document.getElementById('stones-row');
+    row.innerHTML = '';
+    for (let i = 0; i < QUESTIONS_PER_SESSION; i++) {
+      const s = document.createElement('div');
+      s.className = 'stone';
+      s.id = 'stone-' + i;
+      s.textContent = i + 1;
+      row.appendChild(s);
+    }
   }
 
   function startTimer() {
@@ -490,12 +644,13 @@
     state.input = '';
     state.locked = false;
     const q = state.queue[state.idx];
-    document.getElementById('question-text').textContent = q.text + ' ＝';
+    document.getElementById('question-text').innerHTML = q.text.replace('□', '<span class="blank">□</span>');
     const disp = document.getElementById('answer-display');
     disp.textContent = '？';
     disp.className = 'answer-display';
-    document.getElementById('progress-label').textContent = `${state.idx + 1} / ${QUESTIONS_PER_SESSION}`;
-    document.getElementById('progress-fill').style.width = ((state.idx) / QUESTIONS_PER_SESSION * 100) + '%';
+    document.querySelectorAll('.stone').forEach(s => s.classList.remove('current'));
+    const stone = document.getElementById('stone-' + state.idx);
+    if (stone) stone.classList.add('current');
   }
 
   function updateAnswerDisplay() {
@@ -527,7 +682,7 @@
     const badge = document.getElementById('combo-badge');
     if (state.combo >= 3) {
       badge.textContent = `🔥 ${state.combo}れんぞく！`;
-      badge.classList.add('show');
+      badge.classList.remove('show'); void badge.offsetWidth; badge.classList.add('show');
     } else {
       badge.classList.remove('show');
     }
@@ -542,12 +697,14 @@
     const disp = document.getElementById('answer-display');
     const mascot = document.getElementById('play-mascot');
     const speech = document.getElementById('play-speech');
+    const stone = document.getElementById('stone-' + state.idx);
 
     if (isCorrect) {
       state.correct++; state.combo++; state.maxCombo = Math.max(state.maxCombo, state.combo);
       disp.className = 'answer-display correct';
       mascot.textContent = '😻';
       speech.textContent = PRAISE[randInt(0, PRAISE.length - 1)];
+      if (stone) { stone.classList.remove('current'); stone.classList.add('ok'); stone.textContent = '◎'; }
       flashOverlay('ok'); sfxCorrect();
     } else {
       state.combo = 0;
@@ -555,6 +712,7 @@
       disp.textContent = state.input + ' (せいかい: ' + q.answer + ')';
       mascot.textContent = '😿';
       speech.textContent = CONSOLE_WORDS[randInt(0, CONSOLE_WORDS.length - 1)];
+      if (stone) { stone.classList.remove('current'); stone.classList.add('ng'); stone.textContent = '✗'; }
       flashOverlay('ng'); sfxWrong();
     }
     showCombo();
@@ -570,6 +728,23 @@
     }, isCorrect ? 700 : 1300);
   }
 
+  function awardStickers(stars) {
+    const pulls = stars; // 0,1,2,3 pulls
+    if (pulls <= 0) return [];
+    const collected = new Set(loadStickers());
+    const earned = [];
+    for (let i = 0; i < pulls; i++) {
+      const uncollected = STICKERS.filter(s => !collected.has(s));
+      const pick = uncollected.length > 0
+        ? uncollected[randInt(0, uncollected.length - 1)]
+        : STICKERS[randInt(0, STICKERS.length - 1)];
+      collected.add(pick);
+      earned.push(pick);
+    }
+    saveStickers(Array.from(collected));
+    return earned;
+  }
+
   function finishSession() {
     clearInterval(state.timerHandle);
     const totalTime = (Date.now() - state.startTime) / 1000;
@@ -581,7 +756,7 @@
     else if (state.correct >= 5) stars = 1;
 
     const records = loadRecords();
-    const key = recordKey(state.grade, state.op);
+    const key = recordKey(state.grade, state.op, state.mode);
     const prev = records[key] || { stars: 0, bestTime: null };
     records[key] = {
       stars: Math.max(prev.stars, stars),
@@ -589,11 +764,12 @@
     };
     saveRecords(records);
 
-    renderResult(stars, totalTime);
+    const earnedStickers = awardStickers(stars);
+    renderResult(stars, totalTime, earnedStickers);
   }
 
   /* ---------------- result screen ---------------- */
-  function renderResult(stars, totalTime) {
+  function renderResult(stars, totalTime, earnedStickers) {
     showScreen('screen-result');
     document.getElementById('stat-correct').textContent = state.correct + '/' + QUESTIONS_PER_SESSION;
     document.getElementById('stat-time').textContent = fmtTime(totalTime);
@@ -609,6 +785,22 @@
         document.getElementById('star-' + n).classList.add('lit');
       }, i * 250);
     });
+
+    const revealBox = document.getElementById('sticker-reveal');
+    const itemsBox = document.getElementById('sticker-items');
+    itemsBox.innerHTML = '';
+    if (earnedStickers && earnedStickers.length > 0) {
+      revealBox.classList.add('show');
+      earnedStickers.forEach((s, i) => {
+        const span = document.createElement('span');
+        span.textContent = s;
+        span.style.animationDelay = (stars * 0.25 + 0.3 + i * 0.15) + 's';
+        itemsBox.appendChild(span);
+      });
+      setTimeout(sfxSticker, (stars * 250) + 400);
+    } else {
+      revealBox.classList.remove('show');
+    }
 
     if (stars === 3) {
       setTimeout(() => { burstStars(); sfxClear(); }, 700);
@@ -634,11 +826,30 @@
     }
   }
 
+  /* ---------------- sticker album ---------------- */
+  function renderAlbum() {
+    const collected = loadStickers();
+    document.getElementById('album-count').textContent = `${collected.length} / ${STICKERS.length} あつめた`;
+    const grid = document.getElementById('album-grid');
+    grid.innerHTML = '';
+    STICKERS.forEach(s => {
+      const cell = document.createElement('div');
+      const has = collected.includes(s);
+      cell.className = 'album-cell' + (has ? '' : ' locked');
+      cell.textContent = has ? s : '？';
+      grid.appendChild(cell);
+    });
+  }
+
   /* ---------------- wiring ---------------- */
   document.getElementById('btn-goto-select').addEventListener('click', () => {
     ensureAudio(); sfxTap(); syncOpForGrade(); renderSelect(); showScreen('screen-select');
   });
+  document.getElementById('btn-goto-album').addEventListener('click', () => {
+    ensureAudio(); sfxTap(); renderAlbum(); showScreen('screen-album');
+  });
   document.getElementById('btn-back-title').addEventListener('click', () => { sfxTap(); renderBestSummary(); showScreen('screen-title'); });
+  document.getElementById('btn-back-title-2').addEventListener('click', () => { sfxTap(); renderBestSummary(); showScreen('screen-title'); });
   document.getElementById('btn-start-play').addEventListener('click', () => { sfxTap(); startSession(); });
 
   document.getElementById('numpad').addEventListener('click', (e) => {
