@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>けいさんドリル</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Baloo+2:wght@700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Space+Grotesk:wght@500;700&display=swap');
 
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
   html, body {
     height:100%;
-    font-family:'Zen Maru Gothic','Hiragino Sans',sans-serif;
-    background:#f7f2e6;
+    font-family:'Zen Kaku Gothic New','Hiragino Sans',sans-serif;
+    background:#f2f0ea;
     overflow:hidden;
     user-select:none;
     -webkit-user-select:none;
@@ -34,8 +34,8 @@
     height:min(660px, 94svh);
     background:#fffdf8;
     border-radius:20px;
-    border:3px solid #2d3561;
-    box-shadow: 0 8px 0 #2d356122, 0 14px 28px rgba(45,53,97,.18);
+    border:1.5px solid #2d3561;
+    box-shadow: 0 16px 36px rgba(45,53,97,.16);
     overflow:hidden;
     display:flex;
     flex-direction:column;
@@ -58,42 +58,42 @@
   }
   .icon-btn {
     width:36px; height:36px; border-radius:50%; flex:0 0 auto;
-    border:2px solid #2d3561; background:#fff; color:#2d3561;
+    border:1.5px solid #2d3561; background:#fff; color:#2d3561;
     font-size:16px; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 3px 0 #2d3561;
+    box-shadow:0 2px 0 #2d3561;
     cursor:pointer;
   }
-  .icon-btn:active { transform:translateY(3px); box-shadow:0 0 0 #2d3561; }
+  .icon-btn:active { transform:translateY(2px); box-shadow:0 0 0 #2d3561; }
 
   .stat-chip {
-    background:#fff2da; border:2px solid #2d3561; border-radius:10px;
+    background:#fff2da; border:1.5px solid #2d3561; border-radius:10px;
     padding:4px 10px; font-size:12px; font-weight:900; color:#2d3561;
-    font-family:'Zen Maru Gothic';
+    font-family:'Zen Kaku Gothic New';
   }
   .stat-chip.coin { background:#fff8de; }
 
   h1.title {
-    text-align:center; font-family:'Zen Maru Gothic',sans-serif; font-weight:900;
-    font-size:21px; color:#2d3561; letter-spacing:.02em;
+    text-align:center; font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900;
+    font-size:20px; color:#2d3561; letter-spacing:.01em;
     margin: 2px 0;
   }
   h1.title .accent { color:#ff6b5b; }
 
   .big-btn {
     display:block; width:100%; padding:12px; margin-top:auto;
-    border:3px solid #2d3561; border-radius:16px; font-family:'Zen Maru Gothic',sans-serif; font-weight:900;
-    font-size:17px; color:#fff; background:#ff6b5b;
-    box-shadow:0 5px 0 #2d3561;
+    border:1.5px solid #2d3561; border-radius:14px; font-family:'Zen Kaku Gothic New',sans-serif; font-weight:900;
+    font-size:16px; color:#fff; background:#ff6b5b;
+    box-shadow:0 3px 0 #2d3561;
     cursor:pointer;
   }
-  .big-btn:active { transform:translateY(5px); box-shadow:0 0 0 #2d3561; }
+  .big-btn:active { transform:translateY(3px); box-shadow:0 0 0 #2d3561; }
   .big-btn.secondary {
     background:#4fc2a1;
-    box-shadow:0 5px 0 #2d3561; margin-top:8px;
+    box-shadow:0 3px 0 #2d3561; margin-top:8px;
   }
   .big-btn.secondary:active { box-shadow:0 0 0 #2d3561; }
   .big-btn.ghost {
-    background:#fff; color:#7d7d94; box-shadow:0 3px 0 #d8d5e8; border:2px solid #d8d5e8; font-size:12px; padding:7px;
+    background:#fff; color:#7d7d94; box-shadow:0 2px 0 #d8d5e8; border:1.5px solid #d8d5e8; font-size:12px; padding:7px;
     font-weight:500;
   }
 
@@ -107,68 +107,79 @@
   }
 
   .pet-card {
-    background:#fff; border:2px solid #eee5d0; border-radius:16px;
-    padding:10px 14px; margin-bottom:8px; text-align:center;
+    background:#fff; border:1px solid #ebe6d8; border-radius:16px;
+    padding:12px 14px; margin-bottom:8px; text-align:center;
+    box-shadow:0 3px 14px rgba(45,53,97,.07);
   }
-  .pet-circle-wrap { position:relative; width:74px; height:74px; margin:0 auto; }
+  .pet-circle-wrap { position:relative; width:76px; height:76px; margin:0 auto; }
   .pet-circle {
-    width:74px; height:74px; border-radius:50%;
-    background:#fff2da; border:3px solid #2d3561;
+    width:76px; height:76px; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #fffdf6, #f3ecd8);
+    border:1.5px solid #e2dcc6;
+    box-shadow:0 4px 12px rgba(45,53,97,.1);
     display:flex; align-items:center; justify-content:center;
     animation: bob 2.4s ease-in-out infinite;
   }
-  .pet-circle .face { font-size:38px; }
+  .pet-circle .face { font-size:34px; }
   .acc-badge { position:absolute; top:-6px; right:-6px; font-size:20px; }
   @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
-  .pet-name { font-family:'Zen Maru Gothic'; font-weight:900; font-size:14px; color:#2d3561; margin-top:6px; }
-  .pet-progress-label { font-size:11px; color:#a9770f; font-weight:700; margin-top:2px; }
-  .pet-card .xp-bar-bg { margin-top:4px; }
-  .graduate-confirm { margin-top:8px; font-size:12px; color:#2d3561; font-weight:700; display:none; }
+  .pet-name { font-family:'Zen Kaku Gothic New'; font-weight:900; font-size:15px; color:#2d3561; margin-top:8px; }
+  .pet-progress-label { font-size:11px; color:#a9770f; font-weight:700; margin-top:3px; }
+  .pet-card .xp-bar-bg { margin-top:6px; }
+  .graduate-confirm { margin-top:10px; font-size:12px; color:#2d3561; font-weight:700; display:none; }
   .graduate-confirm .confirm-row { display:flex; gap:8px; margin-top:6px; }
   .graduate-confirm .confirm-row .big-btn { flex:1; width:auto; padding:8px; font-size:12px; margin-top:0; }
 
-  .starter-hint { text-align:center; font-size:13px; color:#2d3561; font-weight:900; margin:6px 0 10px; }
+  .starter-hint { text-align:center; font-size:14px; color:#2d3561; font-weight:900; margin:8px 0 12px; }
   .starter-grid { display:flex; gap:8px; }
   .starter-card {
-    flex:1; background:#fff; border:2px solid #2d3561; border-radius:14px;
-    padding:10px 4px; text-align:center; cursor:pointer;
+    flex:1; background:#fff; border:1px solid #ebe6d8; border-radius:14px;
+    padding:12px 4px; text-align:center; cursor:pointer;
+    box-shadow:0 3px 10px rgba(45,53,97,.06);
   }
-  .starter-card:active { transform:translateY(2px); }
-  .starter-card .face { font-size:32px; }
-  .starter-card .name { font-size:11px; font-weight:700; color:#2d3561; margin-top:4px; }
+  .starter-card:active { transform:translateY(2px); box-shadow:0 1px 4px rgba(45,53,97,.06); }
+  .starter-card .face { font-size:30px; }
+  .starter-card .name { font-size:12px; font-weight:700; color:#2d3561; margin-top:6px; }
 
   /* ---------- select screen ---------- */
-  .section-label { font-size:12px; color:#8a8aa0; font-weight:700; margin:9px 0 5px; letter-spacing:.05em; }
-  .grade-row { display:flex; gap:6px; overflow-x:auto; padding-bottom:3px; }
+  .section-label { font-size:13px; color:#9a9aae; font-weight:700; margin:8px 0 5px; letter-spacing:.04em; }
+  .grade-row { display:flex; gap:7px; overflow-x:auto; padding-bottom:3px; }
   .chip {
-    flex:0 0 auto; padding:9px 15px; border-radius:11px; border:2px solid #2d3561;
-    background:#fff; font-family:'Zen Maru Gothic'; font-weight:700; font-size:15px; color:#2d3561;
+    flex:0 0 auto; padding:10px 18px; border-radius:11px; border:1.5px solid #2d3561;
+    background:#fff; font-family:'Zen Kaku Gothic New'; font-weight:700; font-size:16px; color:#2d3561;
     cursor:pointer; white-space:nowrap;
   }
   .chip.active { background:#2d3561; color:#fff; }
 
-  .mode-row { display:flex; gap:7px; }
+  .mode-row { display:flex; gap:8px; }
   .mode-btn {
-    flex:1; padding:8px 4px; border-radius:11px; border:2px solid #2d3561;
-    background:#fff; color:#2d3561; font-family:'Zen Maru Gothic'; font-size:14px; font-weight:700;
-    cursor:pointer; text-align:center; line-height:1.3;
+    flex:1; padding:9px 4px; border-radius:11px; border:1.5px solid #2d3561;
+    background:#fff; color:#2d3561; font-family:'Zen Kaku Gothic New'; font-size:15px; font-weight:700;
+    cursor:pointer; text-align:center; line-height:1.35;
   }
-  .mode-btn small { display:block; font-size:11px; font-weight:500; color:#9494ab; margin-top:1px; }
+  .mode-btn small { display:block; font-size:11.5px; font-weight:500; color:#9494ab; margin-top:2px; }
   .mode-btn.active { background:#2d3561; color:#fff; }
   .mode-btn.active small { color:#c7cbe8; }
 
-  .op-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:1px; }
-  .op-card {
-    position:relative; border-radius:13px; border:2px solid #e5e1d3; background:#fff;
-    padding:10px 8px 8px; text-align:center; cursor:pointer;
+  .op-list { display:flex; flex-direction:column; gap:6px; margin-top:1px; }
+  .op-row {
+    position:relative; display:flex; align-items:center; gap:12px;
+    border-radius:14px; border:1px solid #ebe6d8; background:#fff;
+    padding:7px 14px; cursor:pointer;
+    box-shadow:0 2px 8px rgba(45,53,97,.05);
   }
-  .op-card .op-sym { font-size:23px; color:#ff6b5b; font-family:'Zen Maru Gothic'; font-weight:900; }
-  .op-card .op-name { font-size:13px; color:#5b5b72; margin-top:1px; font-weight:700; }
-  .op-card .stars { font-size:11px; color:#f5b942; margin-top:2px; letter-spacing:1px; min-height:13px; }
-  .op-card.active { border-color:#2d3561; background:#f4f2ff; }
-  .op-card.locked { opacity:.4; pointer-events:none; }
-  .op-card.locked::after {
-    content:'🔒'; position:absolute; top:5px; right:7px; font-size:11px;
+  .op-row .op-icon {
+    width:36px; height:36px; border-radius:50%; flex:0 0 auto;
+    background:#fff2da; display:flex; align-items:center; justify-content:center;
+    font-size:18px; color:#ff6b5b; font-family:'Zen Kaku Gothic New'; font-weight:900;
+  }
+  .op-row .op-info { flex:1; min-width:0; text-align:left; }
+  .op-row .op-name { font-size:15px; color:#2d3561; font-weight:700; }
+  .op-row .stars { font-size:12px; color:#f5b942; margin-top:2px; letter-spacing:1px; }
+  .op-row.active { border-color:#2d3561; background:#f4f2ff; }
+  .op-row.locked { opacity:.4; pointer-events:none; }
+  .op-row.locked::after {
+    content:'🔒'; position:absolute; top:10px; right:12px; font-size:12px;
   }
 
   /* ---------- play screen ---------- */
@@ -177,7 +188,7 @@
   .stone {
     width:19px; height:19px; border-radius:50%; background:#fff; flex:0 0 auto;
     display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#b8b8c8;
-    border:2px solid #e5e1d3; transition: all .15s;
+    border:1.5px solid #e5e1d3; transition: all .15s;
   }
   .stone.current { border-color:#ff6b5b; color:#ff6b5b; box-shadow:0 0 0 3px #ffe0da; }
   .stone.ok { background:#4fc2a1; border-color:#2d3561; color:#fff; }
@@ -190,12 +201,13 @@
   }
   .battle-pet, .battle-boss {
     width:36px; height:36px; border-radius:50%; flex:0 0 auto;
-    display:flex; align-items:center; justify-content:center; font-size:20px;
-    border:2px solid #2d3561; transition: transform .12s;
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+    border:1.5px solid #e2dcc6; box-shadow:0 3px 8px rgba(45,53,97,.08);
+    transition: transform .12s;
   }
-  .battle-pet { background:#fff2da; }
-  .battle-boss { background:#ffe4e0; border-color:#c0392b; }
-  .battle-vs { font-family:'Zen Maru Gothic'; font-weight:900; font-size:11px; color:#a9770f; }
+  .battle-pet { background:#fff9ec; }
+  .battle-boss { background:#fff1ee; border-color:#f0c8c2; }
+  .battle-vs { font-family:'Zen Kaku Gothic New'; font-weight:900; font-size:11px; color:#a9770f; }
   .battle-pet.hit, .battle-boss.hit { animation: battleShake .35s ease; }
   @keyframes battleShake {
     0%,100% { transform:translateX(0) rotate(0); }
@@ -204,7 +216,7 @@
   }
   .combo-chip {
     flex:0 0 auto; font-size:11px; color:#fff; font-weight:900; background:#ff6b5b;
-    border:2px solid #2d3561; border-radius:9px; padding:2px 7px;
+    border:1.5px solid #2d3561; border-radius:9px; padding:2px 7px;
     opacity:0; transform:scale(.6); transition:opacity .15s, transform .15s;
   }
   .combo-chip.show { opacity:1; transform:scale(1); }
@@ -215,22 +227,23 @@
   }
 
   .speech {
-    background:#fff; border:2px solid #2d3561; border-radius:11px; padding:4px 12px;
+    background:#fff; border:1.5px solid #e2dcc6; border-radius:11px; padding:4px 12px;
     font-size:11px; color:#2d3561; margin-bottom:6px; min-height:15px; font-weight:700;
+    box-shadow:0 2px 6px rgba(45,53,97,.05);
   }
   .equation-plate {
     width:100%;
     background:#fff; border-radius:16px; padding:14px 12px;
-    border:3px solid #2d3561; box-shadow:0 4px 0 #2d356122;
+    border:1px solid #ebe6d8; box-shadow:0 4px 16px rgba(45,53,97,.08);
     overflow-x:auto;
   }
   .question-text {
-    font-family:'Baloo 2','Zen Maru Gothic',sans-serif; font-weight:800; font-size:clamp(26px,9.5vw,42px); color:#2d3561;
-    letter-spacing:.01em; font-variant-numeric:tabular-nums; white-space:nowrap;
+    font-family:'Space Grotesk','Zen Kaku Gothic New',sans-serif; font-weight:700; font-size:clamp(26px,9.5vw,42px); color:#2d3561;
+    letter-spacing:0; font-variant-numeric:tabular-nums; white-space:nowrap;
   }
   .answer-slot {
-    display:inline-block; color:#ff6b5b; border-bottom:5px solid #ff6b5b;
-    background:#fff0ed; border-radius:8px 8px 2px 2px;
+    display:inline-block; color:#ff6b5b; border-bottom:4px solid #ff6b5b;
+    background:#fff3f1; border-radius:8px 8px 2px 2px;
     padding:0 10px; min-width:.9em; margin:0 2px;
   }
   .answer-slot.empty { animation: slotPulse 1.1s ease-in-out infinite; }
@@ -240,15 +253,15 @@
 
   .numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:12px; flex:0 0 auto; }
   .num-btn {
-    padding:11px 0; font-size:27px; font-weight:800; border-radius:13px; border:2px solid #e5e1d3;
-    background:#fff; color:#2d3561; font-family:'Baloo 2','Zen Maru Gothic',sans-serif;
-    box-shadow:0 3px 0 #e5e1d3;
+    padding:11px 0; font-size:26px; font-weight:700; border-radius:13px; border:1.5px solid #e5e1d3;
+    background:#fff; color:#2d3561; font-family:'Space Grotesk','Zen Kaku Gothic New',sans-serif;
+    box-shadow:0 2px 0 #e5e1d3;
     cursor:pointer;
   }
-  .num-btn:active { transform:translateY(3px); box-shadow:0 0 0 #e5e1d3; }
-  .num-btn.ok { background:#2d3561; color:#fff; border-color:#2d3561; box-shadow:0 3px 0 #14172b; font-family:'Zen Maru Gothic'; font-weight:900; font-size:19px; }
+  .num-btn:active { transform:translateY(2px); box-shadow:0 0 0 #e5e1d3; }
+  .num-btn.ok { background:#2d3561; color:#fff; border-color:#2d3561; box-shadow:0 2px 0 #14172b; font-family:'Zen Kaku Gothic New'; font-weight:900; font-size:18px; }
   .num-btn.ok:active { box-shadow:0 0 0 #14172b; }
-  .num-btn.del { background:#ffe4e0; color:#ff6b5b; border-color:#ffc9c2; box-shadow:0 3px 0 #ffc9c2; font-size:19px; }
+  .num-btn.del { background:#ffe4e0; color:#ff6b5b; border-color:#ffc9c2; box-shadow:0 2px 0 #ffc9c2; font-size:18px; }
   .num-btn.del:active { box-shadow:0 0 0 #ffc9c2; }
 
   /* ---------- evolution / hatch celebration overlay (app-level, reusable) ---------- */
@@ -262,8 +275,9 @@
   .evolve-overlay.show { opacity:1; }
   .evolve-big-circle {
     width:130px; height:130px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #fff8e6, #ffe6b0);
-    border:4px solid #f5b942;
+    background:radial-gradient(circle at 35% 30%, #fffdf5, #ffe6b0);
+    border:2px solid #f5b942;
+    box-shadow:0 8px 24px rgba(0,0,0,.25);
     display:flex; align-items:center; justify-content:center;
     animation: evolveBigPop .8s cubic-bezier(.34,1.56,.64,1);
   }
@@ -274,13 +288,13 @@
     100% { transform:scale(1) rotate(0); }
   }
   .evolve-overlay-label {
-    margin-top:16px; font-family:'Zen Maru Gothic'; font-weight:900; font-size:24px; color:#fff2da;
-    text-shadow:0 3px 0 #2d3561;
+    margin-top:16px; font-family:'Zen Kaku Gothic New'; font-weight:900; font-size:23px; color:#fff2da;
+    text-shadow:0 2px 8px rgba(0,0,0,.3);
     animation: evolveLabelIn .5s ease .15s backwards;
   }
   @keyframes evolveLabelIn { 0%{opacity:0; transform:translateY(10px) scale(.7)} 100%{opacity:1; transform:translateY(0) scale(1)} }
   .evolve-overlay-sub {
-    margin-top:4px; font-family:'Zen Maru Gothic'; font-weight:700; font-size:12px; color:#c7cbe8;
+    margin-top:4px; font-family:'Zen Kaku Gothic New'; font-weight:700; font-size:12px; color:#c7cbe8;
   }
   .confetti-particle {
     position:absolute; top:50%; left:50%; font-size:20px; pointer-events:none; z-index:31;
@@ -299,22 +313,23 @@
 
   .result-creature {
     width:90px; height:90px; border-radius:50%; margin:2px auto 2px;
-    background:#fff2da; border:3px solid #2d3561; box-shadow:0 5px 0 #2d3561;
+    background:radial-gradient(circle at 32% 28%, #fffdf6, #f3ecd8);
+    border:1.5px solid #e2dcc6; box-shadow:0 4px 14px rgba(45,53,97,.1);
     display:flex; align-items:center; justify-content:center;
   }
-  .result-creature .creature-face { font-size:46px; }
+  .result-creature .creature-face { font-size:44px; }
 
   .result-stats {
     width:100%; display:grid; grid-template-columns:1fr 1fr;
-    background:#f4f2ff; border:2px solid #2d3561; border-radius:13px; padding:9px; margin-top:8px; gap:6px;
+    background:#f6f5fb; border:1px solid #e5e1f2; border-radius:13px; padding:10px; margin-top:8px; gap:8px;
     font-size:10px; color:#5b5b72;
   }
-  .result-stats b { display:block; font-size:17px; color:#2d3561; font-family:'Baloo 2'; font-weight:800; }
-  .result-msg { font-size:14px; color:#2d3561; margin-top:8px; font-weight:900; }
+  .result-stats b { display:block; font-size:18px; color:#2d3561; font-family:'Space Grotesk'; font-weight:700; }
+  .result-msg { font-family:'Zen Kaku Gothic New'; font-size:14px; color:#2d3561; margin-top:8px; font-weight:900; }
 
   .result-events { width:100%; display:flex; flex-direction:column; gap:5px; margin-top:8px; }
   .result-event {
-    background:#fff2da; border:2px solid #f5b942; border-radius:11px; padding:6px 10px;
+    background:#fff8e6; border:1px solid #f0dba0; border-radius:11px; padding:6px 10px;
     font-size:11px; color:#a9770f; font-weight:700; text-align:left;
   }
 
@@ -326,18 +341,19 @@
   .flash-overlay.ok { background:#4fc2a1; }
   .flash-overlay.ng { background:#ff6b5b; }
 
-  .xp-bar-bg { width:100%; height:7px; background:#eee8d6; border:2px solid #2d3561; border-radius:5px; overflow:hidden; }
+  .xp-bar-bg { width:100%; height:7px; background:#f0ead4; border:1px solid #e2dcc6; border-radius:5px; overflow:hidden; }
   .xp-bar-fill { height:100%; width:0%; background:#f5b942; transition:width .3s ease; }
 
   /* ---------- zukan (creature encyclopedia) ---------- */
   .zukan-count { text-align:center; font-size:12px; color:#5b5b72; font-weight:700; margin-bottom:10px; }
   .zukan-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; overflow-y:auto; }
   .zukan-cell {
-    border-radius:14px; background:#fff; border:2px solid #e5e1d3; padding:12px 8px; text-align:center;
+    border-radius:14px; background:#fff; border:1px solid #ebe6d8; padding:12px 8px; text-align:center;
+    box-shadow:0 2px 8px rgba(45,53,97,.05);
   }
-  .zukan-cell.unlocked { border-color:#2d3561; background:#fff2da; }
-  .zukan-cell.unlocked.rarity-rare { border-color:#3f9cbd; background:#eaf8ff; }
-  .zukan-cell.unlocked.rarity-epic { border-color:#a960ff; background:#f7ecff; }
+  .zukan-cell.unlocked { border-color:#e2c98a; background:#fff8e6; }
+  .zukan-cell.unlocked.rarity-rare { border-color:#8fc9de; background:#eaf8ff; }
+  .zukan-cell.unlocked.rarity-epic { border-color:#c9a3ea; background:#f7ecff; }
   .zukan-cell .zface { font-size:32px; }
   .zukan-cell .zname { font-size:11px; color:#5b5b72; font-weight:700; margin-top:5px; }
   .zukan-cell .zcount { font-size:10px; color:#a9770f; font-weight:700; margin-top:2px; }
@@ -348,15 +364,16 @@
   .shop-list { overflow-y:auto; }
   .shop-item {
     display:flex; align-items:center; gap:10px;
-    background:#fff; border:2px solid #e5e1d3; border-radius:13px; padding:8px 10px; margin-bottom:8px;
+    background:#fff; border:1px solid #ebe6d8; border-radius:13px; padding:9px 12px; margin-bottom:8px;
+    box-shadow:0 2px 8px rgba(45,53,97,.05);
   }
-  .shop-item .icon { font-size:26px; flex:0 0 auto; width:32px; text-align:center; }
+  .shop-item .icon { font-size:24px; flex:0 0 auto; width:32px; text-align:center; }
   .shop-item .info { flex:1; min-width:0; }
   .shop-item .name { font-size:13px; font-weight:700; color:#2d3561; }
   .shop-item .price { font-size:11px; color:#a9770f; font-weight:700; }
   .shop-btn {
-    flex:0 0 auto; border:2px solid #2d3561; border-radius:10px; padding:7px 10px;
-    font-family:'Zen Maru Gothic'; font-weight:900; font-size:11px; color:#fff; background:#4fc2a1;
+    flex:0 0 auto; border:1.5px solid #2d3561; border-radius:10px; padding:7px 10px;
+    font-family:'Zen Kaku Gothic New'; font-weight:900; font-size:11px; color:#fff; background:#4fc2a1;
     cursor:pointer;
   }
   .shop-btn:disabled { background:#e5e1d3; border-color:#d3cec0; color:#a9a396; cursor:default; }
@@ -412,7 +429,7 @@
   <section class="screen" id="screen-select">
     <div class="top-row">
       <button class="icon-btn" id="btn-back-title">←</button>
-      <span style="font-family:'Zen Maru Gothic';font-weight:900;color:#2d3561;font-size:15px">もんだいを えらぶ</span>
+      <span style="font-family:'Zen Kaku Gothic New';font-weight:900;color:#2d3561;font-size:15px">もんだいを えらぶ</span>
       <span style="width:36px"></span>
     </div>
 
@@ -426,7 +443,7 @@
     </div>
 
     <div class="section-label">けいさんの しゅるい</div>
-    <div class="op-grid" id="op-grid"></div>
+    <div class="op-list" id="op-grid"></div>
 
     <button class="big-btn" id="btn-start-play" style="margin-top:12px">スタート</button>
   </section>
@@ -493,7 +510,7 @@
   <section class="screen" id="screen-album">
     <div class="top-row">
       <button class="icon-btn" id="btn-back-title-2">←</button>
-      <span style="font-family:'Zen Maru Gothic';font-weight:900;color:#2d3561;font-size:15px">ずかん</span>
+      <span style="font-family:'Zen Kaku Gothic New';font-weight:900;color:#2d3561;font-size:15px">ずかん</span>
       <span style="width:36px"></span>
     </div>
     <div class="zukan-count" id="album-count">0 / 9 はっけん</div>
@@ -504,7 +521,7 @@
   <section class="screen" id="screen-shop">
     <div class="top-row">
       <button class="icon-btn" id="btn-back-title-3">←</button>
-      <span style="font-family:'Zen Maru Gothic';font-weight:900;color:#2d3561;font-size:15px">ショップ</span>
+      <span style="font-family:'Zen Kaku Gothic New';font-weight:900;color:#2d3561;font-size:15px">ショップ</span>
       <div class="stat-chip coin" id="shop-coin-chip">💰 0</div>
     </div>
     <div class="shop-list" id="shop-list"></div>
@@ -885,16 +902,18 @@
     opGrid.innerHTML = '';
     const records = loadRecords();
     ops.forEach(op => {
-      const card = document.createElement('div');
-      card.className = 'op-card' + (op === state.op ? ' active' : '');
+      const row = document.createElement('div');
+      row.className = 'op-row' + (op === state.op ? ' active' : '');
       const rec = records[recordKey(state.grade, op, state.mode)];
       const stars = rec ? rec.stars : 0;
-      card.innerHTML = `
-        <div class="op-sym">${OP_META[op].sym}</div>
-        <div class="op-name">${OP_META[op].name}</div>
-        <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>`;
-      card.addEventListener('click', () => { sfxTap(); state.op = op; renderSelect(); });
-      opGrid.appendChild(card);
+      row.innerHTML = `
+        <div class="op-icon">${OP_META[op].sym}</div>
+        <div class="op-info">
+          <div class="op-name">${OP_META[op].name}</div>
+          <div class="stars">${'★'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
+        </div>`;
+      row.addEventListener('click', () => { sfxTap(); state.op = op; renderSelect(); });
+      opGrid.appendChild(row);
     });
   }
 
