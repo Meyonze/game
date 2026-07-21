@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>けいさんドリル</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Baloo+2:wght@700;800&display=swap');
 
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
@@ -160,87 +160,107 @@
   .stone.ng { background:#ff6b5b; border-color:#2d3561; color:#fff; }
   .meta-row { display:flex; justify-content:center; font-size:10px; color:#8a8aa0; margin-top:2px; font-weight:700; }
 
+  /* compact growth status strip (kept small so numbers stay the focus) */
+  .growth-strip {
+    display:flex; align-items:center; gap:8px;
+    background:#fff; border:2px solid #eee5d0; border-radius:12px;
+    padding:5px 10px; margin-top:6px;
+  }
+  .mini-creature {
+    width:30px; height:30px; border-radius:50%; flex:0 0 auto;
+    background:#fff2da; border:2px solid #2d3561;
+    display:flex; align-items:center; justify-content:center; font-size:17px;
+  }
+  .growth-mid { flex:1; min-width:0; }
+  .xp-bar-bg { width:100%; height:6px; background:#eee8d6; border:2px solid #2d3561; border-radius:5px; overflow:hidden; }
+  .xp-bar-fill { height:100%; width:0%; background:#f5b942; transition:width .3s ease; }
+  .growth-label { font-size:9px; color:#a9770f; font-weight:700; margin-top:2px; }
+  .combo-chip {
+    flex:0 0 auto; font-size:10px; color:#fff; font-weight:900; background:#ff6b5b;
+    border:2px solid #2d3561; border-radius:9px; padding:2px 6px;
+    opacity:0; transform:scale(.6); transition:opacity .15s, transform .15s;
+  }
+  .combo-chip.show { opacity:1; transform:scale(1); }
+
   .question-box {
     flex:1; min-height:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center;
   }
 
-  .creature-wrap {
-    position:relative;
-    display:flex; flex-direction:column; align-items:center; gap:3px;
-  }
-  .creature-circle {
-    width:56px; height:56px; border-radius:50%;
-    background:#fff2da; border:3px solid #2d3561;
-    display:flex; align-items:center; justify-content:center;
-    transition: width .35s ease, height .35s ease;
-  }
-  .creature-circle .creature-face { font-size:30px; display:inline-block; transition:font-size .35s ease; }
-  .creature-circle.evolve { animation: evolvePop .6s ease, evolveGlow .6s ease; }
-  @keyframes evolvePop { 0%{transform:scale(.7) rotate(-10deg)} 50%{transform:scale(1.3) rotate(6deg)} 100%{transform:scale(1) rotate(0)} }
-  @keyframes evolveGlow {
-    0% { box-shadow:0 5px 0 #2d3561, 0 0 0 0 #f5b94200; }
-    40% { box-shadow:0 5px 0 #2d3561, 0 0 0 16px #f5b94266; }
-    100% { box-shadow:0 5px 0 #2d3561, 0 0 0 0 #f5b94200; }
-  }
-  .evolve-label {
-    position:absolute; top:-8px; left:50%; z-index:5;
-    background:#f5b942; color:#2d3561; font-weight:900; font-size:12px;
-    padding:3px 10px; border-radius:10px; border:2px solid #2d3561;
-    white-space:nowrap; pointer-events:none;
-    animation: evolveLabelPop 1.1s ease forwards;
-  }
-  @keyframes evolveLabelPop {
-    0% { opacity:0; transform:translateX(-50%) translateY(6px) scale(.5); }
-    18% { opacity:1; transform:translateX(-50%) translateY(-8px) scale(1.15); }
-    70% { opacity:1; transform:translateX(-50%) translateY(-10px) scale(1); }
-    100% { opacity:0; transform:translateX(-50%) translateY(-22px) scale(.9); }
-  }
-  .xp-bar-bg { width:104px; height:7px; background:#eee8d6; border:2px solid #2d3561; border-radius:5px; overflow:hidden; }
-  .xp-bar-fill { height:100%; width:0%; background:#f5b942; transition:width .3s ease; }
-  .growth-label { font-size:10px; color:#a9770f; font-weight:700; min-height:12px; }
-
-  .combo-badge {
-    position:absolute; top:-6px; right:-14px; z-index:4;
-    font-size:11px; color:#fff; font-weight:900; background:#ff6b5b;
-    border:2px solid #2d3561; border-radius:10px; padding:2px 6px;
-    opacity:0; transform:scale(.6) rotate(8deg); transition:opacity .15s, transform .15s;
-  }
-  .combo-badge.show { opacity:1; transform:scale(1) rotate(8deg); }
-
   .speech {
     background:#fff; border:2px solid #2d3561; border-radius:11px; padding:4px 12px;
-    font-size:11px; color:#2d3561; margin-top:1px; min-height:15px; font-weight:700;
+    font-size:11px; color:#2d3561; margin-bottom:6px; min-height:15px; font-weight:700;
   }
   .equation-plate {
-    background:#fff; border-radius:16px; padding:9px 16px; margin:8px 0 6px;
+    width:100%;
+    background:#fff; border-radius:16px; padding:14px 12px;
     border:3px solid #2d3561; box-shadow:0 4px 0 #2d356122;
+    overflow-x:auto;
   }
   .question-text {
-    font-family:'Zen Maru Gothic'; font-weight:900; font-size:clamp(24px,7.6vw,34px); color:#2d3561;
+    font-family:'Baloo 2','Zen Maru Gothic',sans-serif; font-weight:800; font-size:clamp(26px,9.5vw,42px); color:#2d3561;
     letter-spacing:.01em; font-variant-numeric:tabular-nums; white-space:nowrap;
   }
-  .question-text .blank { color:#ff6b5b; }
-  .answer-display {
-    font-family:'Zen Maru Gothic'; font-weight:900; font-size:24px; color:#ff6b5b; min-height:36px;
-    background:#fffaf0; border:3px solid #2d3561; border-radius:13px;
-    min-width:120px; padding:3px 12px; font-variant-numeric:tabular-nums;
+  .answer-slot {
+    display:inline-block; color:#ff6b5b; border-bottom:5px solid #ff6b5b;
+    background:#fff0ed; border-radius:8px 8px 2px 2px;
+    padding:0 10px; min-width:.9em; margin:0 2px;
   }
-  .answer-display.correct { color:#2f9b7a; border-color:#2f9b7a; background:#f0faf6; }
-  .answer-display.wrong { color:#ff6b5b; border-color:#ff6b5b; background:#fff3f1; font-size:16px; }
+  .answer-slot.empty { animation: slotPulse 1.1s ease-in-out infinite; }
+  @keyframes slotPulse { 0%,100%{opacity:1} 50%{opacity:.45} }
+  .answer-slot.correct { color:#2f9b7a; border-color:#2f9b7a; background:#eafbf3; }
+  .answer-slot.wrong { color:#c0392b; border-color:#c0392b; background:#fdeceb; }
 
-  .numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:10px; flex:0 0 auto; }
+  .numpad { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:12px; flex:0 0 auto; }
   .num-btn {
-    padding:11px 0; font-size:25px; font-weight:900; border-radius:13px; border:2px solid #e5e1d3;
-    background:#fff; color:#2d3561;
+    padding:11px 0; font-size:27px; font-weight:800; border-radius:13px; border:2px solid #e5e1d3;
+    background:#fff; color:#2d3561; font-family:'Baloo 2','Zen Maru Gothic',sans-serif;
     box-shadow:0 3px 0 #e5e1d3;
-    font-family:'Zen Maru Gothic'; cursor:pointer;
+    cursor:pointer;
   }
   .num-btn:active { transform:translateY(3px); box-shadow:0 0 0 #e5e1d3; }
-  .num-btn.ok { background:#2d3561; color:#fff; border-color:#2d3561; box-shadow:0 3px 0 #14172b; font-size:19px; }
+  .num-btn.ok { background:#2d3561; color:#fff; border-color:#2d3561; box-shadow:0 3px 0 #14172b; font-family:'Zen Maru Gothic'; font-weight:900; font-size:19px; }
   .num-btn.ok:active { box-shadow:0 0 0 #14172b; }
   .num-btn.del { background:#ffe4e0; color:#ff6b5b; border-color:#ffc9c2; box-shadow:0 3px 0 #ffc9c2; font-size:19px; }
   .num-btn.del:active { box-shadow:0 0 0 #ffc9c2; }
+
+  /* ---------- evolution celebration overlay ---------- */
+  .evolve-overlay {
+    position:absolute; inset:0; z-index:30;
+    background:rgba(24,28,54,.82);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .evolve-overlay.show { opacity:1; }
+  .evolve-big-circle {
+    width:130px; height:130px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff8e6, #ffe6b0);
+    border:4px solid #f5b942;
+    display:flex; align-items:center; justify-content:center;
+    animation: evolveBigPop .8s cubic-bezier(.34,1.56,.64,1);
+  }
+  .evolve-big-circle .face { font-size:74px; }
+  @keyframes evolveBigPop {
+    0% { transform:scale(0) rotate(-25deg); }
+    55% { transform:scale(1.28) rotate(8deg); }
+    100% { transform:scale(1) rotate(0); }
+  }
+  .evolve-overlay-label {
+    margin-top:16px; font-family:'Zen Maru Gothic'; font-weight:900; font-size:26px; color:#fff2da;
+    text-shadow:0 3px 0 #2d3561;
+    animation: evolveLabelIn .5s ease .15s backwards;
+  }
+  @keyframes evolveLabelIn { 0%{opacity:0; transform:translateY(10px) scale(.7)} 100%{opacity:1; transform:translateY(0) scale(1)} }
+  .evolve-overlay-sub {
+    margin-top:4px; font-family:'Zen Maru Gothic'; font-weight:700; font-size:12px; color:#c7cbe8;
+  }
+  .confetti-particle {
+    position:absolute; top:50%; left:50%; font-size:20px; pointer-events:none; z-index:31;
+    animation: burst 1000ms ease-out forwards;
+  }
+  @keyframes burst {
+    to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0; }
+  }
 
   /* ---------- result screen ---------- */
   #screen-result { align-items:center; text-align:center; justify-content:flex-start; overflow-y:auto; }
@@ -260,7 +280,7 @@
     width:100%; background:#f4f2ff; border:2px solid #2d3561; border-radius:13px; padding:9px; margin-top:8px;
     display:flex; justify-content:space-around; font-size:10px; color:#5b5b72;
   }
-  .result-stats b { display:block; font-size:16px; color:#2d3561; font-family:'Zen Maru Gothic'; font-weight:900; }
+  .result-stats b { display:block; font-size:18px; color:#2d3561; font-family:'Baloo 2'; font-weight:800; }
   .result-msg { font-size:14px; color:#2d3561; margin-top:8px; font-weight:900; }
 
   .evolve-banner {
@@ -268,14 +288,6 @@
     display:none; font-size:11px; color:#a9770f; font-weight:700;
   }
   .evolve-banner.show { display:block; }
-
-  .star-particle {
-    position:fixed; top:50%; left:50%; font-size:16px; pointer-events:none; z-index:50;
-    animation: burst 900ms ease-out forwards;
-  }
-  @keyframes burst {
-    to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity:0; }
-  }
 
   .flash-overlay {
     position:absolute; inset:0; pointer-events:none; opacity:0; border-radius:17px;
@@ -347,16 +359,18 @@
     </div>
     <div class="meta-row"><span id="timer-label">0:00</span></div>
 
-    <div class="question-box">
-      <div class="creature-wrap" id="creature-wrap">
-        <div class="combo-badge" id="combo-badge">🔥 3れんぞく</div>
-        <div class="creature-circle" id="creature-circle"><span class="creature-face" id="creature-face">🥚</span></div>
+    <div class="growth-strip">
+      <div class="mini-creature" id="mini-creature">🥚</div>
+      <div class="growth-mid">
         <div class="xp-bar-bg"><div class="xp-bar-fill" id="xp-bar-fill"></div></div>
         <div class="growth-label" id="growth-label">つぎまで あと 2もん</div>
-        <div class="speech" id="play-speech">がんばって！</div>
       </div>
-      <div class="equation-plate"><div class="question-text" id="question-text">3 ＋ 4 ＝</div></div>
-      <div class="answer-display" id="answer-display">？</div>
+      <div class="combo-chip" id="combo-badge">🔥3</div>
+    </div>
+
+    <div class="question-box">
+      <div class="speech" id="play-speech">がんばって！</div>
+      <div class="equation-plate"><div class="question-text" id="question-text">3 ＋ 4 ＝ <span class="answer-slot empty" id="answer-slot">？</span></div></div>
     </div>
 
     <div class="numpad" id="numpad">
@@ -372,6 +386,12 @@
       <button class="num-btn del" id="btn-del">⌫</button>
       <button class="num-btn" data-d="0">0</button>
       <button class="num-btn ok" id="btn-ok">OK</button>
+    </div>
+
+    <div class="evolve-overlay" id="evolve-overlay">
+      <div class="evolve-big-circle"><span class="face" id="evolve-big-face">🥚</span></div>
+      <div class="evolve-overlay-label" id="evolve-overlay-label">しんか！</div>
+      <div class="evolve-overlay-sub" id="evolve-overlay-sub"></div>
     </div>
   </section>
 
@@ -442,7 +462,6 @@
     dragon: { name:'ドラゴン',     stages:['🥚','🦎','🐍','🐲','🐉'] },
   };
   const LINE_KEYS = Object.keys(LINES);
-  const STAGE_SIZES = [56, 64, 74, 84, 96];
   const STAGE_STEP = 2; // correct answers needed per stage
 
   /* ---------------- state ---------------- */
@@ -497,7 +516,7 @@
         answer: raw[slot],
       };
     }
-    return { text: `${raw.a} ${raw.sym} ${raw.b} ＝`, answer: raw.c };
+    return { text: `${raw.a} ${raw.sym} ${raw.b} ＝ □`, answer: raw.c };
   }
 
   function loadRecords() {
@@ -548,7 +567,7 @@
   function sfxWrong() { beep(180, 0.25, 'sawtooth'); }
   function sfxTap() { beep(600, 0.05, 'square'); }
   function sfxClear() { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => beep(f, 0.2, 'triangle'), i * 110)); }
-  function sfxEvolve() { [440, 660, 880, 1108, 1320].forEach((f, i) => setTimeout(() => beep(f, 0.16, 'sine'), i * 75)); }
+  function sfxEvolve() { [392, 523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => beep(f, 0.17, 'sine'), i * 70)); }
 
   function updateMuteUI() {
     const label = state.muted ? '🔇 おと：オフ' : '🔊 おと：オン';
@@ -618,16 +637,6 @@
   });
 
   /* ---------------- play screen ---------------- */
-  function setCreatureVisual(stage) {
-    const circle = document.getElementById('creature-circle');
-    const face = document.getElementById('creature-face');
-    const size = STAGE_SIZES[stage];
-    circle.style.width = size + 'px';
-    circle.style.height = size + 'px';
-    face.style.fontSize = Math.round(size * 0.58) + 'px';
-    face.textContent = LINES[state.line].stages[stage];
-  }
-
   function updateGrowthLabel() {
     const label = document.getElementById('growth-label');
     if (state.stage >= 4) { label.textContent = '✨ さいだいしんか！'; return; }
@@ -648,7 +657,7 @@
     localStorage.setItem('mathdrill_last_mode', state.mode);
 
     showScreen('screen-play');
-    setCreatureVisual(0);
+    document.getElementById('mini-creature').textContent = LINES[state.line].stages[0];
     document.getElementById('xp-bar-fill').style.width = '0%';
     document.getElementById('play-speech').textContent = 'がんばって！';
     updateGrowthLabel();
@@ -677,21 +686,36 @@
     }, 250);
   }
 
+  function fitQuestionText() {
+    const el = document.getElementById('question-text');
+    const plate = el.closest('.equation-plate');
+    el.style.fontSize = '';
+    let fontSize = parseFloat(getComputedStyle(el).fontSize);
+    const minSize = 17;
+    while (el.scrollWidth > plate.clientWidth - 4 && fontSize > minSize) {
+      fontSize -= 2;
+      el.style.fontSize = fontSize + 'px';
+    }
+  }
+
   function renderQuestion() {
     state.input = '';
     state.locked = false;
     const q = state.queue[state.idx];
-    document.getElementById('question-text').innerHTML = q.text.replace('□', '<span class="blank">□</span>');
-    const disp = document.getElementById('answer-display');
-    disp.textContent = '？';
-    disp.className = 'answer-display';
+    const [before, after] = q.text.split('□');
+    const container = document.getElementById('question-text');
+    container.innerHTML = `${before}<span class="answer-slot empty" id="answer-slot">？</span>${after}`;
     document.querySelectorAll('.stone').forEach(s => s.classList.remove('current'));
     const stone = document.getElementById('stone-' + state.idx);
     if (stone) stone.classList.add('current');
+    fitQuestionText();
   }
 
-  function updateAnswerDisplay() {
-    document.getElementById('answer-display').textContent = state.input.length ? state.input : '？';
+  function updateAnswerSlot() {
+    const slot = document.getElementById('answer-slot');
+    slot.textContent = state.input.length ? state.input : '？';
+    slot.classList.toggle('empty', state.input.length === 0);
+    fitQuestionText();
   }
 
   function pressDigit(d) {
@@ -699,13 +723,13 @@
     if (state.input.length >= 7) return;
     if (state.input === '0') state.input = '';
     state.input += d;
-    updateAnswerDisplay();
+    updateAnswerSlot();
     sfxTap();
   }
   function pressBackspace() {
     if (state.locked) return;
     state.input = state.input.slice(0, -1);
-    updateAnswerDisplay();
+    updateAnswerSlot();
     sfxTap();
   }
 
@@ -718,55 +742,47 @@
   function showCombo() {
     const badge = document.getElementById('combo-badge');
     if (state.combo >= 3) {
-      badge.textContent = `🔥 ${state.combo}れんぞく`;
+      badge.textContent = `🔥${state.combo}`;
       badge.classList.remove('show'); void badge.offsetWidth; badge.classList.add('show');
     } else {
       badge.classList.remove('show');
     }
   }
 
-  function spawnEvolveLabel() {
-    const wrap = document.getElementById('creature-wrap');
-    const el = document.createElement('div');
-    el.className = 'evolve-label';
-    el.textContent = state.stage >= 4 ? '✨ しんかMAX！' : 'しんか！';
-    wrap.appendChild(el);
-    setTimeout(() => el.remove(), 1100);
-  }
-
-  function burstAtCreature() {
-    const circle = document.getElementById('creature-circle');
-    const rect = circle.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
-    for (let i = 0; i < 10; i++) {
+  function confettiBurst(count) {
+    const container = document.querySelector('.app');
+    const rect = container.getBoundingClientRect();
+    for (let i = 0; i < count; i++) {
       const el = document.createElement('span');
-      el.className = 'star-particle';
-      el.textContent = ['✨','⭐','💫'][randInt(0,2)];
+      el.className = 'confetti-particle';
+      el.textContent = ['✨','⭐','🎉','💫'][randInt(0,3)];
       const angle = Math.random() * Math.PI * 2;
-      const dist = 34 + Math.random() * 46;
+      const dist = 40 + Math.random() * (rect.width * 0.42);
       el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
       el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
       el.style.setProperty('--rot', (Math.random()*360) + 'deg');
-      el.style.left = cx + 'px';
-      el.style.top = cy + 'px';
+      el.style.left = (rect.left + rect.width / 2) + 'px';
+      el.style.top = (rect.top + rect.height / 2) + 'px';
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 900);
+      setTimeout(() => el.remove(), 1050);
     }
   }
 
-  function growCreature() {
-    document.getElementById('xp-bar-fill').style.width = (state.correct / QUESTIONS_PER_SESSION * 100) + '%';
-    const newStage = stageForCount(state.correct);
-    if (newStage !== state.stage) {
-      state.stage = newStage;
-      setCreatureVisual(state.stage);
-      const circle = document.getElementById('creature-circle');
-      circle.classList.remove('evolve'); void circle.offsetWidth; circle.classList.add('evolve');
-      spawnEvolveLabel();
-      burstAtCreature();
-      sfxEvolve();
-    }
-    updateGrowthLabel();
+  function playEvolveCelebration(callback) {
+    const overlay = document.getElementById('evolve-overlay');
+    const isMax = state.stage >= 4;
+    document.getElementById('evolve-big-face').textContent = LINES[state.line].stages[state.stage];
+    document.getElementById('evolve-overlay-label').textContent = isMax ? 'さいだいしんか！' : 'しんか！';
+    document.getElementById('evolve-overlay-sub').textContent = isMax
+      ? `${LINES[state.line].name}が かんぜんに そだった！`
+      : `${LINES[state.line].name}が おおきく なった！`;
+    overlay.classList.add('show');
+    sfxEvolve();
+    confettiBurst(isMax ? 20 : 14);
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      callback();
+    }, isMax ? 1500 : 1200);
   }
 
   function submitAnswer() {
@@ -775,35 +791,51 @@
     const q = state.queue[state.idx];
     const userVal = Number(state.input);
     const isCorrect = userVal === q.answer;
-    const disp = document.getElementById('answer-display');
+    const slot = document.getElementById('answer-slot');
     const speech = document.getElementById('play-speech');
     const stone = document.getElementById('stone-' + state.idx);
+    let evolved = false;
 
     if (isCorrect) {
       state.correct++; state.combo++; state.maxCombo = Math.max(state.maxCombo, state.combo);
-      disp.className = 'answer-display correct';
+      slot.classList.remove('empty'); slot.classList.add('correct');
       speech.textContent = PRAISE[randInt(0, PRAISE.length - 1)];
       if (stone) { stone.classList.remove('current'); stone.classList.add('ok'); stone.textContent = '◯'; }
       flashOverlay('ok'); sfxCorrect();
-      growCreature();
+
+      document.getElementById('xp-bar-fill').style.width = (state.correct / QUESTIONS_PER_SESSION * 100) + '%';
+      const newStage = stageForCount(state.correct);
+      if (newStage !== state.stage) {
+        state.stage = newStage;
+        document.getElementById('mini-creature').textContent = LINES[state.line].stages[state.stage];
+        evolved = true;
+      }
+      updateGrowthLabel();
     } else {
       state.combo = 0;
-      disp.className = 'answer-display wrong';
-      disp.textContent = state.input + ' (せいかい: ' + q.answer + ')';
+      slot.classList.remove('empty'); slot.classList.add('wrong');
+      slot.textContent = q.answer;
+      fitQuestionText();
       speech.textContent = CONSOLE_WORDS[randInt(0, CONSOLE_WORDS.length - 1)];
       if (stone) { stone.classList.remove('current'); stone.classList.add('ng'); stone.textContent = '✗'; }
       flashOverlay('ng'); sfxWrong();
     }
     showCombo();
 
-    setTimeout(() => {
+    const advance = () => {
       state.idx++;
       if (state.idx >= QUESTIONS_PER_SESSION) {
         finishSession();
       } else {
         renderQuestion();
       }
-    }, isCorrect ? 700 : 1300);
+    };
+
+    if (evolved) {
+      setTimeout(() => playEvolveCelebration(advance), 500);
+    } else {
+      setTimeout(advance, isCorrect ? 650 : 1300);
+    }
   }
 
   function finishSession() {
@@ -867,26 +899,7 @@
     }
 
     if (stars === 3) {
-      setTimeout(() => { burstStars(); sfxClear(); }, 500);
-    }
-  }
-
-  function burstStars() {
-    const container = document.querySelector('.app');
-    const rect = container.getBoundingClientRect();
-    for (let i = 0; i < 14; i++) {
-      const el = document.createElement('span');
-      el.className = 'star-particle';
-      el.textContent = ['⭐','✨','🌟'][randInt(0,2)];
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 80 + Math.random() * 120;
-      el.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
-      el.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
-      el.style.setProperty('--rot', (Math.random()*360) + 'deg');
-      el.style.left = (rect.left + rect.width / 2) + 'px';
-      el.style.top = (rect.top + rect.height / 2) + 'px';
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 950);
+      setTimeout(() => { confettiBurst(18); sfxClear(); }, 500);
     }
   }
 
