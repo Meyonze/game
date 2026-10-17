@@ -151,7 +151,7 @@
     <div class="brand"><div class="brand-symbol" id="brand-symbol"></div><div><div class="brand-name">CHAIN FORGE</div><div class="brand-sub">連鎖の工房</div></div></div>
     <div class="header-tools"><button class="icon-button" id="map-button" aria-label="ステージを選ぶ" title="ステージを選ぶ"></button><button class="icon-button" id="sound-button" aria-label="音を切り替える" title="音を切り替える"></button><button class="icon-button" id="help-button" aria-label="遊び方" title="遊び方"></button></div>
   </header>
-  <section class="stage-heading"><div><div class="eyebrow" id="stage-label">EXPERIMENT 01 / 05</div><h1 id="stage-name"></h1><p id="stage-subtitle"></p></div><nav class="stage-steps" id="stage-steps" aria-label="ステージ"></nav></section>
+  <section class="stage-heading"><div><div class="eyebrow" id="stage-label">EXPERIMENT 01 / 15</div><h1 id="stage-name"></h1><p id="stage-subtitle"></p></div><nav class="stage-steps" id="stage-steps" aria-label="ステージ"></nav></section>
   <div class="workspace">
     <section class="battle" aria-label="戦場">
       <div class="arena" id="arena"><div class="arena-top"><div class="enemy-count"><b id="remaining">08</b><span>敵 / 残り</span></div><div class="combo-stat"><b id="combo">0</b><span>CHAIN</span></div></div>
@@ -211,7 +211,117 @@
       enemies:[E(3,2,6),E(3,1),E(2,2),E(4,2),E(2,3),E(4,3),E(3,4),E(4,4,2),E(5,3,2),E(5,4),E(0,1,2),E(0,2)],
       terrain:[T(0,0,'wall'),T(5,0,'wall'),T(5,5,'wall')],
       hints:['炉心のHPは6。ランスだけでなく、周囲の敵の撃破パルスも重ねよう。','中央のボムと、下から炉心を撃つランスが軸。左端の敵にも届く経路を作ろう。'],
-      solution:[{x:0,y:4,type:'lance',dir:0},{x:1,y:2,type:'spark',dir:1},{x:3,y:3,type:'bomb',dir:0},{x:3,y:5,type:'lance',dir:0}],start:0}
+      solution:[{x:0,y:4,type:'lance',dir:0},{x:1,y:2,type:'spark',dir:1},{x:3,y:3,type:'bomb',dir:0},{x:3,y:5,type:'lance',dir:0}],start:0},
+    {
+      name:"十字の橋",
+      subtitle:"斜めの爆風と、十字の誘爆。",
+      stock:{"bomb":2},
+      par:2,
+      enemies:[{"x":0,"y":1,"hp":1},{"x":1,"y":1,"hp":2},{"x":2,"y":1,"hp":1},{"x":0,"y":2,"hp":1},{"x":1,"y":4,"hp":1},{"x":2,"y":4,"hp":2},{"x":3,"y":4,"hp":1},{"x":3,"y":3,"hp":1},{"x":3,"y":2,"hp":1},{"x":0,"y":4,"hp":1}],
+      terrain:[{"x":4,"y":1,"type":"wall"},{"x":4,"y":2,"type":"wall"},{"x":4,"y":3,"type":"wall"},{"x":4,"y":4,"type":"wall"}],
+      hints:["ボムは斜めにも届きます。離れた敵集団の間に、2台のボムで橋をかけよう。","B3とC4にボムを置くと、斜めに隣り合って誘爆が届きます。"],
+      solution:[{"type":"bomb","x":1,"y":2,"dir":0},{"type":"bomb","x":2,"y":3,"dir":0}],
+      start:0
+    },
+    {
+      name:"返り火",
+      subtitle:"二度曲がる光を、爆風につなぐ。",
+      stock:{"lance":1,"bomb":1},
+      par:2,
+      enemies:[{"x":0,"y":3,"hp":2},{"x":2,"y":1,"hp":2},{"x":4,"y":1,"hp":2},{"x":5,"y":3,"hp":2},{"x":5,"y":4,"hp":3},{"x":3,"y":3,"hp":1},{"x":3,"y":4,"hp":1},{"x":3,"y":5,"hp":2},{"x":4,"y":5,"hp":1},{"x":5,"y":5,"hp":1}],
+      terrain:[{"x":0,"y":1,"type":"/"},{"x":5,"y":1,"type":"\\"},{"x":1,"y":2,"type":"wall"},{"x":2,"y":2,"type":"wall"},{"x":3,"y":2,"type":"wall"},{"x":4,"y":2,"type":"wall"}],
+      hints:["左右の鏡を通すと、左を上ったランスが右を下ります。","A6から上へランス。E5のボムへは、右端の敵の撃破パルスを渡そう。"],
+      solution:[{"type":"lance","x":0,"y":5,"dir":0},{"type":"bomb","x":4,"y":4,"dir":0}],
+      start:0
+    },
+    {
+      name:"鎧のほころび",
+      subtitle:"一撃の強さより、重ねる順番。",
+      stock:{"lance":2,"bomb":1},
+      par:3,
+      enemies:[{"x":3,"y":2,"hp":6},{"x":1,"y":3,"hp":1},{"x":2,"y":2,"hp":1},{"x":3,"y":3,"hp":1},{"x":1,"y":2,"hp":2},{"x":1,"y":4,"hp":1},{"x":2,"y":4,"hp":1},{"x":3,"y":4,"hp":1},{"x":4,"y":2,"hp":1},{"x":4,"y":3,"hp":2},{"x":5,"y":3,"hp":3}],
+      terrain:[{"x":0,"y":0,"type":"wall"},{"x":5,"y":5,"type":"wall"}],
+      hints:["鎧の敵には、ランスの2ダメージと敵の誘爆を重ねよう。炉心にはボムの一撃も必要です。","A4のランスを右向きに。C4のボムを経由して、D6のランスへつなげます。"],
+      solution:[{"type":"lance","x":0,"y":3,"dir":1},{"type":"bomb","x":2,"y":3,"dir":0},{"type":"lance","x":3,"y":5,"dir":0}],
+      start:0
+    },
+    {
+      name:"火花のリレー",
+      subtitle:"四つの装置で、端から端まで。",
+      stock:{"spark":2,"bomb":2},
+      par:4,
+      enemies:[{"x":0,"y":3,"hp":1},{"x":3,"y":3,"hp":1},{"x":3,"y":2,"hp":1},{"x":4,"y":2,"hp":1},{"x":5,"y":2,"hp":1},{"x":5,"y":3,"hp":1},{"x":5,"y":4,"hp":3},{"x":4,"y":4,"hp":2},{"x":3,"y":4,"hp":1},{"x":2,"y":5,"hp":2},{"x":1,"y":4,"hp":1},{"x":3,"y":5,"hp":1}],
+      terrain:[{"x":3,"y":0,"type":"wall"},{"x":3,"y":1,"type":"wall"},{"x":0,"y":0,"type":"wall"}],
+      hints:["スパークは敵を倒し、その誘爆で次のスパークを起動することもできます。","A6から上へスパーク、B4から右へスパーク。E4とC5のボムへ、敵の撃破パルスを渡そう。"],
+      solution:[{"type":"spark","x":0,"y":5,"dir":0},{"type":"spark","x":1,"y":3,"dir":1},{"type":"bomb","x":4,"y":3,"dir":0},{"type":"bomb","x":2,"y":4,"dir":0}],
+      start:0
+    },
+    {
+      name:"交差する閃光",
+      subtitle:"横と縦の二撃を、一つの炉心へ。",
+      stock:{"lance":2,"bomb":1},
+      par:3,
+      enemies:[{"x":3,"y":2,"hp":7},{"x":1,"y":2,"hp":2},{"x":4,"y":2,"hp":2},{"x":5,"y":2,"hp":3},{"x":3,"y":1,"hp":1},{"x":2,"y":1,"hp":2},{"x":1,"y":1,"hp":2},{"x":3,"y":3,"hp":1},{"x":3,"y":4,"hp":1},{"x":3,"y":0,"hp":2}],
+      terrain:[{"x":0,"y":0,"type":"wall"},{"x":5,"y":5,"type":"wall"}],
+      hints:["炉心には横と縦のランスだけでなく、周囲の敵の誘爆も必要です。","A3のランスを右へ、C3にボム、D6のランスを上へ。横の攻撃から連鎖を始めよう。"],
+      solution:[{"type":"lance","x":0,"y":2,"dir":1},{"type":"bomb","x":2,"y":2,"dir":0},{"type":"lance","x":3,"y":5,"dir":0}],
+      start:0
+    },
+    {
+      name:"鏡の回廊",
+      subtitle:"三枚の鏡で、戦場を一周。",
+      stock:{"lance":1,"bomb":2},
+      par:3,
+      enemies:[{"x":0,"y":2,"hp":2},{"x":2,"y":0,"hp":2},{"x":5,"y":2,"hp":2},{"x":3,"y":5,"hp":2},{"x":5,"y":4,"hp":1},{"x":4,"y":3,"hp":1},{"x":3,"y":3,"hp":1},{"x":3,"y":4,"hp":1},{"x":1,"y":2,"hp":1},{"x":1,"y":3,"hp":2},{"x":1,"y":4,"hp":1},{"x":2,"y":2,"hp":1},{"x":2,"y":4,"hp":2},{"x":3,"y":2,"hp":1},{"x":4,"y":5,"hp":4}],
+      terrain:[{"x":0,"y":0,"type":"/"},{"x":5,"y":0,"type":"\\"},{"x":5,"y":5,"type":"/"},{"x":2,"y":1,"type":"wall"},{"x":4,"y":1,"type":"wall"},{"x":4,"y":2,"type":"wall"}],
+      hints:["ランスは鏡で曲がっても貫通を続けます。外周から内側の装置へ火を渡そう。","A6のランスを上向きに。E5とC4のボムへ、外周の敵から順につなげます。"],
+      solution:[{"type":"lance","x":0,"y":5,"dir":0},{"type":"bomb","x":4,"y":4,"dir":0},{"type":"bomb","x":2,"y":3,"dir":0}],
+      start:0
+    },
+    {
+      name:"城壁の裏側",
+      subtitle:"塞がれた射線の、その先へ。",
+      stock:{"lance":1,"bomb":2},
+      par:3,
+      enemies:[{"x":5,"y":3,"hp":1},{"x":3,"y":2,"hp":1},{"x":4,"y":2,"hp":1},{"x":5,"y":2,"hp":2},{"x":3,"y":3,"hp":1},{"x":3,"y":4,"hp":1},{"x":4,"y":4,"hp":3},{"x":5,"y":4,"hp":1},{"x":1,"y":3,"hp":1},{"x":1,"y":4,"hp":2},{"x":1,"y":5,"hp":1},{"x":2,"y":3,"hp":1},{"x":2,"y":5,"hp":1},{"x":3,"y":5,"hp":2},{"x":5,"y":1,"hp":2}],
+      terrain:[{"x":0,"y":2,"type":"wall"},{"x":1,"y":2,"type":"wall"},{"x":2,"y":2,"type":"wall"},{"x":4,"y":0,"type":"wall"},{"x":4,"y":1,"type":"wall"}],
+      hints:["壁を正面から抜くことはできません。右端をランスで撃ち、敵の誘爆で左側へ渡ろう。","F6から上にランス。E4のボムから、C5のボムへ爆風と敵の誘爆をつなげます。"],
+      solution:[{"type":"lance","x":5,"y":5,"dir":0},{"type":"bomb","x":4,"y":3,"dir":0},{"type":"bomb","x":2,"y":4,"dir":0}],
+      start:0
+    },
+    {
+      name:"八重の炉心",
+      subtitle:"すべての一撃を、取りこぼさずに。",
+      stock:{"lance":3,"bomb":1},
+      par:4,
+      enemies:[{"x":2,"y":2,"hp":8},{"x":1,"y":3,"hp":1},{"x":1,"y":2,"hp":1},{"x":3,"y":2,"hp":1},{"x":2,"y":4,"hp":1},{"x":4,"y":2,"hp":1},{"x":3,"y":4,"hp":1},{"x":4,"y":4,"hp":2},{"x":4,"y":3,"hp":1},{"x":3,"y":3,"hp":1},{"x":2,"y":1,"hp":2},{"x":5,"y":3,"hp":2}],
+      terrain:[{"x":0,"y":0,"type":"wall"},{"x":5,"y":0,"type":"wall"},{"x":0,"y":5,"type":"wall"}],
+      hints:["HP8は、炉心を狙う2本のランスだけでは足りません。ボムと隣接する敵の誘爆も重ねよう。","A4から右へランス、C4にボム。C6のランスを上、F3のランスを左に向けます。"],
+      solution:[{"type":"lance","x":0,"y":3,"dir":1},{"type":"bomb","x":2,"y":3,"dir":0},{"type":"lance","x":2,"y":5,"dir":0},{"type":"lance","x":5,"y":2,"dir":3}],
+      start:0
+    },
+    {
+      name:"起点を見極めて",
+      subtitle:"ひとつの起動が、二つの道を結ぶ。",
+      stock:{"bomb":2,"lance":2},
+      par:4,
+      enemies:[{"x":2,"y":3,"hp":4},{"x":2,"y":2,"hp":1},{"x":2,"y":4,"hp":1},{"x":5,"y":2,"hp":1},{"x":5,"y":3,"hp":3},{"x":3,"y":2,"hp":2},{"x":3,"y":3,"hp":1},{"x":3,"y":4,"hp":2},{"x":2,"y":1,"hp":2},{"x":1,"y":5,"hp":1},{"x":4,"y":4,"hp":2}],
+      terrain:[{"x":0,"y":1,"type":"/"},{"x":5,"y":1,"type":"\\"},{"x":1,"y":2,"type":"wall"},{"x":1,"y":3,"type":"wall"},{"x":1,"y":4,"type":"wall"},{"x":4,"y":0,"type":"wall"}],
+      hints:["最初に起動する装置が重要。ほかの装置から届かない敵を、起点のボムで倒そう。","A6のボムから起爆。A5のランスは上、E4にボム、C6のランスも上です。"],
+      solution:[{"type":"bomb","x":0,"y":5,"dir":0},{"type":"lance","x":0,"y":4,"dir":0},{"type":"bomb","x":4,"y":3,"dir":0},{"type":"lance","x":2,"y":5,"dir":0}],
+      start:0
+    },
+    {
+      name:"連鎖の大炉",
+      subtitle:"二つの炉心、ひとつながりの火。",
+      stock:{"lance":2,"bomb":2},
+      par:4,
+      enemies:[{"x":2,"y":2,"hp":6},{"x":3,"y":3,"hp":6},{"x":3,"y":2,"hp":2},{"x":4,"y":2,"hp":2},{"x":4,"y":3,"hp":1},{"x":3,"y":4,"hp":1},{"x":1,"y":2,"hp":2},{"x":2,"y":4,"hp":1},{"x":2,"y":3,"hp":1},{"x":4,"y":1,"hp":2},{"x":5,"y":1,"hp":2},{"x":5,"y":4,"hp":2},{"x":0,"y":4,"hp":2},{"x":1,"y":4,"hp":2},{"x":5,"y":3,"hp":5}],
+      terrain:[{"x":5,"y":2,"type":"\\"},{"x":5,"y":5,"type":"/"},{"x":3,"y":1,"type":"/"},{"x":0,"y":0,"type":"wall"},{"x":1,"y":1,"type":"wall"},{"x":4,"y":0,"type":"wall"},{"x":0,"y":5,"type":"wall"}],
+      hints:["炉心は2つ。ランスの射線、鏡で曲がる道、ボムの誘爆を一度の連鎖にまとめよう。","A3のランスを右、D6のランスを上に。E5とB4にボムを置き、A3から起爆します。"],
+      solution:[{"type":"lance","x":0,"y":2,"dir":1},{"type":"lance","x":3,"y":5,"dir":0},{"type":"bomb","x":4,"y":4,"dir":0},{"type":"bomb","x":1,"y":3,"dir":0}],
+      start:0
+    }
   ];
   function validate(level,placements){
     const seen=new Set(),used={};
@@ -324,7 +434,7 @@
   saved.cleared=[...new Set(saved.cleared.filter(n=>Number.isInteger(n)&&n>=0&&n<LEVELS.length))];
   if(!saved.best||typeof saved.best!=='object')saved.best={};
   const persist=()=>{try{localStorage.setItem('chain-forge-v1',JSON.stringify(saved));}catch{}};
-  let levelIndex=Number.isInteger(saved.last)?Math.max(0,Math.min(4,saved.last)):0;
+  let levelIndex=Number.isInteger(saved.last)?Math.max(0,Math.min(LEVELS.length-1,saved.last)):0;
   if(levelIndex>0&&!saved.cleared.includes(levelIndex-1))levelIndex=0;
   let level,placements=[],startIndex=0,focus=-1,selected='bomb',defaultDir=0,history=[],phase='setup',viewEnemies=[],fired=new Set(),raf=0,runToken=0,hintCount=0,attempts=0,returnFocus=null;
   let drag=null,suppressClickUntil=0;
@@ -348,12 +458,14 @@
   function clearEffects(){for(const t of fxTimers)clearTimeout(t);fxTimers=[];$('fx').innerHTML='';document.querySelectorAll('.float-number').forEach(el=>el.remove());$('chain-banner').classList.remove('pop');$('arena').classList.remove('shaking');}
   function loadLevel(index){
     cancelAnimationFrame(raf);runToken++;clearEffects();levelIndex=index;saved.last=index;persist();level=LEVELS[index];placements=[];startIndex=0;focus=-1;selected=Object.keys(level.stock)[0];defaultDir=0;history=[];phase='setup';viewEnemies=clone(level.enemies);fired=new Set();hintCount=0;attempts=0;
-    $('stage-label').textContent=`EXPERIMENT ${String(index+1).padStart(2,'0')} / 05`;$('stage-name').textContent=level.name;$('stage-subtitle').textContent=level.subtitle;
+    $('stage-label').textContent=`EXPERIMENT ${String(index+1).padStart(2,'0')} / ${String(LEVELS.length).padStart(2,'0')}`;$('stage-name').textContent=level.name;$('stage-subtitle').textContent=level.subtitle;
     $('combo').textContent='0';$('phase-label').textContent='配置フェーズ';$('board-note').textContent='敵を倒すと十字に誘爆';render();
   }
   function render(){cancelDrag();renderSteps();renderBoard();renderArsenal();renderControls();}
   function renderSteps(){
-    $('stage-steps').innerHTML='';LEVELS.forEach((l,i)=>{const b=document.createElement('button');b.className='stage-step'+(i===levelIndex?' active':'')+(saved.cleared.includes(i)?' done':'');b.textContent=String(i+1).padStart(2,'0');b.disabled=phase==='playing'||(i>0&&!saved.cleared.includes(i-1));b.setAttribute('aria-label',`ステージ${i+1} ${l.name}${b.disabled?' 未開放':''}`);if(i===levelIndex)b.setAttribute('aria-current','step');b.onclick=()=>loadLevel(i);$('stage-steps').append(b);});
+    const first=Math.floor(levelIndex/5)*5,last=Math.min(first+5,LEVELS.length);
+    $('stage-steps').innerHTML='';$('stage-steps').setAttribute('aria-label',`ステージ${first+1}〜${last}、全${LEVELS.length}面。全ステージは地図から選べます。`);
+    for(let i=first;i<last;i++){const l=LEVELS[i],b=document.createElement('button');b.className='stage-step'+(i===levelIndex?' active':'')+(saved.cleared.includes(i)?' done':'');b.textContent=String(i+1).padStart(2,'0');b.disabled=phase==='playing'||(i>0&&!saved.cleared.includes(i-1));b.setAttribute('aria-label',`ステージ${i+1} ${l.name}${b.disabled?' 未開放':''}`);if(i===levelIndex)b.setAttribute('aria-current','step');b.onclick=()=>loadLevel(i);$('stage-steps').append(b);}
   }
   function renderBoard(){
     const board=$('board');board.innerHTML='';
@@ -546,9 +658,9 @@
       if(!saved.cleared.includes(levelIndex))saved.cleared.push(levelIndex);persist();audioFx('clear');
     }
     renderSteps();
-    const allDone=levelIndex===4&&result.clear;
-    const title=result.clear?(allDone?'5つの炉に、火が灯った。':'連鎖、完成。'):'あと一手、工夫しよう。';
-    const desc=result.clear?(allDone?'全5ステージをクリア。別の配置でも、もっと気持ちいい連鎖を探せます。':`${result.kills}体を、ひとつながりの連鎖で撃破。`):`残り${result.enemies.filter(e=>e.hp>0).length}体。今の配置を残して、狙いや起動する装置を変えられます。`;
+    const allDone=levelIndex===LEVELS.length-1&&result.clear;
+    const title=result.clear?(allDone?'すべての炉に、火が灯った。':'連鎖、完成。'):'あと一手、工夫しよう。';
+    const desc=result.clear?(allDone?`全${LEVELS.length}ステージをクリア。別の配置でも、もっと気持ちいい連鎖を探せます。`:`${result.kills}体を、ひとつながりの連鎖で撃破。`):`残り${result.enemies.filter(e=>e.hp>0).length}体。今の配置を残して、狙いや起動する装置を変えられます。`;
     openModal(`<div class="eyebrow">${result.clear?'EXPERIMENT COMPLETE':'TRY ANOTHER COMBINATION'}</div><h2 id="modal-title">${title}</h2>${result.clear?'<div class="stars" aria-label="クリア">✦ ✦ ✦</div>':''}<p>${desc}</p><div class="result-stats"><div><b>${result.kills}</b><span>CHAIN</span></div><div><b>${result.activated}/${placements.length}</b><span>装置起動</span></div><div><b>${score}</b><span>${isBest?'NEW BEST':'SCORE'}</span></div></div><button class="modal-primary" id="result-primary">${result.clear?(allDone?'ステージを選ぶ':'次のステージへ'):'配置を調整する'}</button><button class="modal-secondary" id="result-secondary">${result.clear?'この配置をもう一度':'ヒントを見る'}</button>`);
     $('result-primary').onclick=()=>{closeModal();if(result.clear){if(allDone){restoreSetup();showMap();}else loadLevel(levelIndex+1);}else restoreSetup();};
     $('result-secondary').onclick=()=>{closeModal();restoreSetup();if(result.clear)launch();else showHint();};
@@ -616,7 +728,7 @@
   function showMap(){
     if(phase==='playing')return;
     if(phase==='result')restoreSetup();
-    openModal('<button class="modal-close" aria-label="閉じる" id="map-close">×</button><div class="eyebrow">THE FIVE EXPERIMENTS</div><h2 id="modal-title">工房の地図</h2><p>小さな火花から、最後の炉心へ。</p><div class="level-map" id="level-map"></div><button class="modal-secondary" id="map-back">工房に戻る</button>');
+    openModal(`<button class="modal-close" aria-label="閉じる" id="map-close">×</button><div class="eyebrow">THE ${LEVELS.length} EXPERIMENTS</div><h2 id="modal-title">工房の地図</h2><p>全${LEVELS.length}面。小さな火花から、最後の炉心へ。</p><div class="level-map" id="level-map"></div><button class="modal-secondary" id="map-back">工房に戻る</button>`);
     LEVELS.forEach((l,i)=>{const b=document.createElement('button');b.className='map-item';b.disabled=i>0&&!saved.cleared.includes(i-1);b.innerHTML=`<b>${String(i+1).padStart(2,'0')}</b><span>${l.name}</span><small>${saved.cleared.includes(i)?'CLEAR':b.disabled?'LOCKED':'PLAY'}</small>`;b.onclick=()=>{closeModal();loadLevel(i);};$('level-map').append(b);});$('map-close').onclick=closeModal;$('map-back').onclick=closeModal;
   }
   $('brand-symbol').innerHTML=ICONS.spark;$('map-button').innerHTML=ICONS.map;$('help-button').innerHTML=ICONS.help;$('launch-icon').innerHTML=ICONS.play;
