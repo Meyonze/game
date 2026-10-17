@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101527">
-<meta name="description" content="群れをタップ。吹き飛ばして、ぶつけて、はじける大連鎖。爽快感だけを試すCHAIN FORGEの実験版。">
-<meta name="chain-forge-version" content="03-feel">
-<title>CHAIN FORGE — ひと押し、大連鎖。</title>
+<meta name="description" content="指で触れた場所から、すぐにはじける。押しても、なぞっても遊べるCHAIN FORGEの実験版。">
+<meta name="chain-forge-version" content="04-direct-touch">
+<title>CHAIN FORGE — なぞって、はじける。</title>
 <style>
 :root{color-scheme:dark;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;color:#f7f2e5;background:#0c1020}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:radial-gradient(ellipse at 50% 30%,#292340,#0c1020 75%);-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #ffdb85;outline-offset:3px}[hidden]{display:none!important}.game{width:100%;max-width:480px;height:100vh;height:100dvh;margin:auto;padding:14px 16px max(12px,env(safe-area-inset-bottom));padding-top:max(14px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:12px;position:relative}.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}.brand{font:900 12px/1.1 Arial,sans-serif;letter-spacing:2px;color:#f8dfad;display:flex;align-items:center;gap:8px}.brand i{display:grid;place-items:center;width:24px;height:28px;border-radius:7px 7px 12px 12px;background:#ffd27a;color:#413049;font-style:normal;font-size:20px;box-shadow:0 2px 12px #ffc66b1c}.brand small{display:block;font:8px/1.4 monospace;letter-spacing:1.5px;color:#8e96b4;margin-top:3px}.top-tools{display:flex;align-items:center;gap:10px}.old-link{font-size:10px;color:#b8bbd0;text-decoration:none;padding:7px 2px}.sound{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;background:#1f263c;color:#e3d4b4}.sound svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.intro{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-shrink:0}.intro h1{font-size:21px;letter-spacing:1px;font-weight:800;margin:0}.intro span{font:9px monospace;color:#a4a2bf;letter-spacing:1px}.arena{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #535472;border-radius:24px;background:radial-gradient(ellipse at 50% 35%,#283350,#171e35 80%);box-shadow:inset 0 0 50px #090f2944,0 8px 35px #0002;isolation:isolate;transition:border-color .25s,box-shadow .25s}.arena:after{content:'';position:absolute;inset:0;border-radius:23px;box-shadow:inset 0 1px 0 #ffffff18;pointer-events:none;z-index:5}.arena.fever{border-color:#b383c6;box-shadow:0 0 24px #b059d622,inset 0 0 40px #71368918}.arena canvas{display:block;width:100%;height:100%;touch-action:none;outline-offset:-4px;cursor:crosshair}.combo-hud{position:absolute;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:3}.combo-line{display:flex;justify-content:center;align-items:baseline;gap:7px;height:62px}.combo-line b{font:italic 900 62px/.95 Arial,sans-serif;letter-spacing:-3px;color:#fff2c2;text-shadow:0 3px 0 #8c5149,0 0 20px #ffbd4b22;display:inline-block;min-width:42px}.combo-line span{font:italic 900 14px/1 Arial,sans-serif;letter-spacing:1px;color:#ffd589}.combo-hud p{font-size:10px;font-weight:700;letter-spacing:2px;color:#b8bdd4;margin:1px 0 0}.combo-line b.bump{animation:bump .10s ease-out}.tap-hint{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;text-align:center;white-space:nowrap;color:#fff2d5;text-shadow:0 2px 8px #161a32}.tap-hint .finger{position:relative;display:block;margin:0 auto 10px;width:48px;height:48px;border:2px solid #fff1b7;border-radius:50%;box-shadow:0 0 20px #ffd27555;animation:hint-ring 1.7s ease-in-out infinite}.tap-hint .finger:before{content:'';position:absolute;inset:12px;background:#ffe1a0;border-radius:50%;box-shadow:0 0 12px #ffc573}.tap-hint b{font-size:15px;font-weight:800;letter-spacing:2px}.tap-hint small{display:block;margin-top:6px;color:#d8d8e2;font-size:10px}.shout{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%) rotate(-7deg);pointer-events:none;z-index:4;opacity:0;white-space:nowrap;font:italic 900 clamp(28px,8vw,42px)/1 Arial,sans-serif;letter-spacing:-1px;color:#fff2c5;text-shadow:2px 3px #79405b,0 0 25px #ff8e9666}.shout.show{animation:shout .8s ease-out both}.shout.finished{font-family:'Yu Gothic',sans-serif;font-size:44px;letter-spacing:5px}.controls{flex-shrink:0;text-align:center;position:relative}.controls p{margin:0 0 9px;font-size:11px;letter-spacing:.5px;color:#c1c5d9;line-height:1.5}.burst-button{width:100%;height:56px;border:1px solid #ffe5a5;border-radius:17px;background:linear-gradient(115deg,#ffdc84,#ffb976);color:#523348;box-shadow:0 5px 0 #ac615c,0 0 24px #ffcd6014;display:flex;align-items:center;justify-content:center;gap:12px;font-size:21px;letter-spacing:3px;font-weight:900;position:relative;overflow:hidden}.burst-button:before{content:'';width:34px;height:34px;border:1px solid #7b435d55;border-radius:50%;background:radial-gradient(circle,#fff2bc 20%,#ffd78b 24%,transparent 28%);box-shadow:0 0 0 3px #ffffff2b}.burst-button:active{transform:translateY(3px);box-shadow:0 2px 0 #ac615c}.footnote{font-size:8px;letter-spacing:1px;margin:10px 0 0;color:#777e9b}.arena-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;color:#a3afc9;font-size:9px;letter-spacing:1px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@keyframes hint-ring{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.07);opacity:1}}@keyframes bump{0%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes shout{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4) rotate(-7deg)}18%,65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-7deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(.98) rotate(-7deg)}}
 @media(min-width:600px){.game{max-width:480px;height:min(960px,100dvh);padding:22px 20px 18px}.intro h1{font-size:23px}.arena{border-radius:28px}}
@@ -17,26 +17,28 @@
 </head>
 <body>
 <main class="game">
-  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>FEEL TEST · 03</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge.html">配置モード</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
-  <section class="intro"><h1>ひと押し、大連鎖。</h1><span id="wave">SWARM 01</span></section>
-  <section class="arena" id="arena" aria-label="タップで群れを吹き飛ばす遊び場">
-    <canvas id="field" tabindex="0" role="button" aria-label="好きな場所をタップして爆破。連鎖中も追い打ちできます。キーボードではEnterかSpace。"></canvas>
-    <div class="combo-hud"><div class="combo-line"><b id="combo">0</b><span>CHAIN</span></div><p id="combo-caption">押したところから、はじける。</p></div>
-    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>群れをタップ</b><small>あとは、連鎖にまかせよう。</small></div>
+  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>FEEL TEST · 04</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge.html">配置モード</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
+  <section class="intro"><h1>なぞって、はじける。</h1><span id="wave">SWARM 01</span></section>
+  <section class="arena" id="arena" aria-label="指で触れた場所から弾ける遊び場">
+    <canvas id="field" tabindex="0" role="button" aria-label="触れた範囲の敵が弾けます。指でなぞっても遊べます。キーボードでは矢印で黄色い輪を動かし、EnterかSpaceで弾きます。"></canvas>
+    <div class="combo-hud"><div class="combo-line"><b id="combo">0</b><span>POP!</span></div><p id="combo-caption">指のところから、はじける。</p></div>
+    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞってみて</b><small>指のところから、すぐにはじける。</small></div>
     <div class="shout" id="shout" aria-hidden="true"></div>
-    <div class="arena-hint" id="arena-hint">連鎖中もタップで追い打ち</div>
+    <div class="arena-hint" id="arena-hint">黄色い輪が、触れる範囲</div>
   </section>
-  <section class="controls"><p id="instruction">好きなところを、タップ。</p><button class="burst-button" id="burst">どーん！</button><div class="footnote">吹き飛ばす。ぶつかる。はじける。</div></section>
+  <section class="controls"><p id="instruction">指を動かしたところが、はじける。</p><button class="burst-button" id="burst">ここを弾く</button><div class="footnote">押しても、なぞっても。</div></section>
 </main>
 <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
 <script>
 (function(root){
   'use strict';
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const TOUCH_RADIUS=20;
+  function segmentDistance(x,y,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,length=dx*dx+dy*dy,t=length?clamp(((x-ax)*dx+(y-ay)*dy)/length,0,1):0;return Math.hypot(x-ax-t*dx,y-ay-t*dy);}
   class BlastWorld{
     constructor({width=360,height=500,count=80,seed=1}={}){
       this.width=width;this.height=height;this.seed=seed>>>0||1;this.state='ready';this.combo=0;this.time=0;this.events=[];this.accumulator=0;
-      this.count=clamp(Math.round(count),12,110);this.bodies=[];this.nextPopAt=0;
+      this.count=clamp(Math.round(count),12,110);this.bodies=[];
       const cols=9,rows=Math.ceil(this.count/cols),sx=(width-64)/(cols-1),sy=Math.min(37,(height-125)/Math.max(1,rows-1));
       const top=85+(height-110-(rows-1)*sy)/2;
       for(let i=0;i<this.count;i++){
@@ -54,30 +56,28 @@
       b.fuse=delay;this.emit('ignite',{id:b.id,x:b.x,y:b.y,from});return true;
     }
     blast(x,y){
-      if(!Number.isFinite(x)||!Number.isFinite(y)||this.state==='clear')return false;
-      x=clamp(x,0,this.width);y=clamp(y,0,this.height);
-      if(this.state==='ready')this.state='chain';
-      this.emit('blast',{x,y});let nearest=null,distance=Infinity;
-      for(const b of this.bodies){if(b.dead)continue;
-        const dx=b.x-x,dy=b.y-y,d=Math.hypot(dx,dy);
-        if(d<distance){distance=d;nearest=b;}
-        if(d<112){const force=(1-d/125)*540,angle=d>.01?Math.atan2(dy,dx):this.random()*Math.PI*2;b.vx+=Math.cos(angle)*force;b.vy+=Math.sin(angle)*force;b.spin+=(this.random()-.5)*10;}
-        if(d<64)this.ignite(b,.025+Math.min(.18,d*.002));
-      }
-      if(nearest){if(distance>64)this.ignite(nearest,.08,{x,y});else this.pop(nearest);this.nextPopAt=this.time+.045;}
+      if(!Number.isFinite(x)||!Number.isFinite(y)||x<0||x>this.width||y<0||y>this.height)return false;
+      return this.stroke(x,y,x,y);
+    }
+    stroke(ax,ay,bx,by){
+      if(![ax,ay,bx,by].every(Number.isFinite)||this.state==='clear')return false;
+      const hits=this.bodies.filter(b=>!b.dead&&segmentDistance(b.x,b.y,ax,ay,bx,by)<=TOUCH_RADIUS+b.r);
+      this.emit('touch',{x:bx,y:by,fromX:ax,fromY:ay,radius:TOUCH_RADIUS,hits:hits.length});
+      if(!hits.length)return true;
+      this.state='chain';
+      // Resolve every directly touched target now, before any neighboring blast moves it.
+      for(const b of hits)this.pop(b,true);
       return true;
     }
-    pop(b){
+    pop(b,direct=false){
       if(b.dead)return;b.dead=true;b.fuse=null;this.combo++;
-      this.emit('pop',{id:b.id,x:b.x,y:b.y,r:b.r,color:b.color,combo:this.combo,final:this.combo===this.count});
-      let nearest=null,distance=Infinity,lit=0;
-      for(const c of this.bodies){if(c.dead)continue;const dx=c.x-b.x,dy=c.y-b.y,d=Math.hypot(dx,dy);
-        if(c.fuse===null&&d<distance){distance=d;nearest=c;}
-        if(d<86){const a=d>.01?Math.atan2(dy,dx):this.random()*Math.PI*2,force=(1-d/100)*240;c.vx+=Math.cos(a)*force;c.vy+=Math.sin(a)*force;c.spin+=(this.random()-.5)*5;}
-        if(d<48+c.r&&this.ignite(c,.12+this.random()*.14,{x:b.x,y:b.y}))lit++;
+      const reach=b.r+12;
+      this.emit('pop',{id:b.id,x:b.x,y:b.y,r:b.r,reach,color:b.color,combo:this.combo,direct,final:this.combo===this.count});
+      for(const c of this.bodies){
+        if(c.dead)continue;const dx=c.x-b.x,dy=c.y-b.y,d=Math.hypot(dx,dy);
+        if(d<=reach+c.r)this.ignite(c,.075+Math.min(.035,d*.001),{x:b.x,y:b.y});
+        if(d<65){const a=d>.01?Math.atan2(dy,dx):this.random()*Math.PI*2,force=(1-d/70)*65;c.vx+=Math.cos(a)*force;c.vy+=Math.sin(a)*force;c.spin+=(this.random()-.5)*1.8;}
       }
-      // A visible spark reaches the next target so a tap never ends in a dead pause.
-      if(!lit&&nearest)this.ignite(nearest,.20+Math.min(.15,distance*.0003),{x:b.x,y:b.y});
     }
     resize(height){
       if(!Number.isFinite(height)||height<160)return;
@@ -93,8 +93,8 @@
       this.time+=dt;
       for(const b of this.bodies){
         if(b.dead)continue;
-        if(b.fuse!==null)b.fuse-=dt;
-        const idle=this.state==='ready';
+        if(b.fuse!==null){b.fuse-=dt;if(b.fuse<=0){this.pop(b);continue;}}
+        const idle=b.fuse===null;
         if(idle){b.vx+=((b.ax-b.x)*1.1+Math.sin(this.time*1.5+b.id)*3)*dt;b.vy+=((b.ay-b.y)*1.1+Math.cos(this.time*1.4+b.id)*3)*dt;}
         const drag=Math.exp(-(idle?1.8:1.35)*dt);b.vx=clamp(b.vx*drag,-620,620);b.vy=clamp(b.vy*drag,-620,620);
         b.x+=b.vx*dt;b.y+=b.vy*dt;b.angle+=b.spin*dt;b.spin*=Math.exp(-dt*2);
@@ -113,18 +113,15 @@
           else if(b.fuse!==null&&a.fuse===null)this.ignite(a,.17+this.random()*.1,{x:b.x,y:b.y});
         }
       }
-      if(this.time>=this.nextPopAt){
-        const due=this.bodies.filter(b=>!b.dead&&b.fuse!==null&&b.fuse<=0).sort((a,b)=>a.fuse-b.fuse)[0];
-        if(due){this.pop(due);this.nextPopAt=this.time+(this.combo<12?.042:.028);}
-      }
       for(const b of this.bodies)if(!b.dead){b.x=clamp(b.x,b.r,this.width-b.r);b.y=clamp(b.y,b.r,this.height-b.r);}
       if(this.state==='chain'){
         const live=this.bodies.filter(b=>!b.dead);
         if(!live.length){this.state='clear';this.emit('clear',{combo:this.combo,time:this.time});}
-        else if(!live.some(b=>b.fuse!==null))this.ignite(live[0],.16);
+        else if(!live.some(b=>b.fuse!==null))this.state='ready';
       }
     }
   }
+  BlastWorld.TOUCH_RADIUS=TOUCH_RADIUS;
   root.BlastWorld=BlastWorld;
 })(typeof globalThis!=='undefined'?globalThis:window);
 
@@ -137,20 +134,21 @@
   const palette=['#83f5cc','#c3a1ff','#ff9bbd','#ffe08e'];
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let sound=true;try{const s=JSON.parse(localStorage.getItem('chain-forge-v1'));if(s?.sound===false)sound=false;}catch{}
-  let wave=0,world,worldHeight=500,pixelWidth=360,pixelHeight=500,scale=1,raf=0,last=0,now=0,clearAt=0,lastInput=-1000,hold=0,shake=0,shoutUntil=0;
+  let wave=0,world,worldHeight=500,pixelWidth=360,pixelHeight=500,scale=1,raf=0,last=0,now=0,clearAt=0,hold=0,shake=0,shoutUntil=0;
+  let pointer=null,aim={x:180,y:250,until:Infinity},strokes=[];
   let particles=[],rings=[],sparks=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
   function seed(){return Math.floor(Math.random()*4294967295)||1;}
   function newWave(){
     wave++;world=new BlastWorld({height:worldHeight,count:Math.min(100,Math.max(45,Math.round((68+wave*6)*Math.min(1,worldHeight/470)))),seed:seed()});
-    particles=[];rings=[];sparks=[];clearAt=0;hold=0;shake=0;
-    $('wave').textContent='SWARM '+String(wave).padStart(2,'0');$('combo').textContent='0';$('combo-caption').textContent='押したところから、はじける。';
-    $('burst').textContent='どーん！';$('instruction').textContent='好きなところを、タップ。';$('arena').classList.remove('fever');$('shout').classList.remove('show','finished');
+    particles=[];rings=[];sparks=[];strokes=[];clearAt=0;hold=0;shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
+    $('announcer').textContent='';$('wave').textContent='SWARM '+String(wave).padStart(2,'0');$('combo').textContent='0';$('combo-caption').textContent='指のところから、はじける。';
+    $('burst').textContent='ここを弾く';$('instruction').textContent='指を動かしたところが、はじける。';$('arena').classList.remove('fever');$('shout').classList.remove('show','finished');
     ambient=Array.from({length:22},()=>({x:Math.random()*360,y:Math.random()*worldHeight,r:.5+Math.random()*1.3,phase:Math.random()*6.3}));
   }
   function resize(){
     const rect=canvas.getBoundingClientRect();pixelWidth=rect.width||360;pixelHeight=rect.height||500;worldHeight=Math.max(160,pixelHeight/pixelWidth*360);
     const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(pixelWidth*dpr);canvas.height=Math.round(pixelHeight*dpr);scale=canvas.width/360;
-    if(world)world.resize(worldHeight);
+    if(world){world.resize(worldHeight);aim.y=Math.min(aim.y,worldHeight);cancelPointer();}
   }
   function initAudio(){
     if(!sound)return;
@@ -195,13 +193,14 @@
   }
   function handleEvents(){
     for(const e of world.drain()){
-      if(e.type==='blast'){
-        ring(e.x,e.y,120,'#ffd78c',.48,4);ring(e.x,e.y,65,'#fff3c4',.24,6);bits(e.x,e.y,'#ffd184',16,true);
-        if(!motion){shake=Math.max(shake,4);hold=Math.max(hold,.035);}boom(true);
+      if(e.type==='touch'){
+        const distance=Math.hypot(e.x-e.fromX,e.y-e.fromY);
+        if(distance>2){strokes.push({ax:e.fromX,ay:e.fromY,bx:e.x,by:e.y,r:e.radius,life:.18,max:.18});if(strokes.length>48)strokes.shift();}
+        if(e.hits){ring(e.x,e.y,e.radius,'#ffe7a3',.2,2);if(!motion)shake=Math.max(shake,Math.min(1.5,.4+e.hits*.15));if(e.hits>=3)boom();}
       }
       if(e.type==='ignite'&&e.from&&!motion){sparks.push({x:e.from.x,y:e.from.y,tx:e.x,ty:e.y,life:.19,max:.19,color:'#ffdb9b'});if(sparks.length>65)sparks.shift();}
       if(e.type==='pop'){
-        const color=palette[e.color];bits(e.x,e.y,color,e.final?26:8,e.final);ring(e.x,e.y,e.final?140:35+e.r,color,e.final?.75:.35,e.final?6:2);
+        const color=palette[e.color];bits(e.x,e.y,color,e.final?26:8,e.final);ring(e.x,e.y,e.final?85:e.reach,color,e.final?.75:.35,e.final?6:2);
         ring(e.x,e.y,e.r*1.7,'#fff2d8',.16,1);
         $('combo').textContent=String(e.combo);$('combo').classList.remove('bump');void $('combo').offsetWidth;$('combo').classList.add('bump');popSound(e.combo);
         if(e.combo===15){$('arena').classList.add('fever');$('combo-caption').textContent='いいね、そのまま！';}
@@ -211,21 +210,45 @@
       }
       if(e.type==='wall'&&!motion)bits(e.x,e.y,palette[e.color],2);
       if(e.type==='clear'){
-        clearAt=now+1.15;shout('全 壊 ！',true);$('burst').textContent='もう一発！';$('instruction').textContent='もう一発、いこう。';$('combo-caption').textContent='気持ちよく、全部はじけた。';$('announcer').textContent=e.combo+'連鎖。全壊！';
+        clearAt=now+1.15;pointer=null;shout('全 壊 ！',true);$('burst').textContent='もう一発！';$('instruction').textContent='もう一発、いこう。';$('combo-caption').textContent='気持ちよく、全部はじけた。';$('announcer').textContent=e.combo+'連鎖。全壊！';
         if(sound&&audio){try{for(const [i,f]of [523.25,659.25,783.99,1046.5].entries())tone(f,.38,.06,'sine',i*.045);}catch{}}
       }
     }
   }
-  function fire(x,y){
-    if(now-lastInput<.065)return;lastInput=now;initAudio();
-    if(world.state==='clear')newWave();
+  function react(){
+    handleEvents();
     $('tap-hint').hidden=true;
-    if(world.blast(x,y)){handleEvents();$('burst').textContent=world.state==='clear'?'もう一発！':'追い打ち！';$('instruction').textContent='連鎖中も、タップで追い打ち。';}
+    if(world.state!=='clear')$('instruction').textContent='押しても、なぞっても、指のところから。';
   }
-  canvas.addEventListener('pointerdown',e=>{if(e.isPrimary===false||(typeof e.button==='number'&&e.button!==0))return;e.preventDefault();const r=canvas.getBoundingClientRect();fire((e.clientX-r.left)/r.width*360,(e.clientY-r.top)/r.height*worldHeight);});
-  function centerFire(){const target=world.bodies.filter(b=>!b.dead).sort((a,b)=>Math.hypot(a.x-180,a.y-worldHeight/2)-Math.hypot(b.x-180,b.y-worldHeight/2))[0];fire(target?.x??180,target?.y??worldHeight/2);}
-  canvas.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();centerFire();}});
-  $('burst').onclick=centerFire;
+  function fire(x,y){
+    initAudio();if(world.state==='clear')newWave();
+    aim={x,y,until:Infinity};if(world.blast(x,y))react();
+  }
+  function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*360,y:(e.clientY-r.top)/r.height*worldHeight};}
+  function cancelPointer(e){if(!pointer||(e?.pointerId!==undefined&&e.pointerId!==pointer.id))return;const id=pointer.id;pointer=null;try{canvas.releasePointerCapture?.(id);}catch{}}
+  canvas.addEventListener('pointerdown',e=>{
+    if(e.isPrimary===false||pointer||(typeof e.button==='number'&&e.button!==0))return;e.preventDefault();
+    const p=point(e);fire(p.x,p.y);pointer={id:e.pointerId,...p};try{canvas.setPointerCapture?.(e.pointerId);}catch{}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=point(e);if(!pointer){if(e.pointerType!=='touch')aim={...p,until:now+.5};return;}
+    if(e.pointerId!==pointer.id)return;e.preventDefault();aim={...p,until:Infinity};
+    if(world.state!=='clear'){world.stroke(pointer.x,pointer.y,p.x,p.y);react();}pointer={...pointer,...p};
+  });
+  function endPointer(e){
+    if(!pointer||e.pointerId!==pointer.id)return;
+    if(e.type!=='pointercancel'&&e.type!=='lostpointercapture'&&world.state!=='clear'){
+      const p=point(e);world.stroke(pointer.x,pointer.y,p.x,p.y);aim={...p,until:Infinity};react();
+    }
+    cancelPointer();
+  }
+  canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',cancelPointer);canvas.addEventListener('lostpointercapture',cancelPointer);window.addEventListener('blur',cancelPointer);
+  canvas.addEventListener('keydown',e=>{
+    const vectors={ArrowLeft:[-18,0],ArrowRight:[18,0],ArrowUp:[0,-18],ArrowDown:[0,18]};
+    if(vectors[e.key]){e.preventDefault();const[dx,dy]=vectors[e.key];aim={x:clamp(aim.x+dx,0,360),y:clamp(aim.y+dy,0,worldHeight),until:Infinity};}
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();fire(aim.x,aim.y);}
+  });
+  $('burst').onclick=()=>fire(aim.x,aim.y);
   function circle(x,y,r,fill){ctx.beginPath();ctx.arc(x,y,Math.max(.1,r),0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();}
   function jelly(b){
     const hot=b.fuse!==null,speed=Math.hypot(b.vx,b.vy),stretch=motion?1:Math.min(.17,speed/1800),pulse=hot&&!motion?1+Math.sin(now*28+b.id)*.055:1;
@@ -244,6 +267,7 @@
     ctx.restore();
   }
   function drawEffects(dt){
+    for(const s of strokes){s.life-=dt;if(s.life<=0)continue;ctx.globalAlpha=s.life/s.max*.12;ctx.beginPath();ctx.moveTo(s.ax,s.ay);ctx.lineTo(s.bx,s.by);ctx.lineWidth=s.r*2;ctx.lineCap='round';ctx.strokeStyle='#ffe4a1';ctx.stroke();}strokes=strokes.filter(s=>s.life>0);ctx.globalAlpha=1;
     for(const p of particles){
       p.life-=dt;if(p.life<=0)continue;const t=1-p.life/p.max;ctx.globalAlpha=Math.min(1,p.life*5);
       if(p.kind==='reward'){
@@ -266,17 +290,19 @@
     for(const a of ambient){ctx.globalAlpha=.12+Math.sin(now*.8+a.phase)*.08;circle(a.x,a.y,a.r,'#c6caff');}ctx.globalAlpha=1;
     for(const b of world.bodies)if(!b.dead)jelly(b);
     drawEffects(dt);ctx.restore();
+    if(aim.until>now&&world.state!=='clear'){ctx.save();ctx.globalAlpha=pointer?.8:.5;ctx.beginPath();ctx.arc(aim.x,aim.y,BlastWorld.TOUCH_RADIUS,0,Math.PI*2);ctx.strokeStyle='#ffe4a1';ctx.lineWidth=1.5;ctx.stroke();circle(aim.x,aim.y,2,'#fff1c6');ctx.restore();}
   }
   function frame(time){
     if(document.hidden){last=0;raf=0;return;}
     const dt=last?clamp((time-last)/1000,0,.05):1/60;last=time;now=time/1000;
     if(clearAt&&now>=clearAt)newWave();
     let step=dt;if(hold>0&&!motion){const part=Math.min(hold,dt);hold-=part;step=dt-part+part*.12;}
+    if(pointer&&world.state!=='clear')world.stroke(pointer.x,pointer.y,pointer.x,pointer.y);
     world.update(step);handleEvents();draw(dt);
     if(shoutUntil&&now>=shoutUntil){$('shout').classList.remove('show');shoutUntil=0;}
     raf=requestAnimationFrame(frame);
   }
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0;last=0;if(audio)audio.suspend().catch(()=>{});}else if(!raf){last=0;raf=requestAnimationFrame(frame);}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelPointer();cancelAnimationFrame(raf);raf=0;last=0;if(audio)audio.suspend().catch(()=>{});}else if(!raf){last=0;raf=requestAnimationFrame(frame);}});
   window.addEventListener('resize',resize);
   renderSound();resize();newWave();raf=requestAnimationFrame(frame);
 })();
