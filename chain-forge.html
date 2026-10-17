@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#172b28">
-<meta name="description" content="置いて、つないで、一気に崩す。小さな盤面で大きな連鎖をつくるパズルゲーム。">
+<meta name="theme-color" content="#1c263c">
+<meta name="chain-forge-version" content="02-overdrive">
+<meta name="description" content="3回の起爆で、大連鎖をつくれ。火薬樽とオーバードライブで記録を狙う連鎖ラッシュと、全15面のパズル。">
 <title>CHAIN FORGE — 連鎖の工房</title>
 <style>
 :root{--ink:#213a33;--muted:#77867d;--paper:#f5f4eb;--line:#d8ded0;--green:#c2e5b3;--gold:#e9bc5a;--mint:#77ba9a;--shadow:0 8px 0 #13231f14;--serif:Georgia,'Yu Mincho',serif}
@@ -143,6 +144,42 @@
 @media(max-width:700px){.arena{grid-template-rows:28px minmax(0,1fr) 11px 20px}}
 @media(max-width:700px) and (max-height:650px){.arena{grid-template-rows:23px minmax(0,1fr) 9px 18px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+/* OVERDRIVE: luminous battlefield, punchy effects, compact mobile HUD. */
+.brand-name{font-family:Arial,sans-serif;font-weight:900;letter-spacing:1px}.brand-symbol{background:linear-gradient(145deg,#5946b3,#293858);color:#ffd65b;box-shadow:0 3px 0 #19283c}
+.mode-switch{display:flex;gap:3px;background:#e1e5df;border-radius:9px;padding:3px;width:max-content;margin-bottom:10px}.mode-switch button{padding:7px 13px;background:none;border-radius:7px;font-size:11px;font-weight:700;color:#6c7680}.mode-switch button[aria-pressed=true]{background:#29364e;color:#fff7d1;box-shadow:0 2px 5px #1a253229}.mode-switch button:disabled{opacity:.65}
+.arena{background:radial-gradient(ellipse at 50% 0%,#354467,#1c263c 75%);border:1px solid #4c5f7e;box-shadow:0 6px 0 #182035,0 12px 25px #19283c20;color:#e3ecff;transition:box-shadow .3s,border-color .3s}.arena-top{gap:12px}.enemy-count span{color:#b0bed2}.enemy-count b{font-family:Arial,sans-serif;font-weight:800;color:#f2f6ff}.combo-stat{flex-direction:column;align-items:center;gap:0;min-width:47px}.combo-stat b{font:900 34px/1 Arial,sans-serif;color:#ffd773;filter:drop-shadow(0 2px 0 #9d6339)}.combo-stat span{color:#ffd773;font-size:8px}.board{background:#151e32;border-color:#526384;box-shadow:inset 0 0 30px #070e2470;gap:5px}.cell{background:#394966;border-color:#4d607a;border-bottom-color:#1b2a46}.cell.empty{background:#283650;border-style:dashed;border-bottom-width:1px}.cell.empty:hover{background:#465574}.cell.enemy{background:linear-gradient(145deg,#425775,#30425d)}.cell.enemy.core{background:radial-gradient(ellipse,#8e5949,#4a3449);border-color:#b17863}.cell.enemy.barrel{background:linear-gradient(145deg,#74444f,#513448);border-color:#c47769}.cell.placed{background:linear-gradient(145deg,#746145,#4d4b4c);border-color:#c8a25d}.cell.focused{outline-color:#ffe178}.cell.ignition{background:#66512f;border-color:#ffdd78;box-shadow:0 0 12px #ffc96150}.cell.ignition:before{background:#ffd360;color:#4a2e25;border-color:#fff4ae}.cell.enemy.dead{background:#263d48;border-color:#36575c}.cell.enemy.dead:after{color:#6cb99f;font-size:22px}.hp{background:#16253d;border-color:#97accd}.hp.high{background:#ed744b;color:#fff6d1;border-color:#ffd488}.cell.reachable{background:#6b633e!important;border-color:#ffe09a}.cell.fired{background:#485c59}.cell.fired .piece-art{filter:brightness(1.3) drop-shadow(0 0 6px #ffe075)}.board-labels{color:#9aa9c6}.arena-bottom{color:#a7b9d0}.arena-bottom strong{color:#dbe9ff}.board-guide{color:#cfddff}.status-dot{background:#95ffb5;box-shadow:0 0 6px #85ffa680}.hint-cell:after{background:#ffe19b;color:#50362b;border-color:#f9d375}.cell.core .enemy-art{filter:drop-shadow(0 0 4px #ffb34d55)}
+.rush-hud{flex:1;min-width:0;max-width:250px;text-align:center}.rush-score-line{display:flex;align-items:baseline;justify-content:center;gap:4px;white-space:nowrap}.rush-score-line>b{font:900 23px/1.15 Arial,sans-serif;color:#fff3c6;letter-spacing:.5px}.rush-score-line>span{font:8px monospace;color:#bfcce0}.rush-score-line .rush-ammo{margin-left:8px;color:#f6ddb3;font-size:9px}.rush-ammo strong{font-size:15px;color:#ffdc75}.rush-hud>small{font:8px monospace;color:#acbad0}.rush-meter{position:relative;overflow:hidden;border:1px solid #63718f;border-radius:5px;height:14px;margin:4px 0 1px;background:#111e35}.rush-meter i{position:absolute;inset:0 auto 0 0;width:var(--charge,0%);background:linear-gradient(90deg,#7e68ec,#e78bf7);transition:width .15s}.rush-meter span{position:relative;display:block;line-height:12px;font-size:8px;color:#fff0fd;text-shadow:0 1px 2px #1c1648}
+.rush-tools{display:flex;justify-content:space-between;margin-top:7px}.rush-tools .text-button{font-size:10px;text-decoration:underline;text-underline-offset:3px;padding:5px 0;color:#5a6679}.rush-tools .text-button:disabled{opacity:.4}.rush-rules{display:grid;gap:9px;text-align:left;margin:16px 0}.rush-rules article{display:flex;align-items:center;gap:12px;background:#edece2;border:1px solid #d7dcd3;border-radius:12px;padding:13px}.rush-rules article>svg{width:54px;height:54px;flex:0 0 54px}.rush-rules h3{font-size:13px;margin:0 0 4px;color:#344259}.rush-rules p{font-size:11px;line-height:1.8;margin:0}.overdrive-symbol{flex:0 0 54px;text-align:center;font:italic 900 44px/1 Arial,sans-serif;color:#9b50d7;text-shadow:0 2px #e7c6ff}.rush-result-score{font:900 54px/1.1 Arial,sans-serif;letter-spacing:-2px;color:#8d54bb;padding:12px 0}.rush-result-score small{display:block;font:10px monospace;letter-spacing:3px;color:#9375aa;margin-top:5px}
+.launch{background:linear-gradient(110deg,#f0ae4d,#ed7f47);border-color:#bd693c;color:#382d36;box-shadow:0 5px 0 #984f3f,0 0 20px #f7b74526}.launch:hover{background:linear-gradient(110deg,#ffcf6d,#f59960)}.launch strong{font-weight:900;letter-spacing:2px}.launch small{opacity:.85}.launch:disabled{box-shadow:0 3px 0 #87967f}.weapon-card.selected{border-color:#9a73bc;background:#efe6f3;box-shadow:0 0 0 2px #ae80d11a}.ignition-option.active{background:#eed7ff;border-color:#b58acb;box-shadow:inset 0 0 0 1px #9c73b34a}
+.impact-flash{position:absolute;inset:0;border-radius:12px;pointer-events:none;opacity:0;z-index:7;background:radial-gradient(ellipse,#fff6b1aa,transparent 75%)}.impact-flash.flash{animation:impact-flash .22s ease-out}.arena.overdrive{border-color:#da94ff;box-shadow:0 0 0 2px #ba65f944,0 0 35px #b254e847,inset 0 0 30px #c960e925}.arena.overdrive .board{border-color:#b482dd}.arena.overdrive .combo-stat b{color:#f1b6ff;filter:drop-shadow(0 2px 0 #7e409e)}.arena.is-playing .board{box-shadow:0 0 18px #698fff1c,inset 0 0 30px #070e2470}
+.chain-banner{top:43%;font:italic 900 clamp(22px,6vw,38px)/1 Arial,sans-serif;color:#fff2bd;letter-spacing:-1px;text-shadow:2px 3px 0 #793f38,-1px -1px 0 #653b59,0 0 18px #f5b654;max-width:130%;text-align:center}.arena.overdrive .chain-banner{color:#fff0ff;text-shadow:2px 3px 0 #6c348c,0 0 18px #ec8aff}.chain-banner.pop{animation:chain-punch .85s ease-out both}.float-number{font:900 20px/1 Arial,sans-serif;color:#fff4bc;text-shadow:1px 2px #7a3d2b,-1px -1px #6a312b,1px -1px #6a312b,-1px 1px #6a312b;animation:score-float .8s ease-out both;white-space:nowrap}.score-text{color:#fff5b5;font-size:17px;z-index:10}.damage-text{color:#fff;font-size:22px}.boom-text{color:#ffe777;font-size:27px;font-style:italic;z-index:11}
+.fx .beam,.fx .beam-glow{animation:beam-fade .38s ease-out both;stroke-linecap:round}.fx .beam-glow{filter:blur(3px)}.fx .shockwave{animation:shockwave .65s cubic-bezier(.12,.6,.3,1) both;transform-origin:center;transform-box:fill-box}.fx .shockwave-inner{animation:shockwave .48s ease-out both;transform-origin:center;transform-box:fill-box}.fx .blast-fill{animation:explosion .55s ease-out both;transform-origin:center;transform-box:fill-box}.fx .pulse-cross{animation:pulse-cross .45s ease-out both;transform-origin:center;transform-box:fill-box}.fx .kill-flare{animation:explosion .35s ease-out both}.fx .debris{animation:debris .6s cubic-bezier(.1,.55,.45,1) both;transform-box:fill-box;transform-origin:center}.bump{animation:counter-bump .18s ease-out}.cell.enemy.hurt .enemy-art{animation:hit-pop .18s ease-out}.shaking{animation:game-shake .19s ease-out both}
+@keyframes game-shake{0%,100%{transform:translate(0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-1px)}80%{transform:translate(1px,2px)}}
+@keyframes hit-pop{0%{filter:brightness(3);transform:scale(1.16,.86)}100%{filter:none;transform:scale(1)}}
+@keyframes counter-bump{0%{transform:scale(1.4)}100%{transform:scale(1)}}
+@keyframes impact-flash{0%{opacity:.65}100%{opacity:0}}
+@keyframes beam-fade{0%,15%{opacity:1}100%{opacity:0}}
+@keyframes shockwave{0%{transform:scale(.12);opacity:1;stroke-width:12}100%{transform:scale(1.35);opacity:0;stroke-width:1}}
+@keyframes explosion{0%{transform:scale(.18);opacity:1}30%{opacity:.85}100%{transform:scale(1.2);opacity:0}}
+@keyframes pulse-cross{0%{transform:scale(.25);opacity:1}100%{transform:scale(1.25);opacity:0}}
+@keyframes debris{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--spin)) scale(.2)}}
+@keyframes score-float{0%{opacity:1;transform:translate(-50%,-30%) scale(.6)}20%{opacity:1;transform:translate(-50%,-80%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-240%) scale(.9)}}
+@keyframes chain-punch{0%{opacity:0;transform:translate(-50%,-50%) scale(1.8) rotate(-8deg)}15%,65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-5deg)}100%{opacity:0;transform:translate(-50%,-75%) scale(.98) rotate(-5deg)}}
+@media(min-width:701px){.arena-top{min-height:65px;padding-bottom:12px}.stage-heading{margin-top:17px}.stage-heading h1{font-weight:800}.rule-item{font-size:12px;display:block}.stage-steps{align-self:flex-end;margin-bottom:8px}}
+@media(max-width:700px){.mode-switch{margin-bottom:6px;padding:2px}.mode-switch button{font-size:10px;padding:5px 11px}.stage-heading{margin:6px 0}.stage-heading h1{font-size:17px;margin:3px 0}.stage-heading .eyebrow{font-size:7px;letter-spacing:1px}.arena.rush-mode{grid-template-rows:51px minmax(0,1fr) 11px 20px}.arena-top{gap:7px}.rush-hud{max-width:200px}.rush-score-line>b{font-size:21px}.rush-score-line .rush-ammo{margin-left:4px;font-size:8px}.rush-hud>small{font-size:7px}.rush-meter{height:13px;margin-top:3px}.rush-meter span{font-size:7px;line-height:11px}.enemy-count{flex-direction:column;gap:0;align-items:center;min-width:37px}.enemy-count b{font-size:23px}.enemy-count span{font-size:7px;line-height:11px}.combo-stat b{font-size:29px}.combo-stat span{font-size:7px;line-height:11px}.rush-tools{margin-top:3px}.rush-tools .text-button{font-size:9px;padding:5px 3px}.launch{box-shadow:0 3px 0 #984f3f}.board{gap:4px}.chain-banner{font-size:clamp(22px,7vw,32px)}.rush-rules article{padding:10px}.rush-rules h3{font-size:12px}.rush-rules p{font-size:10px}}
+@media(max-width:700px) and (max-height:650px){.mode-switch{margin-bottom:4px}.mode-switch button{padding:4px 9px;font-size:9px}.stage-heading{margin:4px 0}.stage-heading h1{font-size:15px}.arena.rush-mode{grid-template-rows:46px minmax(0,1fr) 9px 18px}.rush-score-line>b{font-size:18px}.rush-meter{margin-top:2px;height:11px}.rush-meter span{line-height:9px}.rush-hud>small{font-size:6px}.combo-stat b{font-size:24px}.enemy-count b{font-size:21px}.rush-tools .text-button{padding:3px;font-size:8px}.board{gap:3px}.chain-banner{font-size:24px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}.impact-flash{display:none}.fx{opacity:.7}.chain-banner.pop{opacity:1;transform:translate(-50%,-50%)}.float-number{display:none}.enemy-art{transform:none!important}}
+
+
+@media(max-width:700px){
+  .rush-view .stage-heading h1,.rush-view #stage-label{display:none}
+  .rush-view .mode-switch{margin-bottom:0}
+  .rush-view .rush-tools{display:none}
+  .stage-heading>div{width:100%;min-width:0}
+  .stage-heading .stage-steps{position:absolute;right:0;bottom:3px}
+  .stage-heading h1{max-width:calc(100% - 145px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
 </style>
 </head>
 <body>
@@ -151,11 +188,11 @@
     <div class="brand"><div class="brand-symbol" id="brand-symbol"></div><div><div class="brand-name">CHAIN FORGE</div><div class="brand-sub">連鎖の工房</div></div></div>
     <div class="header-tools"><button class="icon-button" id="map-button" aria-label="ステージを選ぶ" title="ステージを選ぶ"></button><button class="icon-button" id="sound-button" aria-label="音を切り替える" title="音を切り替える"></button><button class="icon-button" id="help-button" aria-label="遊び方" title="遊び方"></button></div>
   </header>
-  <section class="stage-heading"><div><div class="eyebrow" id="stage-label">EXPERIMENT 01 / 15</div><h1 id="stage-name"></h1><p id="stage-subtitle"></p></div><nav class="stage-steps" id="stage-steps" aria-label="ステージ"></nav></section>
+  <section class="stage-heading"><div><nav class="mode-switch" aria-label="ゲームモード"><button id="mode-rush" aria-pressed="true">連鎖ラッシュ</button><button id="mode-puzzle" aria-pressed="false">パズル15面</button></nav><div class="eyebrow" id="stage-label">3 SHOTS / SCORE ATTACK</div><h1 id="stage-name"></h1><p id="stage-subtitle"></p></div><nav class="stage-steps" id="stage-steps" aria-label="ステージ"></nav></section>
   <div class="workspace">
     <section class="battle" aria-label="戦場">
-      <div class="arena" id="arena"><div class="arena-top"><div class="enemy-count"><b id="remaining">08</b><span>敵 / 残り</span></div><div class="combo-stat"><b id="combo">0</b><span>CHAIN</span></div></div>
-        <div class="board-space" id="board-space"><div class="board-wrap" id="board-wrap"><div class="board" id="board" aria-label="6×6の戦場"></div><svg class="fx" id="fx" viewBox="0 0 600 600" aria-hidden="true"></svg><div class="chain-banner" id="chain-banner" aria-hidden="true"></div></div></div>
+      <div class="arena" id="arena"><div class="arena-top"><div class="enemy-count"><b id="remaining">08</b><span>敵 / 残り</span></div><div class="rush-hud" id="rush-hud"><div class="rush-score-line"><b id="rush-score">0</b><span>PTS</span><span class="rush-ammo">残り <strong id="rush-shots">3</strong> 発</span></div><div class="rush-meter" id="rush-meter"><i></i><span id="rush-charge">6連鎖で誘爆強化</span></div><small>BEST <span id="rush-best">0</span></small></div><div class="combo-stat"><b id="combo">0</b><span>CHAIN</span></div></div>
+        <div class="board-space" id="board-space"><div class="board-wrap" id="board-wrap"><div class="board" id="board" aria-label="6×6の戦場"></div><div class="impact-flash" id="impact-flash" aria-hidden="true"></div><svg class="fx" id="fx" viewBox="0 0 600 600" aria-hidden="true"></svg><div class="chain-banner" id="chain-banner" aria-hidden="true"></div></div></div>
         <div class="board-labels" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span></div>
         <div class="arena-bottom"><span><i class="status-dot"></i><strong id="phase-label">配置フェーズ</strong></span><span id="board-note">敵を倒すと十字に誘爆</span><button class="board-guide" id="guide-button">敵・ギミックの図解</button></div>
       </div>
@@ -168,10 +205,11 @@
       <div class="ignition-row" role="group" aria-label="最初に起爆する装置を選ぶ"><span class="ignition-label">起爆</span><div class="ignition-options" id="ignition-options"></div></div>
       <div class="piece-info" id="piece-info" aria-live="polite"></div>
       <button class="launch" id="launch-button" disabled><span><strong id="launch-label">連鎖を起動</strong><br><small id="launch-sub">IGNITE YOUR CHAIN</small></span><span id="launch-icon"></span></button>
-      <div class="rule-note"><h3>連鎖のルール</h3><div class="rule-item"><span class="rule-icon">01</span><span>装置を置く。<b>弾や爆風で別の装置も起動。</b></span></div><div class="rule-item"><span class="rule-icon">02</span><span>敵を倒すと、<b>上下左右に1ダメージ</b>のパルス。</span></div><div class="rule-item"><span class="rule-icon">03</span><span>最初に起動する装置は<b>タップで選択。</b><br>一度の連鎖ですべての敵を倒そう。</span></div><div class="legend"><span><i></i>HP 1</span><span><i></i>鎧 / HP 2以上</span></div></div>
+      <div class="rush-tools" id="rush-tools"><button class="text-button" id="rush-retry">同じ群れを最初から</button><button class="text-button" id="rush-new">別の群れへ</button></div>
+      <div class="rule-note"><h3 id="rule-heading">連鎖のルール</h3><div class="rule-item" id="rule-copy"></div><div class="legend"><span><i></i>HP 1</span><span><i></i>鎧 / HP 2以上</span></div></div>
     </aside>
   </div>
-  <footer class="footer"><span>SMALL SPARK. BIG CHAIN.</span><button class="text-button" id="reset-button">配置をリセット</button><span>PROTOTYPE · 01</span></footer>
+  <footer class="footer"><span>SMALL SPARK. BIG CHAIN.</span><button class="text-button" id="reset-button">配置をリセット</button><span>PROTOTYPE · 02 / OVERDRIVE</span></footer>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal-backdrop" id="modal-backdrop" hidden><section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"></section></div>
@@ -353,10 +391,10 @@
   }
   function simulate(level,placements,startIndex=0){
     if(!validate(level,placements)||!placements[startIndex])throw new Error('Invalid setup');
-    const enemies=clone(level.enemies).map((e,i)=>({...e,id:i,maxHp:e.hp}));
+    const enemies=clone(level.enemies).map((e,i)=>({...e,id:i,maxHp:e.maxHp||e.hp}));
     const weapons=clone(placements).map((w,i)=>({...w,id:i,fired:false}));
     const terrain=new Map((level.terrain||[]).map(t=>[key(t.x,t.y),t.type]));
-    const events=[],queue=[];let seq=0,kills=0,activated=0;
+    const events=[],queue=[];let seq=0,kills=0,activated=0,score=0;
     function schedule(at,type,data){queue.push({at,type,...data,seq:seq++});}
     function event(at,type,data){events.push({at,type,...data});}
     function impact(x,y,damage,at,source){if(inside(x,y)&&terrain.get(key(x,y))!=='wall')schedule(at,'impact',{x,y,damage,source});}
@@ -384,23 +422,44 @@
         if(!e)continue;
         e.hp=Math.max(0,e.hp-a.damage);event(at,'damage',{id:e.id,x:e.x,y:e.y,hp:e.hp,damage:a.damage,source:a.source});
         if(e.hp===0){
-          kills++;event(at+50,'kill',{id:e.id,x:e.x,y:e.y,combo:kills});
-          event(at+110,'pulse',{x:e.x,y:e.y});
-          for(const [dx,dy]of DIRS)impact(e.x+dx,e.y+dy,1,at+240,'pulse');
+          kills++;
+          const powered=!!level.arcade&&kills>=6,barrel=e.kind==='barrel';
+          const points=100*Math.min(5,1+Math.floor((kills-1)/4))+(e.kind==='core'?400:barrel?100:0);score+=points;
+          event(at+50,'kill',{id:e.id,x:e.x,y:e.y,combo:kills,points,score,kind:e.kind||'enemy'});
+          if(level.arcade&&kills===6)event(at+60,'overdrive',{x:e.x,y:e.y});
+          if(barrel)event(at+110,'blast',{x:e.x,y:e.y,source:'barrel'});
+          else event(at+110,'pulse',{x:e.x,y:e.y,powered});
+          const directions=barrel||powered?DIRS.concat([[1,1],[-1,1],[1,-1],[-1,-1]]):DIRS;
+          for(const [dx,dy]of directions)impact(e.x+dx,e.y+dy,barrel||powered?2:1,at+240,barrel?'barrel':'pulse');
         }
       }
     }
     events.sort((a,b)=>a.at-b.at);
-    return {events,enemies,weapons,kills,activated,clear:enemies.every(e=>e.hp===0),duration:Math.max(0,...events.map(e=>e.at))+650};
+    return {events,enemies,weapons,kills,activated,score,clear:enemies.every(e=>e.hp===0),duration:Math.max(0,...events.map(e=>e.at))+750};
   }
-  root.ChainForge={N,DIRS,WEAPONS,LEVELS,key,inside,clone,validate,trace,simulate};
+  function createChallenge(seed=1){
+    seed=Number(seed)>>>0;let state=seed||1;
+    const random=()=>{state^=state<<13;state^=state>>>17;state^=state<<5;return(state>>>0)/4294967296;};
+    const positions=[[0,0],[1,0],[0,1],[1,1],[4,0],[5,0],[4,1],[5,1],[4,2],[5,2],[0,3],[1,3],[0,4],[1,4],[2,4],[1,5],[2,5],[4,4],[5,4],[4,5],[5,5]];
+    const rotate=Math.floor(random()*4),flip=random()<.5;
+    const transform=(x,y)=>{if(flip)x=5-x;for(let i=0;i<rotate;i++)[x,y]=[5-y,x];return{x,y};};
+    const barrels=new Set(['1,1','4,1','1,3']);
+    const armor=new Set(['0,0','5,0','2,5']);
+    const enemies=positions.map(([x,y])=>{
+      const k=key(x,y),kind=barrels.has(k)?'barrel':k==='1,4'||k==='4,4'?'core':'enemy';
+      const hp=kind==='core'?(k==='1,4'?8:10):kind==='barrel'?1:armor.has(k)?2:random()<.12?2:1;
+      return{...transform(x,y),hp,maxHp:hp,kind};
+    });
+    return{seed,arcade:true,name:'連鎖ラッシュ',subtitle:'3回の起爆で、どこまで巻き込める？',stock:{bomb:2,lance:1,spark:1},enemies,terrain:[],suggestion:transform(1,2)};
+  }
+  root.ChainForge={N,DIRS,WEAPONS,LEVELS,key,inside,clone,validate,trace,simulate,createChallenge};
 })(typeof globalThis!=='undefined'?globalThis:window);
 
 </script>
 <script>
 (function(){
   'use strict';
-  const {N,DIRS,WEAPONS,LEVELS,key,clone,trace,simulate}=ChainForge;
+  const {N,DIRS,WEAPONS,LEVELS,key,clone,trace,simulate,createChallenge}=ChainForge;
   const $=id=>document.getElementById(id), arrows=['↑','→','↓','←'];
   const lineIcon=(paths)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
   const ICONS={
@@ -428,40 +487,80 @@
     return `<svg class="enemy-art" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="54" rx="22" ry="5" fill="#213a33" opacity=".12"/><path d="M11 43c0-14 6-26 21-26s21 12 21 26c0 10-8 12-12 10-6 5-13 5-18 0-6 3-12-1-12-10z" fill="${c}" stroke="#3b5846" stroke-width="2"/><path d="M17 36c1-6 4-11 10-13" fill="none" stroke="${light}" stroke-width="4" stroke-linecap="round"/>${armor?`<path d="m14 23 4-12 10 5 4-9 5 9 10-5 3 12-18 8z" fill="${core?'#ebc764':'#bdd1c9'}" stroke="#3b5846" stroke-width="2"/>`: '<path d="M28 18q-8-11 1-12 9 0 5 12" fill="#b3cd8f" stroke="#3b5846" stroke-width="2"/>'}<ellipse cx="25" cy="38" rx="2.5" ry="4" fill="#2b4939"/><ellipse cx="40" cy="38" rx="2.5" ry="4" fill="#2b4939"/><path d="M29 45q3 3 6 0" fill="none" stroke="#2b4939" stroke-width="1.7" stroke-linecap="round"/><circle cx="19" cy="43" r="3.2" fill="#deb291" opacity=".65"/><circle cx="46" cy="43" r="3.2" fill="#deb291" opacity=".65"/></svg>`;
   }
   function terrainArt(type){return type==='wall'?'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="m12 21 15-8 22 6 6 20-11 13-26-3-9-15z" fill="#a0af98" stroke="#7b9379" stroke-width="2"/><path d="m12 21 19 8 18-10M31 29l-4 20" fill="none" stroke="#c8d3b9" stroke-width="3"/><path d="m40 27 7 4-4 8" fill="none" stroke="#81957d" stroke-width="2"/></svg>':`<svg viewBox="0 0 64 64" aria-hidden="true"><path d="${type==='/'?'M15 49 49 15':'M15 15 49 49'}" stroke="#628f8c" stroke-width="10" stroke-linecap="round"/><path d="${type==='/'?'M15 46 46 15':'M18 15 49 46'}" stroke="#def9ee" stroke-width="5" stroke-linecap="round"/><path d="m12 14 5-6m-9 6h9" stroke="#a4c7b3" stroke-width="2"/></svg>`;}
+  function barrelArt(){return '<svg class="enemy-art barrel-art" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="55" rx="22" ry="5" fill="#000" opacity=".25"/><path d="M19 12h26l6 9v28l-6 6H19l-6-6V21z" fill="#f25a3c" stroke="#692234" stroke-width="3"/><path d="M15 25h34M15 44h34" stroke="#ffce75" stroke-width="5"/><path d="m34 24-10 14h8l-2 12 12-17h-9z" fill="#fff2b1"/><path d="M31 12V7h9l4-5" fill="none" stroke="#ffdb7a" stroke-width="3"/><path d="m44 0 2 7m-6-3 9 1" stroke="#fff4bd" stroke-width="2"/></svg>';}
   let saved={cleared:[],best:{},last:0,seen:false,sound:true};
   try{const s=JSON.parse(localStorage.getItem('chain-forge-v1'));if(s&&typeof s==='object')saved={...saved,...s};}catch{}
   if(!Array.isArray(saved.cleared))saved.cleared=[];
   saved.cleared=[...new Set(saved.cleared.filter(n=>Number.isInteger(n)&&n>=0&&n<LEVELS.length))];
   if(!saved.best||typeof saved.best!=='object')saved.best={};
+  let mode=saved.mode==='puzzle'?'puzzle':'rush';
+  if(!Number.isFinite(saved.rushBest)||saved.rushBest<0)saved.rushBest=0;
   const persist=()=>{try{localStorage.setItem('chain-forge-v1',JSON.stringify(saved));}catch{}};
   let levelIndex=Number.isInteger(saved.last)?Math.max(0,Math.min(LEVELS.length-1,saved.last)):0;
   if(levelIndex>0&&!saved.cleared.includes(levelIndex-1))levelIndex=0;
   let level,placements=[],startIndex=0,focus=-1,selected='bomb',defaultDir=0,history=[],phase='setup',viewEnemies=[],fired=new Set(),raf=0,runToken=0,hintCount=0,attempts=0,returnFocus=null;
   let drag=null,suppressClickUntil=0;
-  let audio=null,toastTimer,fxTimers=[];
+  let rush=null,shotBaseScore=0;
+  const reducedMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
+  let audio=null,master=null,noise=null,toastTimer,fxTimers=[],hitPause=0,lastFlash=-1000;
+  const soundTimes={};
   const audioFx=(kind,combo=0)=>{
     if(!saved.sound)return;
     try{
-      if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();
+      if(!audio){
+        audio=new(window.AudioContext||window.webkitAudioContext)();master=audio.createDynamicsCompressor();master.connect(audio.destination);
+        noise=audio.createBuffer(1,Math.floor(audio.sampleRate*.28),audio.sampleRate);const data=noise.getChannelData(0);let prev=0;for(let i=0;i<data.length;i++){prev=(prev+(Math.random()*2-1)*.1)/1.04;data[i]=prev*3;}
+      }
       if(audio.state==='suspended')audio.resume().catch(()=>{});
+      const clock=performance.now();if((kind==='kill'||kind==='blast')&&clock-(soundTimes[kind]??-1000)<(kind==='kill'?55:90))return;soundTimes[kind]=clock;
       const t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();
-      o.type=kind==='fire'?'triangle':'sine';
-      const notes=[261.63,329.63,392,523.25,659.25,783.99,1046.5];
-      const f=kind==='place'?390:kind==='fire'?165:kind==='clear'?783.99:notes[Math.min(combo,notes.length-1)];
-      o.frequency.setValueAtTime(f,t);if(kind==='fire')o.frequency.exponentialRampToValueAtTime(65,t+.18);
-      g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(kind==='fire'?.085:.055,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+.2);
-      o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.24);
+      o.type=kind==='fire'||kind==='blast'?'triangle':'sine';
+      const notes=[261.63,329.63,392,523.25,659.25,783.99,1046.5,1318.5,1567.98];
+      const boom=kind==='fire'||kind==='blast',triumph=kind==='clear'||kind==='overdrive';
+      const f=kind==='place'?440:boom?kind==='blast'?110:180:triumph?523.25:notes[Math.min(Math.floor(combo/2),notes.length-1)];
+      o.frequency.setValueAtTime(f,t);if(boom)o.frequency.exponentialRampToValueAtTime(32,t+.26);if(triumph)o.frequency.exponentialRampToValueAtTime(1046.5,t+.3);
+      g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(boom?.15:.065,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+(triumph?.5:.28));
+      o.connect(g);g.connect(master);o.start(t);o.stop(t+.55);
+      if(boom){const n=audio.createBufferSource(),ng=audio.createGain();n.buffer=noise;ng.gain.setValueAtTime(kind==='blast'?.22:.1,t);ng.gain.exponentialRampToValueAtTime(.001,t+.25);n.connect(ng);ng.connect(master);n.start(t);n.stop(t+.28);}
     }catch{}
   };
   function toast(message){$('toast').textContent=message;$('toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),2600);}
   function snapshot(){history.push({placements:clone(placements),startIndex,focus,selected,defaultDir});if(history.length>50)history.shift();}
-  function clearEffects(){for(const t of fxTimers)clearTimeout(t);fxTimers=[];$('fx').innerHTML='';document.querySelectorAll('.float-number').forEach(el=>el.remove());$('chain-banner').classList.remove('pop');$('arena').classList.remove('shaking');}
+  function clearEffects(){for(const t of fxTimers)clearTimeout(t);fxTimers=[];$('fx').innerHTML='';document.querySelectorAll('.float-number').forEach(el=>el.remove());$('chain-banner').classList.remove('pop');$('arena').classList.remove('shaking','overdrive','is-playing');$('impact-flash').classList.remove('flash');}
+  function renderMode(){
+    $('arena').classList[mode==='rush'?'add':'remove']('rush-mode');
+    document.body.classList[mode==='rush'?'add':'remove']('rush-view');
+    $('mode-rush').setAttribute('aria-pressed',String(mode==='rush'));$('mode-puzzle').setAttribute('aria-pressed',String(mode==='puzzle'));
+    $('mode-rush').disabled=$('mode-puzzle').disabled=phase==='playing';
+    $('rush-hud').hidden=mode!=='rush';$('stage-steps').hidden=mode==='rush';$('rush-tools').hidden=mode!=='rush';
+    $('map-button').setAttribute('aria-label',mode==='rush'?'ラッシュのメニュー':'ステージを選ぶ');
+    $('rule-heading').textContent=mode==='rush'?'連鎖ラッシュのコツ':'連鎖のルール';
+    $('rule-copy').innerHTML=mode==='rush'?'<b>3回の起爆でハイスコア。</b>毎回、装置は補充。敵のダメージは残ります。<br><br><b>赤い火薬樽は周囲8マスに2ダメージ。</b>6連鎖から敵の誘爆も周囲8マス・2ダメージに強化！<br><br>連鎖が長いほど得点倍率アップ。早く全滅させると、残り起爆数のボーナス。':'装置を置いて、ひとつだけ起動。敵を倒すと上下左右に1ダメージ。弾・爆風で次の装置へつなぎ、一度の連鎖で全撃破しよう。';
+  }
+  function updateRushHud(){
+    if(!rush)return;
+    $('rush-score').textContent=String(rush.score);$('rush-best').textContent=String(saved.rushBest);
+    $('rush-shots').textContent=String(Math.max(0,3-rush.shots));
+    $('rush-meter').style.setProperty('--charge','0%');$('rush-charge').textContent='6連鎖で誘爆強化';
+  }
+  function loadRush(seed,layout=[],ignition=0){
+    cancelAnimationFrame(raf);runToken++;clearEffects();mode='rush';saved.mode=mode;persist();
+    const base=createChallenge(seed);rush={seed:base.seed,base:clone(base),shots:0,score:0,kills:0,chain:0,firstLayout:clone(layout),firstStart:ignition};
+    level=clone(base);placements=clone(layout);startIndex=placements[ignition]?ignition:0;focus=placements.length?startIndex:-1;selected='bomb';defaultDir=0;history=[];phase='setup';viewEnemies=clone(level.enemies);fired=new Set();hintCount=0;attempts=0;
+    $('stage-label').textContent='3 SHOTS / SCORE ATTACK';$('stage-name').textContent='連鎖ラッシュ';$('stage-subtitle').textContent='敵の集団をつなぎ、火薬樽を巻き込め。';
+    $('combo').textContent='0';$('phase-label').textContent='1射目を配置';$('board-note').textContent='赤い樽を巻き込もう';updateRushHud();render();
+  }
+  function newSeed(){return Math.floor(Date.now()*Math.random())>>>0;}
+  function switchMode(next){
+    if(phase==='playing'||mode===next)return;closeModal();mode=next;saved.mode=mode;persist();
+    if(mode==='rush')loadRush(newSeed());else{loadLevel(levelIndex);if(!saved.seen)showTutorial(true);}
+  }
   function loadLevel(index){
-    cancelAnimationFrame(raf);runToken++;clearEffects();levelIndex=index;saved.last=index;persist();level=LEVELS[index];placements=[];startIndex=0;focus=-1;selected=Object.keys(level.stock)[0];defaultDir=0;history=[];phase='setup';viewEnemies=clone(level.enemies);fired=new Set();hintCount=0;attempts=0;
-    $('stage-label').textContent=`EXPERIMENT ${String(index+1).padStart(2,'0')} / ${String(LEVELS.length).padStart(2,'0')}`;$('stage-name').textContent=level.name;$('stage-subtitle').textContent=level.subtitle;
+    cancelAnimationFrame(raf);runToken++;clearEffects();mode='puzzle';saved.mode=mode;levelIndex=index;saved.last=index;persist();level=LEVELS[index];placements=[];startIndex=0;focus=-1;selected=Object.keys(level.stock)[0];defaultDir=0;history=[];phase='setup';viewEnemies=clone(level.enemies);fired=new Set();hintCount=0;attempts=0;
+    $('stage-label').textContent=`EXPERIMENT ${String(index+1).padStart(2,'0')} / ${String(LEVELS.length).padStart(2,'0')}`;$('stage-name').textContent=level.name;$('stage-name').title=level.name;$('stage-subtitle').textContent=level.subtitle;
     $('combo').textContent='0';$('phase-label').textContent='配置フェーズ';$('board-note').textContent='敵を倒すと十字に誘爆';render();
   }
-  function render(){cancelDrag();renderSteps();renderBoard();renderArsenal();renderControls();}
+  function render(){cancelDrag();renderMode();renderSteps();renderBoard();renderArsenal();renderControls();}
   function renderSteps(){
     const first=Math.floor(levelIndex/5)*5,last=Math.min(first+5,LEVELS.length);
     $('stage-steps').innerHTML='';$('stage-steps').setAttribute('aria-label',`ステージ${first+1}〜${last}、全${LEVELS.length}面。全ステージは地図から選べます。`);
@@ -473,10 +572,10 @@
       const b=document.createElement('button');b.className='cell';b.dataset.x=x;b.dataset.y=y;
       const e=viewEnemies.find(e=>e.x===x&&e.y===y),terrain=level.terrain.find(t=>t.x===x&&t.y===y),wi=placements.findIndex(w=>w.x===x&&w.y===y),w=placements[wi];
       let label=`${String.fromCharCode(65+x)}${y+1}: `;
-      if(e){const max=level.enemies.find(o=>o.x===x&&o.y===y).hp;b.classList.add('enemy');if(e.hp<=0)b.classList.add('dead');b.style.setProperty('--delay',`${-(x+y)*.3}s`);b.innerHTML=enemyArt(max,x+y)+`<span class="hp${max>3?' high':''}">${e.hp}</span>`;label+=e.hp>0?`敵 HP${e.hp}`:'撃破済み';}
+      if(e){const original=level.enemies.find(o=>o.x===x&&o.y===y),max=original.maxHp||original.hp;b.classList.add('enemy');if(e.hp<=0)b.classList.add('dead');if(e.kind==='barrel')b.classList.add('barrel');if(e.kind==='core')b.classList.add('core');b.style.setProperty('--delay',`${-(x+y)*.3}s`);b.innerHTML=(e.kind==='barrel'?barrelArt():enemyArt(max,x+y))+`<span class="hp${max>3?' high':''}">${e.hp}</span>`;label+=e.hp>0?`${e.kind==='barrel'?'火薬樽':e.kind==='core'?'炉心':'敵'} HP${e.hp}`:'撃破済み';}
       else if(terrain){b.classList.add(terrain.type==='wall'?'wall':'mirror');b.innerHTML=terrainArt(terrain.type);label+=terrain.type==='wall'?'岩':'鏡';}
       else if(w){b.classList.add('placed');if(focus===wi)b.classList.add('focused');if(startIndex===wi)b.classList.add('ignition');if(fired.has(wi))b.classList.add('fired');b.innerHTML=weaponArt(w.type,w.dir)+(WEAPONS[w.type].directed?`<span class="orient">${arrows[w.dir]}</span>`:'');label+=`${WEAPONS[w.type].name}${WEAPONS[w.type].directed?' '+arrows[w.dir]:''}${startIndex===wi?' 最初に起動':''}`;}
-      else{b.classList.add('empty');label+='空きマス';if(levelIndex===0&&placements.length===0&&x===2&&y===2)b.classList.add('hint-cell');}
+      else{b.classList.add('empty');label+='空きマス';if(!placements.length&&(mode==='puzzle'?levelIndex===0&&x===2&&y===2:rush.shots===0&&x===level.suggestion.x&&y===level.suggestion.y))b.classList.add('hint-cell');}
       b.setAttribute('aria-label',label);b.disabled=phase==='playing';
       b.onclick=()=>onCell(x,y);b.onpointerenter=()=>preview(x,y);b.onpointerleave=()=>clearPreview();
       if(w)b.onpointerdown=e=>beginDrag(e,b,{index:wi,type:w.type,dir:w.dir});
@@ -499,9 +598,9 @@
     const locked=phase==='playing',p=placements[focus];
     renderIgnitionOptions();
     $('rotate-button').innerHTML=ICONS.rotate+'回転';$('remove-button').innerHTML=ICONS.remove+'外す';$('undo-button').innerHTML=ICONS.undo+'戻す';$('hint-button').innerHTML=ICONS.hint+'ヒント';
-    $('rotate-button').disabled=locked||!(p?WEAPONS[p.type].directed:WEAPONS[selected].directed);$('remove-button').disabled=locked||!p;$('undo-button').disabled=locked||!history.length;$('hint-button').disabled=locked;$('reset-button').disabled=locked;$('map-button').disabled=locked;$('guide-button').disabled=locked;
+    $('rotate-button').disabled=locked||!(p?WEAPONS[p.type].directed:WEAPONS[selected].directed);$('remove-button').disabled=locked||!p;$('undo-button').disabled=locked||!history.length;$('hint-button').disabled=locked;$('reset-button').disabled=locked;$('map-button').disabled=locked;$('guide-button').disabled=locked;$('rush-retry').disabled=locked;$('rush-new').disabled=locked;$('help-button').disabled=locked;
     const starter=placements[startIndex];
-    $('launch-button').disabled=locked||!placements.length;$('launch-label').textContent=locked?'連鎖中…':'連鎖を起動';$('launch-sub').textContent=locked?'WATCH THE SPARK TRAVEL':starter?`${WEAPONS[starter.type].name} ${coordinate(starter)} から起爆`:'IGNITE YOUR CHAIN';
+    $('launch-button').disabled=locked||!placements.length;$('launch-label').textContent=locked?'連鎖中…':mode==='rush'?`${rush.shots+1}射目を起爆`:'連鎖を起動';$('launch-sub').textContent=locked?'LET IT CHAIN!':starter?`${WEAPONS[starter.type].name} ${coordinate(starter)} から起爆`:mode==='rush'?'赤い樽のそばにボムを置こう':'IGNITE YOUR CHAIN';
     $('launch-button').setAttribute('aria-label',starter?`${coordinate(starter)}の${WEAPONS[starter.type].name}から連鎖を起動`:'連鎖を起動');
     if(locked){$('piece-info').textContent='ひとつの火花が、次の火花へ。';$('instruction').innerHTML='連鎖の行方を見届けよう。';}
     else if(p){$('piece-info').textContent=`${WEAPONS[p.type].name}${WEAPONS[p.type].directed?' '+arrows[p.dir]:''} ｜ ドラッグで移動・起爆欄で切替`; $('instruction').innerHTML='装置は<b>ドラッグで移動。</b>起爆欄のボタンで、最初の装置を選べます。';}
@@ -615,41 +714,102 @@
   $('undo-button').onclick=()=>{if(phase!=='setup'||!history.length)return;const s=history.pop();({placements,startIndex,focus,selected,defaultDir}=s);render();};
   $('reset-button').onclick=()=>{if(phase!=='setup')return;if(!placements.length)return;snapshot();placements=[];focus=-1;startIndex=0;render();toast('配置をリセットしました。');};
   function cellCenter(x,y){const cell=$('board').querySelector(`[data-x="${x}"][data-y="${y}"]`),wrap=$('board-wrap').getBoundingClientRect(),rect=cell.getBoundingClientRect();return{x:(rect.x-wrap.x+rect.width/2)/wrap.width*600,y:(rect.y-wrap.y+rect.height/2)/wrap.height*600};}
-  function svgFx(tag,attrs){const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v]of Object.entries(attrs))el.setAttribute(k,v);$('fx').append(el);fxTimers.push(setTimeout(()=>el.remove(),650));return el;}
+  function svgFx(tag,attrs,lifetime=700){
+    if($('fx').children.length>200)return null;
+    const el=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v]of Object.entries(attrs))el.setAttribute(k,v);$('fx').append(el);fxTimers.push(setTimeout(()=>el.remove(),lifetime));return el;
+  }
+  function announce(text){const banner=$('chain-banner');banner.textContent=text;banner.classList.remove('pop');void banner.offsetWidth;banner.classList.add('pop');fxTimers.push(setTimeout(()=>banner.classList.remove('pop'),900));}
+  function shake(){if(reducedMotion)return;$('arena').classList.remove('shaking');void $('arena').offsetWidth;$('arena').classList.add('shaking');}
+  function flash(){if(reducedMotion||performance.now()-lastFlash<190)return;lastFlash=performance.now();$('impact-flash').classList.remove('flash');void $('impact-flash').offsetWidth;$('impact-flash').classList.add('flash');}
+  function debris(p,color,count=7){
+    if(reducedMotion)return;
+    for(let i=0;i<count;i++){
+      const angle=(i/count)*Math.PI*2+(p.x+p.y)*.01,length=38+(i%3)*19;
+      const el=svgFx(i%2?'rect':'circle',i%2?{x:p.x-4,y:p.y-4,width:8,height:8,rx:2,fill:color,class:'debris'}:{cx:p.x,cy:p.y,r:3+i%3,fill:color,class:'debris'},620);
+      el?.style.setProperty('--dx',Math.cos(angle)*length+'px');el?.style.setProperty('--dy',Math.sin(angle)*length+'px');el?.style.setProperty('--spin',(i%2?180:-160)+'deg');
+    }
+  }
+  function floatText(p,text,kind=''){
+    const div=document.createElement('span');div.className='float-number '+kind;div.textContent=text;div.style.left=p.x/6+'%';div.style.top=p.y/6+'%';$('board-wrap').append(div);fxTimers.push(setTimeout(()=>div.remove(),850));
+  }
   function effect(e){
     const p=cellCenter(e.x,e.y);
-    if(e.type==='ray'){const a=cellCenter(e.fromX,e.fromY);svgFx('line',{x1:a.x,y1:a.y,x2:p.x,y2:p.y,stroke:e.weapon==='lance'?'#6eafc9':'#dbb655','stroke-width':10});svgFx('line',{x1:a.x,y1:a.y,x2:p.x,y2:p.y,stroke:'#fff9d4','stroke-width':4});}
-    if(e.type==='blast'){svgFx('circle',{cx:p.x,cy:p.y,r:112,fill:'#efb85c','fill-opacity':'.3',stroke:'#d88d4e','stroke-width':3});$('arena').classList.remove('shaking');void $('arena').offsetWidth;$('arena').classList.add('shaking');}
-    if(e.type==='pulse'){svgFx('path',{d:`M${p.x-60} ${p.y}h120M${p.x} ${p.y-60}v120`,stroke:'#afc47e','stroke-width':8,'stroke-linecap':'round',fill:'none'});}
-    if(e.type==='damage'){const div=document.createElement('span');div.className='float-number';div.textContent='−'+e.damage;div.style.left=p.x/6+'%';div.style.top=p.y/6+'%';$('board-wrap').append(div);fxTimers.push(setTimeout(()=>div.remove(),800));}
-    if(e.type==='kill'){svgFx('circle',{cx:p.x,cy:p.y,r:30,fill:'#dceab2',stroke:'#8ab071','stroke-width':2});}
+    if(e.type==='ray'){
+      const a=cellCenter(e.fromX,e.fromY),color=e.weapon==='lance'?'#63e7ff':'#ffd451';
+      svgFx('line',{x1:a.x,y1:a.y,x2:p.x,y2:p.y,stroke:color,'stroke-width':20,opacity:'.35',class:'beam-glow'},420);
+      svgFx('line',{x1:a.x,y1:a.y,x2:p.x,y2:p.y,stroke:color,'stroke-width':10,class:'beam'},420);
+      svgFx('line',{x1:a.x,y1:a.y,x2:p.x,y2:p.y,stroke:'#fffde4','stroke-width':4,class:'beam'},420);
+    }
+    if(e.type==='blast'){
+      const big=e.source==='barrel',color=big?'#ff714c':'#ffd05a';
+      svgFx('circle',{cx:p.x,cy:p.y,r:big?130:110,fill:color,'fill-opacity':'.28',class:'blast-fill'});
+      svgFx('circle',{cx:p.x,cy:p.y,r:big?125:100,fill:'none',stroke:color,'stroke-width':9,class:'shockwave'});
+      svgFx('circle',{cx:p.x,cy:p.y,r:65,fill:'none',stroke:'#fff8ca','stroke-width':5,class:'shockwave-inner'});
+      debris(p,color,big?12:9);shake();flash();audioFx('blast');
+      if(big)floatText(p,'BOOM!','boom-text');
+    }
+    if(e.type==='pulse'){
+      svgFx('path',{d:`M${p.x-85} ${p.y}h170M${p.x} ${p.y-85}v170`+(e.powered?`M${p.x-65} ${p.y-65}l130 130M${p.x-65} ${p.y+65}l130-130`:''),stroke:e.powered?'#ec87ff':'#90f4c1','stroke-width':e.powered?9:6,'stroke-linecap':'round',fill:'none',class:'pulse-cross'},500);
+      if(e.powered)svgFx('circle',{cx:p.x,cy:p.y,r:95,fill:'none',stroke:'#d27dff','stroke-width':3,class:'shockwave'},550);
+    }
+    if(e.type==='damage'&&e.hp>0)floatText(p,'−'+e.damage,'damage-text');
+    if(e.type==='kill'){
+      const color=e.kind==='core'?'#ffd359':e.kind==='barrel'?'#ff8b53':'#a2ffc2';
+      svgFx('circle',{cx:p.x,cy:p.y,r:e.kind==='core'?95:45,fill:'#fffce0',class:'kill-flare'},450);debris(p,color,e.kind==='core'?12:6);
+      if(mode==='rush')floatText(p,'+'+e.points,'score-text');
+      if(e.kind==='core'){shake();flash();if(!reducedMotion)hitPause=65;announce('CORE BREAK!');audioFx('blast');}
+    }
   }
   function applyEvent(e){
     if(e.type==='activate'){fired.add(e.id);const c=$('board').querySelector(`[data-x="${e.x}"][data-y="${e.y}"]`);c?.classList.add('fired');audioFx('fire');}
     if(e.type==='damage'){viewEnemies[e.id].hp=e.hp;const c=$('board').querySelector(`[data-x="${e.x}"][data-y="${e.y}"]`);if(c){c.querySelector('.hp').textContent=e.hp;c.classList.remove('hurt');void c.offsetWidth;c.classList.add('hurt');}}
     if(e.type==='kill'){
       const c=$('board').querySelector(`[data-x="${e.x}"][data-y="${e.y}"]`);c?.classList.add('dead');$('combo').textContent=e.combo;audioFx('kill',e.combo-1);
+      $('combo').classList.remove('bump');void $('combo').offsetWidth;$('combo').classList.add('bump');
       $('remaining').textContent=String(level.enemies.length-e.combo).padStart(2,'0');
-      if(e.combo===3||e.combo===6||e.combo===9||e.combo===12){const banner=$('chain-banner');banner.textContent=e.combo+' CHAIN!';banner.classList.remove('pop');void banner.offsetWidth;banner.classList.add('pop');}
+      if(mode==='rush'){
+        $('rush-score').textContent=String(shotBaseScore+e.score);$('rush-meter').style.setProperty('--charge',Math.min(100,e.combo/6*100)+'%');
+        $('rush-charge').textContent=e.combo>=6?'OVERDRIVE / 得点 ×'+Math.min(5,1+Math.floor((e.combo-1)/4)):e.combo+' / 6 CHAIN';
+      }
+      if(e.combo%4===0&&e.combo!==6)announce(e.combo+' CHAIN!');
     }
+    if(e.type==='overdrive'){$('arena').classList.add('overdrive');announce('OVERDRIVE!');audioFx('overdrive');shake();if(!reducedMotion)hitPause=85;}
     effect(e);
   }
   function launch(){
     if(phase!=='setup'||!placements.length)return;
     cancelDrag();
-    closeModal();clearPreview();clearEffects();attempts++;phase='playing';viewEnemies=clone(level.enemies);fired=new Set();$('combo').textContent='0';$('phase-label').textContent='連鎖フェーズ';$('board-note').textContent='ひとつの装置は、一度だけ起動';render();
-    const result=simulate(level,placements,startIndex),token=++runToken;let eventIndex=0;const start=performance.now();
+    closeModal();clearPreview();clearEffects();hitPause=0;attempts++;if(mode==='rush'){shotBaseScore=rush.score;if(rush.shots===0){rush.firstLayout=clone(placements);rush.firstStart=startIndex;}}phase='playing';viewEnemies=clone(level.enemies);fired=new Set();$('combo').textContent='0';$('phase-label').textContent='連鎖フェーズ';$('board-note').textContent='ひとつの装置は、一度だけ起動';render();$('arena').classList.add('is-playing');
+    const result=simulate(level,placements,startIndex),token=++runToken;let eventIndex=0,elapsed=0,last=performance.now();
     audioFx('place');
     const frame=now=>{
       if(token!==runToken)return;
-      const elapsed=(now-start)*1.0;
+      let delta=Math.min(80,Math.max(0,now-last));last=now;if(hitPause>0){const hold=Math.min(delta,hitPause);hitPause-=hold;delta-=hold;}elapsed+=delta;
       while(eventIndex<result.events.length&&result.events[eventIndex].at<=elapsed)applyEvent(result.events[eventIndex++]);
       if(elapsed<result.duration)raf=requestAnimationFrame(frame);else finish(result);
     };
     raf=requestAnimationFrame(frame);
   }
   $('launch-button').onclick=launch;
+  function retryRush(){const {seed,firstLayout,firstStart}=rush;closeModal();loadRush(seed,firstLayout,firstStart);}
+  function finishRush(result){
+    rush.shots++;rush.score+=result.score;rush.kills+=result.kills;rush.chain=Math.max(rush.chain,result.kills);
+    const complete=result.clear||rush.shots>=3;
+    if(!complete){
+      level={...level,enemies:result.enemies.filter(e=>e.hp>0).map(({x,y,hp,maxHp,kind})=>({x,y,hp,maxHp,kind}))};
+      clearEffects();phase='setup';viewEnemies=clone(level.enemies);placements=[];startIndex=0;focus=-1;selected='bomb';history=[];fired=new Set();defaultDir=0;
+      updateRushHud();$('combo').textContent=String(result.kills);$('phase-label').textContent=`${rush.shots+1}射目を配置`;$('board-note').textContent='装置を補充・ダメージは持ち越し';render();
+      announce(result.kills+' CHAIN / +'+result.score);toast(result.kills?`あと${3-rush.shots}回。残った敵はHPを引き継ぎます。`:'集団の間に装置を置いて、爆風の橋をつくろう。');return;
+    }
+    const bonus=result.clear?1500+(3-rush.shots)*1200:0;rush.score+=bonus;
+    const isBest=rush.score>saved.rushBest;if(isBest)saved.rushBest=rush.score;persist();updateRushHud();phase='result';
+    $('phase-label').textContent=result.clear?'全撃破！':'3射終了';$('board-note').textContent=result.clear?'ALL CLEAR':'配置を変えて記録更新';
+    if(result.clear){announce('ALL CLEAR!');audioFx('clear');}
+    openModal(`<div class="eyebrow">${isBest?'NEW RECORD!':'RUSH RESULT'}</div><h2 id="modal-title">${result.clear?'大連鎖、決まった！':rush.chain>=12?'いい連鎖。次は、もっと。':'次は、どこにつなぐ？'}</h2><div class="rush-result-score">${rush.score}<small>POINTS</small></div><p>${result.clear?`全${rush.base.enemies.length}体を撃破！ 全撃破ボーナス +${bonus}。`:`${rush.kills} / ${rush.base.enemies.length}体を撃破。全滅できなくても得点は記録。`}<br>長い連鎖ほど高得点。集団の間を装置でつなごう。</p><div class="result-stats"><div><b>${rush.chain}</b><span>最大 CHAIN</span></div><div><b>${rush.shots}</b><span>起爆数 / 3</span></div><div><b>${saved.rushBest}</b><span>BEST</span></div></div><button class="modal-primary" id="rush-result-retry">同じ群れで、配置を変える</button><button class="modal-secondary" id="rush-result-new">別の群れに挑む</button><button class="modal-secondary" id="rush-result-puzzle">パズル15面で遊ぶ</button>`);
+    $('rush-result-retry').onclick=retryRush;$('rush-result-new').onclick=()=>{closeModal();loadRush(newSeed());};$('rush-result-puzzle').onclick=()=>switchMode('puzzle');
+  }
   function finish(result){
+    $('arena').classList.remove('is-playing');if(mode==='rush'){finishRush(result);return;}
     phase='result';$('phase-label').textContent=result.clear?'全撃破':'連鎖終了';$('board-note').textContent=result.clear?'ALL CLEAR':'配置を変えて、もう一度';
     const score=result.kills*100+result.activated*150+(Object.values(level.stock).reduce((a,b)=>a+b,0)-placements.length)*120+(result.clear?500:0);
     let isBest=false;
@@ -665,7 +825,7 @@
     $('result-primary').onclick=()=>{closeModal();if(result.clear){if(allDone){restoreSetup();showMap();}else loadLevel(levelIndex+1);}else restoreSetup();};
     $('result-secondary').onclick=()=>{closeModal();restoreSetup();if(result.clear)launch();else showHint();};
   }
-  function restoreSetup(){phase='setup';clearEffects();viewEnemies=clone(level.enemies);fired=new Set();$('combo').textContent='0';$('phase-label').textContent='配置フェーズ';$('board-note').textContent='敵を倒すと十字に誘爆';render();}
+  function restoreSetup(){if(mode==='rush'){if(phase==='result')retryRush();return;}phase='setup';clearEffects();viewEnemies=clone(level.enemies);fired=new Set();$('combo').textContent='0';$('phase-label').textContent='配置フェーズ';$('board-note').textContent='敵を倒すと十字に誘爆';render();}
   function openModal(html){
     cancelDrag();
     if($('modal-backdrop').hidden)returnFocus=document.activeElement;
@@ -678,17 +838,21 @@
   function rangeDiagram(kind){
     let origin=enemyArt(1),hits=[1,3,5,7],symbols={};
     if(kind==='bomb'){origin=weaponArt('bomb');hits=[0,1,2,3,5,6,7,8];}
+    if(kind==='barrel'){origin=barrelArt();hits=[0,1,2,3,5,6,7,8];symbols=Object.fromEntries(hits.map(i=>[i,'−2']));}
     if(kind==='/'||kind==='\\'){origin=terrainArt(kind);hits=[7,kind==='/'?5:3];symbols={7:'↑',[kind==='/'?5:3]:kind==='/'?'→':'←'};}
     if(kind==='wall'){origin=terrainArt('wall');hits=[7];symbols={7:'↑',1:'×'};}
-    return `<div class="mini-board" role="img" aria-label="${kind==='pulse'?'敵の撃破で上下左右4マスに1ダメージ':kind==='bomb'?'ボムの周囲8マスに1ダメージ':kind==='wall'?'岩で弾が止まる':'鏡で弾が90度曲がる'}">${Array.from({length:9},(_,i)=>`<span class="mini-cell ${i===4?'range-origin':hits.includes(i)?'range-hit':'range-blank'}">${i===4?origin:symbols[i]||(hits.includes(i)?'−1':'')}</span>`).join('')}</div>`;
+    return `<div class="mini-board" role="img" aria-label="${kind==='pulse'?'敵の撃破で上下左右4マスに1ダメージ':kind==='barrel'?'火薬樽は周囲8マスに2ダメージ':kind==='bomb'?'ボムの周囲8マスに1ダメージ':kind==='wall'?'岩で弾が止まる':'鏡で弾が90度曲がる'}">${Array.from({length:9},(_,i)=>`<span class="mini-cell ${i===4?'range-origin':hits.includes(i)?'range-hit':'range-blank'}">${i===4?origin:symbols[i]||(hits.includes(i)?'−1':'')}</span>`).join('')}</div>`;
   }
   function showTileDetails(tile){
+    if(mode==='rush'&&tile.kind==='barrel'){
+      openModal(`<div class="eyebrow">CHAIN STARTER / ${coordinate(tile)}</div><div class="guide-heading">${barrelArt()}<h2 id="modal-title">火薬樽 · HP ${tile.hp}</h2></div><p>一撃で爆発！ <strong>周囲8マスに2ダメージ。</strong><br>敵も装置も巻き込み、離れた集団へ火を渡せます。</p><div class="inspect-range">${rangeDiagram('barrel')}<p>斜めも含めて<br><strong>8マスに2ダメージ</strong></p></div><button class="modal-primary" id="inspect-back">盤面に戻る</button>`);$('inspect-back').onclick=closeModal;return;
+    }
     const enemy=typeof tile.hp==='number';
     let title,art,description,diagram,note,tag;
     if(enemy){
-      const name=tile.hp>3?'炉心':tile.hp>1?'鎧の敵':'敵';title=`${name} · HP ${tile.hp}`;tag=`ENEMY / ${coordinate(tile)}`;art=enemyArt(tile.hp);
+      const name=tile.kind==='core'||tile.hp>3?'炉心':tile.hp>1?'鎧の敵':'敵';title=`${name} · HP ${tile.hp}`;tag=`ENEMY / ${coordinate(tile)}`;art=enemyArt(tile.maxHp||tile.hp);
       description='HPが0になると撃破。<strong>すべての敵は、倒すと誘爆します。</strong>上下左右の1マスに、それぞれ1ダメージを与えます。';
-      diagram=rangeDiagram('pulse');note='隣の敵を倒すと、さらにその敵も誘爆。隣が装置なら、その装置も起動します。<strong>斜めには届きません。</strong>';
+      diagram=rangeDiagram('pulse');note=mode==='rush'?'通常は上下左右に1ダメージ。<strong>同じ起爆で6連鎖すると、以後は周囲8マスに2ダメージ！</strong>残ったHPは次の起爆へ引き継ぎます。':'隣の敵を倒すと、さらにその敵も誘爆。隣が装置なら、その装置も起動します。<strong>斜めには届きません。</strong>';
     }else if(tile.type==='wall'){
       title='岩';tag=`OBSTACLE / ${coordinate(tile)}`;art=terrainArt('wall');
       description='弾はこのマスで止まります。<strong>ランスの貫通弾も、岩は通れません。</strong>岩は壊せず、装置も置けません。';
@@ -702,6 +866,7 @@
     $('inspect-back').onclick=closeModal;$('inspect-guide').onclick=showGuide;
   }
   function showGuide(){
+    if(mode==='rush'){showRushGuide();return;}
     if(phase==='playing')return;if(phase==='result')restoreSetup();
     openModal(`<button class="modal-close" aria-label="閉じる" id="guide-close">×</button><div class="eyebrow">KNOW YOUR CHAIN</div><h2 id="modal-title">敵・ギミックの図解</h2><p>盤面の敵・岩・鏡をタップしても、<br>その効果と範囲を確認できます。</p><div class="rule-flow"><b>攻撃</b>→<b>敵を撃破</b>→<b>十字に誘爆</b>→<b>次へ連鎖</b></div><div class="guide-list">
       <article class="guide-entry">${rangeDiagram('pulse')}<div class="guide-copy"><h3>敵は全員、倒すと誘爆</h3><p><span class="guide-key">上下左右1マスに1ダメージ。</span>斜めには届きません。隣の敵を倒せば、その敵も誘爆します。隣の装置も起動できます。</p></div></article>
@@ -720,20 +885,37 @@
     $('tutorial-guide').onclick=()=>{saved.seen=true;persist();showGuide();};
   }
   function showHint(){
+    if(mode==='rush'){showRushGuide();return;}
     if(phase==='playing')return;if(phase==='result')restoreSetup();hintCount++;
     openModal(`<button class="modal-close" aria-label="閉じる" id="hint-close">×</button><div class="eyebrow">A LITTLE SPARK</div><h2 id="modal-title">工房のヒント</h2><p class="hint-text">${level.hints[Math.min(hintCount-1,level.hints.length-1)]}</p><p>正解はひとつとは限りません。<br>配置を残したまま、何度でも試せます。</p><button class="modal-primary" id="hint-back">自分で試す</button>${hintCount>1?'<button class="modal-secondary" id="hint-solution">攻略例を配置する</button>':'<button class="modal-secondary" id="hint-more">もう少しヒント</button>'}`);
     $('hint-close').onclick=closeModal;$('hint-back').onclick=closeModal;if($('hint-more'))$('hint-more').onclick=showHint;
     if($('hint-solution'))$('hint-solution').onclick=()=>{snapshot();placements=clone(level.solution);startIndex=level.start;focus=startIndex;selected=placements[focus].type;closeModal();render();toast('攻略例を配置しました。「連鎖を起動」で試せます。');};
   }
   function showMap(){
+    if(mode==='rush'){showRushMenu();return;}
     if(phase==='playing')return;
     if(phase==='result')restoreSetup();
     openModal(`<button class="modal-close" aria-label="閉じる" id="map-close">×</button><div class="eyebrow">THE ${LEVELS.length} EXPERIMENTS</div><h2 id="modal-title">工房の地図</h2><p>全${LEVELS.length}面。小さな火花から、最後の炉心へ。</p><div class="level-map" id="level-map"></div><button class="modal-secondary" id="map-back">工房に戻る</button>`);
     LEVELS.forEach((l,i)=>{const b=document.createElement('button');b.className='map-item';b.disabled=i>0&&!saved.cleared.includes(i-1);b.innerHTML=`<b>${String(i+1).padStart(2,'0')}</b><span>${l.name}</span><small>${saved.cleared.includes(i)?'CLEAR':b.disabled?'LOCKED':'PLAY'}</small>`;b.onclick=()=>{closeModal();loadLevel(i);};$('level-map').append(b);});$('map-close').onclick=closeModal;$('map-back').onclick=closeModal;
   }
+  function showRushGuide(first=false){
+    if(phase==='playing')return;if(phase==='result')restoreSetup();
+    openModal(`<button class="modal-close" aria-label="閉じる" id="rush-guide-close">×</button><div class="eyebrow">MAKE A BIGGER CHAIN</div><h2 id="modal-title">正解よりも、大連鎖。</h2><p>3回の起爆でハイスコアを狙おう。<br>全滅できなくても、得点は記録されます。</p><div class="rush-rules"><article>${barrelArt()}<div><h3>赤い樽を、巻き込む。</h3><p>火薬樽は<strong>周囲8マスに2ダメージ</strong>。ボムを隣に置いて、爆風を渡そう。</p></div></article><article><b class="overdrive-symbol">6</b><div><h3>6連鎖で、オーバードライブ。</h3><p>その起爆が終わるまで、敵の誘爆も<strong>周囲8マス・2ダメージ</strong>へ強化。連鎖が長いほど得点倍率アップ！</p></div></article><article>${weaponArt('lance')}<div><h3>集団の間に、装置の橋。</h3><p>毎回、装置4台を補充。<strong>敵のダメージは次の起爆に残る</strong>ので、炉心を狙い直せます。</p></div></article></div><p class="inspect-note">操作は同じ。装置はドラッグで移動、回転ボタンで向きを変更。「起爆」欄で最初の装置を選びます。早い全撃破はボーナス。同じ群れで配置を変え、記録更新を狙おう。</p><button class="modal-primary" id="rush-guide-start">${first?'大連鎖をつくる':'盤面に戻る'}</button><button class="modal-secondary" id="rush-guide-devices">装置の効果を確認</button>`);
+    const done=()=>{saved.rushSeen=true;persist();closeModal();};$('rush-guide-start').onclick=()=>{audioFx('place');done();};$('rush-guide-close').onclick=done;
+    $('rush-guide-devices').onclick=()=>{
+      openModal(`<div class="eyebrow">YOUR LOADOUT</div><h2 id="modal-title">4台で、連鎖をつくる。</h2><div class="rush-rules">${Object.entries(WEAPONS).map(([type,w])=>`<article>${weaponArt(type)}<div><h3>${w.name} ×${level.stock[type]}</h3><p>${w.description}</p></div></article>`).join('')}</div><p>装置は1回の連鎖につき1度だけ起動。敵の誘爆や、ほかの装置の攻撃でつなげます。</p><button class="modal-primary" id="rush-devices-back">盤面に戻る</button>`);$('rush-devices-back').onclick=done;
+    };
+  }
+  function showRushMenu(){
+    if(phase==='playing')return;
+    openModal(`<button class="modal-close" id="rush-menu-close" aria-label="閉じる">×</button><div class="eyebrow">CHAIN RUSH</div><h2 id="modal-title">次は、どうつなぐ？</h2><p>ベスト ${saved.rushBest} POINTS<br>同じ群れの最初の配置を残して、やり直せます。</p><button class="modal-primary" id="rush-menu-back">続ける</button><button class="modal-secondary" id="rush-menu-retry">同じ群れを最初から</button><button class="modal-secondary" id="rush-menu-new">別の群れに挑む</button>`);
+    $('rush-menu-close').onclick=closeModal;$('rush-menu-back').onclick=closeModal;$('rush-menu-retry').onclick=retryRush;$('rush-menu-new').onclick=()=>{closeModal();loadRush(newSeed());};
+  }
+  $('mode-rush').onclick=()=>switchMode('rush');$('mode-puzzle').onclick=()=>switchMode('puzzle');
+  $('rush-retry').onclick=retryRush;$('rush-new').onclick=()=>loadRush(newSeed());
   $('brand-symbol').innerHTML=ICONS.spark;$('map-button').innerHTML=ICONS.map;$('help-button').innerHTML=ICONS.help;$('launch-icon').innerHTML=ICONS.play;
   const renderSound=()=>{$('sound-button').innerHTML=saved.sound?ICONS.sound:ICONS.mute;$('sound-button').setAttribute('aria-label',saved.sound?'音をオフにする':'音をオンにする');$('sound-button').setAttribute('aria-pressed',String(saved.sound));};
-  renderSound();$('sound-button').onclick=()=>{saved.sound=!saved.sound;persist();renderSound();if(saved.sound)audioFx('place');};$('help-button').onclick=()=>{if(phase==='result')restoreSetup();showTutorial();};$('hint-button').onclick=showHint;$('map-button').onclick=showMap;
+  renderSound();$('sound-button').onclick=()=>{saved.sound=!saved.sound;persist();renderSound();if(saved.sound)audioFx('place');};$('help-button').onclick=()=>{if(phase==='playing')return;if(phase==='result')restoreSetup();if(mode==='rush')showRushGuide();else showTutorial();};$('hint-button').onclick=showHint;$('map-button').onclick=showMap;
   $('guide-button').onclick=showGuide;
   document.addEventListener('keydown',e=>{
     if(drag){if(e.key==='Escape'){e.preventDefault();cancelDrag();}return;}
@@ -749,7 +931,7 @@
     const el=document.activeElement;if(el?.classList.contains('cell')&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();let x=Number(el.dataset.x),y=Number(el.dataset.y);if(e.key==='ArrowLeft')x--;if(e.key==='ArrowRight')x++;if(e.key==='ArrowUp')y--;if(e.key==='ArrowDown')y++;$('board').querySelector(`[data-x="${Math.max(0,Math.min(5,x))}"][data-y="${Math.max(0,Math.min(5,y))}"]`)?.focus();}
   });
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelDrag();if(audio)audio.suspend().catch(()=>{});}});
-  loadLevel(levelIndex);if(!saved.seen)showTutorial(true);
+  if(mode==='rush'){loadRush(newSeed());if(!saved.rushSeen)showRushGuide(true);}else{loadLevel(levelIndex);if(!saved.seen)showTutorial(true);}
 })();
 
 </script>
