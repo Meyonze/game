@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101527">
 <meta name="description" content="使える線は、短い一筆だけ。群れを巻き込み、目標数を弾こう。">
-<meta name="chain-forge-version" content="05-one-stroke">
+<meta name="chain-forge-version" content="06-route-islands">
 <title>CHAIN FORGE — 一筆で、大連鎖。</title>
 <style>
 :root{color-scheme:dark;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;color:#f7f2e5;background:#0c1020}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:radial-gradient(ellipse at 50% 30%,#292340,#0c1020 75%);-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #ffdb85;outline-offset:3px}[hidden]{display:none!important}.game{width:100%;max-width:480px;height:100vh;height:100dvh;margin:auto;padding:14px 16px max(12px,env(safe-area-inset-bottom));padding-top:max(14px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:12px;position:relative}.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}.brand{font:900 12px/1.1 Arial,sans-serif;letter-spacing:2px;color:#f8dfad;display:flex;align-items:center;gap:8px}.brand i{display:grid;place-items:center;width:24px;height:28px;border-radius:7px 7px 12px 12px;background:#ffd27a;color:#413049;font-style:normal;font-size:20px;box-shadow:0 2px 12px #ffc66b1c}.brand small{display:block;font:8px/1.4 monospace;letter-spacing:1.5px;color:#8e96b4;margin-top:3px}.top-tools{display:flex;align-items:center;gap:10px}.old-link{font-size:10px;color:#b8bbd0;text-decoration:none;padding:7px 2px}.sound{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;background:#1f263c;color:#e3d4b4}.sound svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.intro{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-shrink:0}.intro h1{font-size:21px;letter-spacing:1px;font-weight:800;margin:0}.intro span{font:9px monospace;color:#a4a2bf;letter-spacing:1px}.arena{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #535472;border-radius:24px;background:radial-gradient(ellipse at 50% 35%,#283350,#171e35 80%);box-shadow:inset 0 0 50px #090f2944,0 8px 35px #0002;isolation:isolate;transition:border-color .25s,box-shadow .25s}.arena:after{content:'';position:absolute;inset:0;border-radius:23px;box-shadow:inset 0 1px 0 #ffffff18;pointer-events:none;z-index:5}.arena.fever{border-color:#b383c6;box-shadow:0 0 24px #b059d622,inset 0 0 40px #71368918}.arena canvas{display:block;width:100%;height:100%;touch-action:none;outline-offset:-4px;cursor:crosshair}.combo-hud{position:absolute;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:3}.combo-line{display:flex;justify-content:center;align-items:baseline;gap:7px;height:62px}.combo-line b{font:italic 900 62px/.95 Arial,sans-serif;letter-spacing:-3px;color:#fff2c2;text-shadow:0 3px 0 #8c5149,0 0 20px #ffbd4b22;display:inline-block;min-width:42px}.combo-line span{font:italic 900 14px/1 Arial,sans-serif;letter-spacing:1px;color:#ffd589}.combo-hud p{font-size:10px;font-weight:700;letter-spacing:2px;color:#b8bdd4;margin:1px 0 0}.combo-line b.bump{animation:bump .10s ease-out}.tap-hint{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;text-align:center;white-space:nowrap;color:#fff2d5;text-shadow:0 2px 8px #161a32}.tap-hint .finger{position:relative;display:block;margin:0 auto 10px;width:48px;height:48px;border:2px solid #fff1b7;border-radius:50%;box-shadow:0 0 20px #ffd27555;animation:hint-ring 1.7s ease-in-out infinite}.tap-hint .finger:before{content:'';position:absolute;inset:12px;background:#ffe1a0;border-radius:50%;box-shadow:0 0 12px #ffc573}.tap-hint b{font-size:15px;font-weight:800;letter-spacing:2px}.tap-hint small{display:block;margin-top:6px;color:#d8d8e2;font-size:10px}.shout{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%) rotate(-7deg);pointer-events:none;z-index:4;opacity:0;white-space:nowrap;font:italic 900 clamp(28px,8vw,42px)/1 Arial,sans-serif;letter-spacing:-1px;color:#fff2c5;text-shadow:2px 3px #79405b,0 0 25px #ff8e9666}.shout.show{animation:shout .8s ease-out both}.shout.finished{font-family:'Yu Gothic',sans-serif;font-size:44px;letter-spacing:5px}.controls{flex-shrink:0;text-align:center;position:relative}.controls p{margin:0 0 9px;font-size:11px;letter-spacing:.5px;color:#c1c5d9;line-height:1.5}.burst-button{width:100%;height:56px;border:1px solid #ffe5a5;border-radius:17px;background:linear-gradient(115deg,#ffdc84,#ffb976);color:#523348;box-shadow:0 5px 0 #ac615c,0 0 24px #ffcd6014;display:flex;align-items:center;justify-content:center;gap:12px;font-size:21px;letter-spacing:3px;font-weight:900;position:relative;overflow:hidden}.burst-button:before{content:'';width:34px;height:34px;border:1px solid #7b435d55;border-radius:50%;background:radial-gradient(circle,#fff2bc 20%,#ffd78b 24%,transparent 28%);box-shadow:0 0 0 3px #ffffff2b}.burst-button:active{transform:translateY(3px);box-shadow:0 2px 0 #ac615c}.footnote{font-size:8px;letter-spacing:1px;margin:10px 0 0;color:#777e9b}.arena-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;color:#a3afc9;font-size:9px;letter-spacing:1px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@keyframes hint-ring{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.07);opacity:1}}@keyframes bump{0%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes shout{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4) rotate(-7deg)}18%,65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-7deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(.98) rotate(-7deg)}}
@@ -16,20 +16,25 @@
 
 .ink-row{display:flex;align-items:center;gap:9px;margin-bottom:8px;font-size:10px;color:#d8cbb7}.ink-row>span{white-space:nowrap}.ink-row>b{font:700 11px monospace;min-width:35px;text-align:right;color:#ffe0a0}.ink-track{height:9px;flex:1;border-radius:8px;border:1px solid #797081;background:#080e21;overflow:hidden}.ink-track i{height:100%;display:block;background:linear-gradient(90deg,#f6a981,#ffe6a1);width:100%;border-radius:8px}.ink-track.low i{background:#ff9e85}.button-slot{height:56px}.gesture-prompt{display:grid;place-items:center;height:56px;background:#ffffff07;border:1px dashed #a99a8244;border-radius:17px;color:#ded2bb;font-size:13px;letter-spacing:1px}.burst-button{font-size:16px;letter-spacing:1px}.burst-button:before{display:none}.new-board{font-size:10px;background:none;color:#b8bbd0;border:0;text-decoration:underline;text-underline-offset:3px;min-height:28px;margin-top:4px;padding:5px 10px}.new-board:disabled{opacity:.35}.controls p{min-height:17px}.shout.finished{font-size:32px;letter-spacing:1px}
 @media(max-height:680px){.button-slot,.gesture-prompt{height:46px}.gesture-prompt{font-size:11px}.ink-row{margin-bottom:6px;font-size:9px}.ink-row>b{font-size:10px}.new-board{min-height:23px;margin-top:2px;font-size:9px}.burst-button{font-size:14px}.controls p{font-size:9px;letter-spacing:0}}
+@media(min-height:681px){.intro h1{font-size:17px;letter-spacing:0}}
+@media(max-height:680px){.intro h1{font-size:14px;letter-spacing:0}}
+
+@media(max-height:680px){.combo-hud{top:8px}.combo-line{height:36px}.combo-line b{font-size:36px}.combo-line span{font-size:10px}.combo-hud p{font-size:7px;line-height:10px}}
+@media(max-height:420px) and (orientation:landscape){.combo-hud{top:4px;left:10px;right:auto;text-align:left}.combo-line{height:27px}.combo-line b{font-size:27px}.combo-hud p{display:none}}
 </style>
 </head>
 <body>
 <main class="game">
-  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>ONE STROKE · 05</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge.html">配置モード</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
-  <section class="intro"><h1>一筆で、大連鎖。</h1><span id="wave">SWARM 01</span></section>
+  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>ONE STROKE · 06</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge.html">配置モード</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
+  <section class="intro"><h1 id="board-name">三つの大きな島</h1><span id="wave">SWARM 01</span></section>
   <section class="arena" id="arena" aria-label="指で触れた場所から弾ける遊び場">
     <canvas id="field" tabindex="0" role="button" aria-label="一筆で目標数を弾こう。指を離すか線が尽きると終了。キーボードでは矢印で狙い、Spaceを押しながら矢印でなぞり、Spaceを離すと終了。Enterでも開始と終了。"></canvas>
     <div class="combo-hud"><div class="combo-line"><b id="combo">0</b><span>POP!</span></div><p id="combo-caption">短い一筆で、目標数を弾こう。</p></div>
-    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>一筆で、巻き込もう</b><small>離すまで、線はひとつ。</small></div>
+    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>拾う群れを、選ぼう</b><small>離れた群れを、短い線でつなごう。</small></div>
     <div class="shout" id="shout" aria-hidden="true"></div>
     <div class="arena-hint" id="arena-hint">指を離すか、線が尽きると終了</div>
   </section>
-  <section class="controls"><div class="ink-row"><span>使える線</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="使える線の残量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">100%</b></div><p id="instruction">短い線で、目標数を巻き込もう。</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">指を置いて、離すまでが一筆。</div><button class="burst-button" id="burst" hidden>同じ群れでもう一筆</button></div><button class="new-board" id="new-board">別の群れに挑む →</button></section>
+  <section class="controls"><div class="ink-row"><span>使える線</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="使える線の残量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">100%</b></div><p id="instruction">短い線で、目標数を巻き込もう。</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">指を置いて、離すまでが一筆。</div><button class="burst-button" id="burst" hidden>同じ群れでもう一筆</button></div><button class="new-board" id="new-board">次の群れへ →</button></section>
 </main>
 <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
 <script>
@@ -39,7 +44,7 @@
   const TOUCH_RADIUS=20;
   function segmentDistance(x,y,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,length=dx*dx+dy*dy,t=length?clamp(((x-ax)*dx+(y-ay)*dy)/length,0,1):0;return Math.hypot(x-ax-t*dx,y-ay-t*dy);}
   class BlastWorld{
-    constructor({width=360,height=500,count=80,seed=1}={}){
+    constructor({width=360,height=500,count=80,seed=1,bodies=null,groups=[]}={}){
       this.width=width;this.height=height;this.seed=seed>>>0||1;this.state='ready';this.combo=0;this.time=0;this.events=[];this.accumulator=0;
       this.count=clamp(Math.round(count),12,110);this.bodies=[];
       const cols=9,rows=Math.ceil(this.count/cols),sx=(width-64)/(cols-1),sy=Math.min(37,(height-125)/Math.max(1,rows-1));
@@ -49,6 +54,8 @@
         const x=32+col*sx+(row%2?4:-4)+(this.random()-.5)*8,y=top+row*sy+(this.random()-.5)*8;
         this.bodies.push({id:i,x,y,ax:x,ay:y,r,vx:(this.random()-.5)*12,vy:(this.random()-.5)*12,fuse:null,dead:false,color:Math.floor(this.random()*4),angle:(this.random()-.5)*.22,spin:0,wallAt:-1});
       }
+      this.groups=groups;
+      if(bodies){this.bodies=bodies.map((b,id)=>({...b,id,ax:b.x,ay:b.y,vx:0,vy:0,fuse:null,dead:false,angle:0,spin:0,wallAt:-1}));this.count=this.bodies.length;}
     }
     random(){let x=this.seed;x^=x<<13;x^=x>>>17;x^=x<<5;this.seed=x>>>0;return this.seed/4294967296;}
     emit(type,data){this.events.push({type,...data});}
@@ -79,7 +86,6 @@
       for(const c of this.bodies){
         if(c.dead)continue;const dx=c.x-b.x,dy=c.y-b.y,d=Math.hypot(dx,dy);
         if(d<=reach+c.r)this.ignite(c,.075+Math.min(.035,d*.001),{x:b.x,y:b.y});
-        if(d<65){const a=d>.01?Math.atan2(dy,dx):this.random()*Math.PI*2,force=(1-d/70)*65;c.vx+=Math.cos(a)*force;c.vy+=Math.sin(a)*force;c.spin+=(this.random()-.5)*1.8;}
       }
     }
     resize(height){
@@ -94,35 +100,40 @@
     }
     step(dt){
       this.time+=dt;
-      for(const b of this.bodies){
-        if(b.dead)continue;
-        if(b.fuse!==null){b.fuse-=dt;if(b.fuse<=0){this.pop(b);continue;}}
-        const idle=b.fuse===null;
-        if(idle){b.vx+=((b.ax-b.x)*1.1+Math.sin(this.time*1.5+b.id)*3)*dt;b.vy+=((b.ay-b.y)*1.1+Math.cos(this.time*1.4+b.id)*3)*dt;}
-        const drag=Math.exp(-(idle?1.8:1.35)*dt);b.vx=clamp(b.vx*drag,-620,620);b.vy=clamp(b.vy*drag,-620,620);
-        b.x+=b.vx*dt;b.y+=b.vy*dt;b.angle+=b.spin*dt;b.spin*=Math.exp(-dt*2);
-        let hit=false;
-        if(b.x<b.r){b.x=b.r;b.vx=Math.abs(b.vx)*.78;hit=true;}if(b.x>this.width-b.r){b.x=this.width-b.r;b.vx=-Math.abs(b.vx)*.78;hit=true;}
-        if(b.y<b.r){b.y=b.r;b.vy=Math.abs(b.vy)*.78;hit=true;}if(b.y>this.height-b.r){b.y=this.height-b.r;b.vy=-Math.abs(b.vy)*.78;hit=true;}
-        if(hit&&Math.hypot(b.vx,b.vy)>160&&this.time-b.wallAt>.14){b.wallAt=this.time;this.emit('wall',{x:b.x,y:b.y,color:b.color});}
-      }
-      for(let i=0;i<this.bodies.length;i++){const a=this.bodies[i];if(a.dead)continue;
-        for(let j=i+1;j<this.bodies.length;j++){const b=this.bodies[j];if(b.dead)continue;const dx=b.x-a.x,dy=b.y-a.y,min=a.r+b.r,d2=dx*dx+dy*dy;if(d2>=min*min)continue;
-          const d=Math.sqrt(d2)||.01,nx=d2>.0001?dx/d:1,ny=d2>.0001?dy/d:0,overlap=(min-d)/2;
-          a.x-=nx*overlap;a.y-=ny*overlap;b.x+=nx*overlap;b.y+=ny*overlap;
-          const speed=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;
-          if(speed<0){const impulse=-speed*.82;a.vx-=impulse*nx;a.vy-=impulse*ny;b.vx+=impulse*nx;b.vy+=impulse*ny;}
-          if(a.fuse!==null&&b.fuse===null)this.ignite(b,.17+this.random()*.1,{x:a.x,y:a.y});
-          else if(b.fuse!==null&&a.fuse===null)this.ignite(a,.17+this.random()*.1,{x:b.x,y:b.y});
-        }
-      }
-      for(const b of this.bodies)if(!b.dead){b.x=clamp(b.x,b.r,this.width-b.r);b.y=clamp(b.y,b.r,this.height-b.r);}
+      // Logical target positions stay fixed. Motion and fragments are rendering only.
+      for(const b of this.bodies)if(!b.dead&&b.fuse!==null){b.fuse-=dt;if(b.fuse<=0)this.pop(b);}
       if(this.state==='chain'){
         const live=this.bodies.filter(b=>!b.dead);
         if(!live.length){this.state='clear';this.emit('clear',{combo:this.combo,time:this.time});}
         else if(!live.some(b=>b.fuse!==null))this.state='ready';
       }
     }
+  }
+  const STROKE_BOARDS=[
+    {name:'三つの大きな島',groups:[[60,140,22],[300,140,22],[180,420,22],[180,270,8]],goal:60,length:420,order:[2,0,1]},
+    {name:'分かれ道',groups:[[180,430,18],[180,280,12],[60,140,24],[300,140,24],[50,420,8]],goal:68,length:420,order:[0,1,2,3]},
+    {name:'ぐるりの輪',groups:[[180,130,14],[300,210,14],[300,360,14],[180,440,14],[60,360,14],[60,210,14]],goal:56,length:370,order:[0,1,2,3]},
+    {name:'大きい群れを拾う',groups:[[180,270,24],[60,140,12],[300,140,12],[60,400,20],[300,400,20]],goal:60,length:280,order:[3,0,4]},
+    {name:'ジグザグ',groups:[[65,140,18],[295,240,18],[65,340,18],[295,440,18],[295,140,6],[65,440,6]],goal:66,length:550,order:[0,1,2,3]},
+    {name:'外周の近道',groups:[[60,140,10],[180,140,10],[300,140,10],[300,285,22],[300,430,10],[180,430,10],[60,430,10],[60,285,22]],goal:70,length:430,order:[7,6,5,4,3]},
+    {name:'遠くを捨てる',groups:[[50,135,6],[310,135,6],[100,300,22],[260,300,22],[180,440,22],[180,160,6]],goal:60,length:245,order:[2,4,3]},
+    {name:'最後の分岐',groups:[[180,430,22],[70,300,18],[290,300,18],[60,140,14],[300,140,14],[180,230,8],[180,120,6]],goal:78,length:450,order:[3,1,0,2,5]}
+  ];
+  function hexPoints(count){
+    const result=[[0,0]];
+    for(let ring=1;result.length<count;ring++){
+      const cells=[];for(let q=-ring;q<=ring;q++)for(let r=-ring;r<=ring;r++)if(Math.max(Math.abs(q),Math.abs(r),Math.abs(q+r))===ring)cells.push([12.8*(q+r*.5),12.8*Math.sqrt(3)/2*r]);
+      cells.sort((a,b)=>Math.atan2(a[1],a[0])-Math.atan2(b[1],b[0]));const take=Math.min(cells.length,count-result.length);
+      for(let i=0;i<take;i++)result.push(cells[Math.floor(i*cells.length/take)]);
+    }return result;
+  }
+  function createStrokeBoard(index=0){
+    index=((index%STROKE_BOARDS.length)+STROKE_BOARDS.length)%STROKE_BOARDS.length;const source=STROKE_BOARDS[index],bodies=[],groups=[];
+    source.groups.forEach(([x,y,count],group)=>{
+      const offsets=hexPoints(count);groups.push({x,y,count,radius:Math.max(...offsets.map(p=>Math.hypot(...p)))+6.8});
+      offsets.forEach(([dx,dy],i)=>bodies.push({x:x+dx,y:y+dy,r:6.8,color:(i+group)%4,group}));
+    });
+    return{width:360,height:500,index,name:source.name,bodies,groups,goal:source.goal,length:source.length,seed:index+1};
   }
   class StrokeRun{
     constructor(options={}){
@@ -154,6 +165,7 @@
     }
     get success(){return this.world.combo>=this.goal;}
   }
+  root.STROKE_BOARDS=STROKE_BOARDS;root.createStrokeBoard=createStrokeBoard;
   root.StrokeRun=StrokeRun;
   BlastWorld.TOUCH_RADIUS=TOUCH_RADIUS;
   root.BlastWorld=BlastWorld;
@@ -168,40 +180,38 @@
   const palette=['#83f5cc','#c3a1ff','#ff9bbd','#ffe08e'];
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let sound=true;try{const s=JSON.parse(localStorage.getItem('chain-forge-v1'));if(s?.sound===false)sound=false;}catch{}
-  let wave=0,world,worldHeight=500,pixelWidth=360,pixelHeight=500,scale=1,raf=0,last=0,now=0,hold=0,shake=0,shoutUntil=0;
-  let run,boardSeed=0,boardBest=0,boardCount=0,scored=false,keyboardDrawing=false;
-  try{const b=JSON.parse(localStorage.getItem('chain-forge-stroke-v1'));if(Number.isInteger(b?.seed)&&b.seed>0){boardSeed=b.seed;wave=Math.max(1,Number.isInteger(b.index)?b.index:1);boardBest=Number.isInteger(b.best)?Math.max(0,b.best):0;boardCount=b.count||0;}}catch{}
+  let world,worldHeight=500,pixelWidth=360,pixelHeight=500,scale=1,offsetX=0,offsetY=0,raf=0,last=0,now=0,hold=0,shake=0,shoutUntil=0;
+  let run,boardIndex=0,boardBest=0,boardRecords={},scored=false,keyboardDrawing=false;
+  try{const b=JSON.parse(localStorage.getItem('chain-forge-stroke-v2'));if(Number.isInteger(b?.index))boardIndex=((b.index%STROKE_BOARDS.length)+STROKE_BOARDS.length)%STROKE_BOARDS.length;if(b?.best&&typeof b.best==='object')boardRecords=b.best;}catch{}
   let pointer=null,aim={x:180,y:250,until:Infinity},strokes=[];
   let particles=[],rings=[],sparks=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
-  function seed(){return Math.floor(Math.random()*4294967295)||1;}
-  function persistBoard(){try{localStorage.setItem('chain-forge-stroke-v1',JSON.stringify({seed:boardSeed,index:wave,best:boardBest,count:world.count}));}catch{}}
+  function persistBoard(){try{localStorage.setItem('chain-forge-stroke-v2',JSON.stringify({index:boardIndex,best:boardRecords}));}catch{}}
   function renderRun(){
     const percent=Math.round(run.remaining/run.maxLength*100);$('ink-fill').style.width=percent+'%';$('ink-left').textContent=percent+'%';$('ink-track').setAttribute('aria-valuenow',String(percent));
     $('ink-track').classList[percent<20?'add':'remove']('low');$('new-board').disabled=run.phase==='drawing'||run.phase==='resolving';
     $('burst').hidden=run.phase!=='result';$('gesture-prompt').hidden=run.phase==='result';
-    if(run.phase==='drawing'){$('gesture-prompt').textContent='離すまでが、一筆。';$('instruction').textContent='線が尽きる前に、もうひとつの群れへ。';}
+    if(run.phase==='drawing'){$('gesture-prompt').textContent='離すまでが、一筆。';$('instruction').textContent='残りの線で、どの群れへ？';}
     if(run.phase==='resolving'){$('gesture-prompt').textContent='連鎖を見届けよう。';$('instruction').textContent=run.reason==='ink'?'線を使い切った！ 連鎖の結果を待とう。':'指を離した。連鎖の結果を待とう。';}
   }
   function newWave(fresh=true){
-    if(fresh||!boardSeed){wave++;boardSeed=seed();boardBest=0;}
-    const count=Math.min(74,Math.max(45,Math.round(74*Math.min(1,worldHeight/470))));if(boardCount!==count)boardBest=0;boardCount=count;
-    run=new StrokeRun({height:worldHeight,count,seed:boardSeed});world=run.world;scored=false;keyboardDrawing=false;persistBoard();
+    if(fresh)boardIndex=(boardIndex+1)%STROKE_BOARDS.length;
+    const board=createStrokeBoard(boardIndex);run=new StrokeRun(board);world=run.world;boardBest=Number.isInteger(boardRecords[boardIndex])?Math.max(0,boardRecords[boardIndex]):0;scored=false;keyboardDrawing=false;persistBoard();
     particles=[];rings=[];sparks=[];strokes=[];hold=0;shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
-    $('announcer').textContent='';$('wave').textContent='目標 '+run.goal+'匹';$('combo').textContent='0';$('combo-caption').textContent='この群れの BEST '+boardBest+' / '+world.count;
-    $('burst').textContent='同じ群れでもう一筆';$('gesture-prompt').textContent='指を置いて、離すまでが一筆。';$('instruction').textContent='短い線で、'+run.goal+'匹以上を巻き込もう。';$('arena').classList.remove('fever');$('shout').classList.remove('show','finished');
+    $('announcer').textContent='';$('board-name').textContent=(boardIndex+1)+'/'+STROKE_BOARDS.length+' '+STROKE_BOARDS[boardIndex].name;$('wave').textContent='目標 '+run.goal+'匹';$('combo').textContent='0';$('combo-caption').textContent='この群れの BEST '+boardBest+' / '+world.count;
+    $('burst').textContent='同じ群れでもう一筆';$('gesture-prompt').textContent='指を置いて、離すまでが一筆。';$('instruction').textContent=run.goal+'匹が目標。×数字は群れの匹数。';$('arena').classList.remove('fever');$('shout').classList.remove('show','finished');
     ambient=Array.from({length:22},()=>({x:Math.random()*360,y:Math.random()*worldHeight,r:.5+Math.random()*1.3,phase:Math.random()*6.3}));renderRun();
   }
   function finishRun(){
-    if(scored)return;scored=true;boardBest=Math.max(boardBest,world.combo);persistBoard();
+    if(scored)return;scored=true;boardBest=Math.max(boardBest,world.combo);boardRecords[boardIndex]=boardBest;persistBoard();
     $('combo-caption').textContent='この群れの BEST '+boardBest+' / '+world.count;
     $('instruction').textContent=run.success?(world.combo===world.count?'全壊！ この一筆は完璧。':'目標達成！ 次は、もっと巻き込める？'):'あと'+(run.goal-world.combo)+'匹。出発点や通り道を変えてみよう。';
     shout(world.combo===world.count?'ALL CLEAR!':run.success?'CLEAR!':'あと '+(run.goal-world.combo)+'匹',!run.success);
     $('announcer').textContent=world.combo+'匹。'+(run.success?'目標達成。':'目標まであと'+(run.goal-world.combo)+'匹。')+'同じ群れで再挑戦できます。';renderRun();
   }
   function resize(){
-    const rect=canvas.getBoundingClientRect();pixelWidth=rect.width||360;pixelHeight=rect.height||500;worldHeight=Math.max(160,pixelHeight/pixelWidth*360);
-    const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(pixelWidth*dpr);canvas.height=Math.round(pixelHeight*dpr);scale=canvas.width/360;
-    if(world){world.resize(worldHeight);aim.y=Math.min(aim.y,worldHeight);cancelPointer();}
+    const rect=canvas.getBoundingClientRect();pixelWidth=rect.width||360;pixelHeight=rect.height||500;worldHeight=500;
+    const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(pixelWidth*dpr);canvas.height=Math.round(pixelHeight*dpr);scale=Math.min(canvas.width/360,canvas.height/500);offsetX=(canvas.width-360*scale)/2;offsetY=(canvas.height-500*scale)/2;
+    if(world)cancelPointer();
   }
   function initAudio(){
     if(!sound)return;
@@ -276,7 +286,7 @@
   function moveStroke(x,y){
     if(run.phase!=='drawing')return;run.move(x,y);aim={...run.last,until:Infinity};react();if(run.phase!=='drawing')cancelPointer();
   }
-  function point(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*360,y:(e.clientY-r.top)/r.height*worldHeight};}
+  function point(e){const r=canvas.getBoundingClientRect(),s=Math.min(r.width/360,r.height/500),px=(r.width-360*s)/2,py=(r.height-500*s)/2;return{x:(e.clientX-r.left-px)/s,y:(e.clientY-r.top-py)/s};}
   function cancelPointer(e){
     if(e?.pointerId!==undefined&&pointer&&e.pointerId!==pointer.id)return;
     const id=pointer?.id;pointer=null;keyboardDrawing=false;run?.end(e?.type==='pointercancel'?'cancel':'release');
@@ -340,9 +350,10 @@
     for(const s of sparks){s.life-=dt;if(s.life<=0)continue;const t=1-s.life/s.max,px=s.x+(s.tx-s.x)*t,py=s.y+(s.ty-s.y)*t-Math.sin(t*Math.PI)*16;ctx.globalAlpha=(1-t)*.7;ctx.beginPath();ctx.moveTo(px-(s.tx-s.x)*.1,py-(s.ty-s.y)*.1);ctx.lineTo(px,py);ctx.lineWidth=2;ctx.strokeStyle=s.color;ctx.stroke();circle(px,py,2.3,'#fff1c8');}sparks=sparks.filter(s=>s.life>0);ctx.globalAlpha=1;
   }
   function draw(dt){
-    ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,360,worldHeight);ctx.save();
+    ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);ctx.setTransform(scale,0,0,scale,offsetX,offsetY);ctx.save();ctx.beginPath();ctx.rect(0,0,360,500);ctx.clip();
     if(shake>.05&&!motion){ctx.translate(Math.sin(now*145)*shake,Math.cos(now*119)*shake*.6);shake*=Math.exp(-dt*17);}
     for(const a of ambient){ctx.globalAlpha=.12+Math.sin(now*.8+a.phase)*.08;circle(a.x,a.y,a.r,'#c6caff');}ctx.globalAlpha=1;
+    for(let i=0;i<world.groups.length;i++){const g=world.groups[i],left=world.bodies.filter(b=>b.group===i&&!b.dead).length;if(!left)continue;ctx.globalAlpha=.045;circle(g.x,g.y,g.radius+7,'#fff0ce');ctx.globalAlpha=.7;ctx.fillStyle='#f4ddbc';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('×'+left,g.x,g.y+g.radius+12);ctx.globalAlpha=1;}
     for(const b of world.bodies)if(!b.dead)jelly(b);
     if(run.path.length){ctx.save();ctx.globalAlpha=.5;ctx.strokeStyle='#ffe2a0';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();run.path.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.restore();}
     drawEffects(dt);ctx.restore();
@@ -359,7 +370,7 @@
   }
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelPointer();cancelAnimationFrame(raf);raf=0;last=0;if(audio)audio.suspend().catch(()=>{});}else if(!raf){last=0;raf=requestAnimationFrame(frame);}});
   window.addEventListener('resize',resize);
-  renderSound();resize();newWave(!boardSeed);raf=requestAnimationFrame(frame);
+  renderSound();resize();newWave(false);raf=requestAnimationFrame(frame);
 })();
 
 </script>
