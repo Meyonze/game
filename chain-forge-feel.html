@@ -231,7 +231,7 @@
     const p=point(e);fire(p.x,p.y);pointer={id:e.pointerId,...p};try{canvas.setPointerCapture?.(e.pointerId);}catch{}
   });
   canvas.addEventListener('pointermove',e=>{
-    const p=point(e);if(!pointer){if(e.pointerType!=='touch')aim={...p,until:now+.5};return;}
+    const p=point(e);if(!pointer){if(e.pointerType!=='touch')aim={...p,until:Infinity};return;}
     if(e.pointerId!==pointer.id)return;e.preventDefault();aim={...p,until:Infinity};
     if(world.state!=='clear'){world.stroke(pointer.x,pointer.y,p.x,p.y);react();}pointer={...pointer,...p};
   });
