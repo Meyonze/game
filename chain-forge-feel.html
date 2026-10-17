@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101527">
-<meta name="description" content="10秒のスコアアタック。同じ色をつないだ瞬間から連続破壊。金色ボムとフィーバーで高得点。">
-<meta name="chain-forge-version" content="09-color10">
-<title>一筆で、大連鎖。 — 10秒ラッシュ</title>
+<meta name="description" content="15秒のスコアアタック。同じ色をつないだ瞬間から連続破壊。金色ボムとフィーバーで高得点。">
+<meta name="chain-forge-version" content="10-power15">
+<title>一筆で、大連鎖。 — 15秒ラッシュ</title>
 <style>
 :root{color-scheme:dark;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;color:#f7f2e5;background:#0c1020}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:radial-gradient(ellipse at 50% 30%,#292340,#0c1020 75%);-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #ffdb85;outline-offset:3px}[hidden]{display:none!important}.game{width:100%;max-width:480px;height:100vh;height:100dvh;margin:auto;padding:14px 16px max(12px,env(safe-area-inset-bottom));padding-top:max(14px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:12px;position:relative}.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}.brand{font:900 12px/1.1 Arial,sans-serif;letter-spacing:2px;color:#f8dfad;display:flex;align-items:center;gap:8px}.brand i{display:grid;place-items:center;width:24px;height:28px;border-radius:7px 7px 12px 12px;background:#ffd27a;color:#413049;font-style:normal;font-size:20px;box-shadow:0 2px 12px #ffc66b1c}.brand small{display:block;font:8px/1.4 monospace;letter-spacing:1.5px;color:#8e96b4;margin-top:3px}.top-tools{display:flex;align-items:center;gap:10px}.old-link{font-size:10px;color:#b8bbd0;text-decoration:none;padding:7px 2px}.sound{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;background:#1f263c;color:#e3d4b4}.sound svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.intro{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-shrink:0}.intro h1{font-size:21px;letter-spacing:1px;font-weight:800;margin:0}.intro span{font:9px monospace;color:#a4a2bf;letter-spacing:1px}.arena{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #535472;border-radius:24px;background:radial-gradient(ellipse at 50% 35%,#283350,#171e35 80%);box-shadow:inset 0 0 50px #090f2944,0 8px 35px #0002;isolation:isolate;transition:border-color .25s,box-shadow .25s}.arena:after{content:'';position:absolute;inset:0;border-radius:23px;box-shadow:inset 0 1px 0 #ffffff18;pointer-events:none;z-index:5}.arena.fever{border-color:#b383c6;box-shadow:0 0 24px #b059d622,inset 0 0 40px #71368918}.arena canvas{display:block;width:100%;height:100%;touch-action:none;outline-offset:-4px;cursor:crosshair}.combo-hud{position:absolute;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:3}.combo-line{display:flex;justify-content:center;align-items:baseline;gap:7px;height:62px}.combo-line b{font:italic 900 62px/.95 Arial,sans-serif;letter-spacing:-3px;color:#fff2c2;text-shadow:0 3px 0 #8c5149,0 0 20px #ffbd4b22;display:inline-block;min-width:42px}.combo-line span{font:italic 900 14px/1 Arial,sans-serif;letter-spacing:1px;color:#ffd589}.combo-hud p{font-size:10px;font-weight:700;letter-spacing:2px;color:#b8bdd4;margin:1px 0 0}.combo-line b.bump{animation:bump .10s ease-out}.tap-hint{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;text-align:center;white-space:nowrap;color:#fff2d5;text-shadow:0 2px 8px #161a32}.tap-hint .finger{position:relative;display:block;margin:0 auto 10px;width:48px;height:48px;border:2px solid #fff1b7;border-radius:50%;box-shadow:0 0 20px #ffd27555;animation:hint-ring 1.7s ease-in-out infinite}.tap-hint .finger:before{content:'';position:absolute;inset:12px;background:#ffe1a0;border-radius:50%;box-shadow:0 0 12px #ffc573}.tap-hint b{font-size:15px;font-weight:800;letter-spacing:2px}.tap-hint small{display:block;margin-top:6px;color:#d8d8e2;font-size:10px}.shout{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%) rotate(-7deg);pointer-events:none;z-index:4;opacity:0;white-space:nowrap;font:italic 900 clamp(28px,8vw,42px)/1 Arial,sans-serif;letter-spacing:-1px;color:#fff2c5;text-shadow:2px 3px #79405b,0 0 25px #ff8e9666}.shout.show{animation:shout .8s ease-out both}.shout.finished{font-family:'Yu Gothic',sans-serif;font-size:44px;letter-spacing:5px}.controls{flex-shrink:0;text-align:center;position:relative}.controls p{margin:0 0 9px;font-size:11px;letter-spacing:.5px;color:#c1c5d9;line-height:1.5}.burst-button{width:100%;height:56px;border:1px solid #ffe5a5;border-radius:17px;background:linear-gradient(115deg,#ffdc84,#ffb976);color:#523348;box-shadow:0 5px 0 #ac615c,0 0 24px #ffcd6014;display:flex;align-items:center;justify-content:center;gap:12px;font-size:21px;letter-spacing:3px;font-weight:900;position:relative;overflow:hidden}.burst-button:before{content:'';width:34px;height:34px;border:1px solid #7b435d55;border-radius:50%;background:radial-gradient(circle,#fff2bc 20%,#ffd78b 24%,transparent 28%);box-shadow:0 0 0 3px #ffffff2b}.burst-button:active{transform:translateY(3px);box-shadow:0 2px 0 #ac615c}.footnote{font-size:8px;letter-spacing:1px;margin:10px 0 0;color:#777e9b}.arena-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;color:#a3afc9;font-size:9px;letter-spacing:1px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@keyframes hint-ring{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.07);opacity:1}}@keyframes bump{0%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes shout{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4) rotate(-7deg)}18%,65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-7deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(.98) rotate(-7deg)}}
 @media(min-width:600px){.game{max-width:480px;height:min(960px,100dvh);padding:22px 20px 18px}.intro h1{font-size:23px}.arena{border-radius:28px}}
@@ -31,16 +31,16 @@
 </head>
 <body>
 <main class="game">
-  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>10 SECOND COLOR · 09</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge.html">配置モード</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
-  <section class="intro"><h1 id="board-name">10秒、消しまくれ！</h1><span id="wave">10秒</span></section>
+  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>15 SECOND POWER · 10</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge.html">配置モード</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
+  <section class="intro"><h1 id="board-name">15秒、消しまくれ！</h1><span id="wave">15秒</span></section>
   <section class="arena" id="arena" aria-label="指で触れた場所から弾ける遊び場">
-    <canvas id="field" tabindex="0" role="button" aria-label="同じ色を3体つなぐと即座に消去。その後は同じ色につなぐたびに消えます。指を離すと別の色を選べます。最初のタッチから10秒の得点を競います。速いなぞりは得点2倍。金色ボムに触れると大爆発。矢印で照準、Spaceを押しながら矢印でなぞる。離しても10秒の時計は続きます。"></canvas>
+    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。同じ色を7体つなぐと強力ボムが生まれます。指を離すと別の色を選べます。最初のタッチから15秒の得点を競います。速いなぞりは得点2倍。金色ボムに触れると大爆発。矢印で照準、Spaceを押しながら矢印でなぞる。離しても15秒の時計は続きます。"></canvas>
     <div class="combo-hud"><div class="combo-line"><b id="combo">0</b><span>PTS</span></div><p id="combo-caption">BEST 0</p></div>
-    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞって、消しまくれ</b><small>同じ色3体から、そのまま連続消去！</small></div>
+    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞって、消しまくれ</b><small>触れた瞬間から即消し。7つで強ボム！</small></div>
     <div class="shout" id="shout" aria-hidden="true"></div>
-    <div class="arena-hint" id="arena-hint">速くなぞると ×2 · 金色ボムで大爆発</div>
+    <div class="arena-hint" id="arena-hint">同じ色7つで強ボム · 長くつなぐとさらに強化</div>
   </section>
-  <section class="controls"><div class="ink-row"><span>残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">10.0秒</b></div><p id="instruction">同じ色を3体。その後はつなぐたび即消し！</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">なぞった瞬間、10秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、10秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
+  <section class="controls"><div class="ink-row"><span>残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">15.0秒</b></div><p id="instruction">同じ色をなぞって即消し。7つつなぐと強ボム！</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">触れた瞬間、15秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、15秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
 </main>
 <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
 <script>
@@ -51,10 +51,10 @@
   const position=(col,row)=>({x:29+col*37.75+(row%2?9.4:-9.4),y:86+row*35});
   function distance(b,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy,t=l?clamp(((b.x-ax)*dx+(b.y-ay)*dy)/l,0,1):0;return Math.hypot(b.x-ax-t*dx,b.y-ay-t*dy);}
   class RapidRun{
-    constructor({seed=107,duration=10}={}){
+    constructor({seed=107,duration=15}={}){
       this.seed=seed>>>0||1;this.initialSeed=this.seed;this.width=360;this.height=500;this.count=COLS*ROWS;this.duration=duration;this.time=0;this.remaining=duration;this.phase='ready';this.world=this;
-      this.score=0;this.popped=0;this.combo=0;this.maxCombo=0;this.lastPop=-Infinity;this.feverUntil=0;this.feverCount=0;this.active=false;this.events=[];this.nextId=0;this.bodies=[];this.bombsDue=0;this.fast=false;
-      this.chainColor=null;this.chainCount=0;this.pending=[];this.anchor=null;this.trace=[];this.bridge=80;
+      this.score=0;this.popped=0;this.combo=0;this.maxCombo=0;this.lastPop=-Infinity;this.feverUntil=0;this.feverCount=0;this.active=false;this.events=[];this.nextId=0;this.bodies=[];this.fast=false;
+      this.chainColor=null;this.chainCount=0;this.anchor=null;this.trace=[];this.bridge=80;
       for(let col=0;col<COLS;col++)for(let row=0;row<ROWS;row++)this.bodies.push(this.make(col,row,{spawnAt:-1}));
       // A visible opening bomb teaches the only special target through touch.
       Object.assign(this.bodies.find(b=>b.col===4&&b.row===5),{bomb:true,power:82});
@@ -68,7 +68,7 @@
     start(x,y){
       if(this.phase==='result'||![x,y].every(Number.isFinite)||x<0||x>360||y<65||y>500)return false;
       if(this.phase==='ready'){this.phase='running';this.emit('begin');}
-      this.active=true;this.chainColor=null;this.chainCount=0;this.pending=[];this.anchor=null;this.trace=[];this.bridge=80;this.last={x,y};this.lastMove=this.time;this.fast=false;this.touch(x,y,x,y,true);return true;
+      this.active=true;this.chainColor=null;this.chainCount=0;this.anchor=null;this.trace=[];this.bridge=80;this.last={x,y};this.lastMove=this.time;this.fast=false;this.touch(x,y,x,y,true);return true;
     }
     move(x,y){
       if(this.phase!=='running'||!this.active||![x,y].every(Number.isFinite))return false;
@@ -76,7 +76,7 @@
       this.fast=d/Math.max(.008,this.time-this.lastMove)>=450;
       this.touch(a.x,a.y,x,y,false);this.last={x,y};this.lastMove=this.time;return true;
     }
-    end(){this.active=false;this.fast=false;this.pending=[];this.anchor=null;this.trace=[];this.chainColor=null;this.chainCount=0;}
+    end(){this.active=false;this.fast=false;this.anchor=null;this.trace=[];this.chainColor=null;this.chainCount=0;}
     touch(ax,ay,bx,by,initial){
       if(this.phase!=='running')return;
       const brush=this.fever?21:TOUCH;
@@ -90,20 +90,18 @@
         if(b.dead)continue;
         if(b.bomb){this.explode([b]);continue;}
         if(this.chainColor===null)this.chainColor=b.color;
-        if(b.color!==this.chainColor||this.pending.some(p=>p.id===b.id)||this.anchor&&Math.hypot(b.x-this.anchor.x,b.y-this.anchor.y)>this.bridge)continue;
+        if(b.color!==this.chainColor||this.anchor&&Math.hypot(b.x-this.anchor.x,b.y-this.anchor.y)>this.bridge)continue;
         this.anchor={x:b.x,y:b.y};this.bridge=80;this.trace.push({...this.anchor});if(this.trace.length>48)this.trace.shift();this.chainCount++;
         this.emit('connect',{x:b.x,y:b.y,color:b.color,count:this.chainCount});
-        if(this.chainCount%8===0)this.bombsDue++;
-        if(this.chainCount<3)this.pending.push(b);
-        else if(this.chainCount===3){this.explode([...this.pending,b]);this.pending=[];}
-        else this.explode([b]);
+        if(this.chainCount%7===0){b.rewardPower=Math.min(152,112+(this.chainCount/7-1)*20);this.emit('bomb-earned',{x:b.x,y:b.y,power:b.rewardPower,count:this.chainCount});}
+        this.explode([b]);
       }
     }
     explode(hits){
       const queue=[...hits],seen=new Set();
       for(let i=0;i<queue.length;i++){
         const b=queue[i];if(b.dead||seen.has(b.id))continue;seen.add(b.id);this.pop(b);
-        if(b.bomb){if(this.chainColor!==null){this.anchor={x:b.x,y:b.y};this.bridge=145;}this.emit('bomb',{x:b.x,y:b.y,radius:b.power});for(const c of this.bodies)if(!c.dead&&!seen.has(c.id)&&Math.hypot(c.x-b.x,c.y-b.y)<=b.power+c.r*.5)queue.push(c);}
+        if(b.bomb){if(this.chainColor!==null){this.anchor={x:b.x,y:b.y};this.bridge=b.power+63;}this.emit('bomb',{x:b.x,y:b.y,radius:b.power});for(const c of this.bodies)if(!c.dead&&!seen.has(c.id)&&Math.hypot(c.x-b.x,c.y-b.y)<=b.power+c.r*.5)queue.push(c);}
       }
     }
     pop(b){
@@ -121,8 +119,10 @@
       if(this.time-this.lastPop>.85&&this.combo){this.combo=0;this.feverCount=0;this.emit('combo-break');}
       this.bodies=this.bodies.map(b=>{
         if(!b.dead||this.time<b.refillAt)return b;
-        const bomb=this.bombsDue>0;if(bomb)this.bombsDue--;
-        return this.make(b.col,b.row,{bomb});
+        const bomb=!!b.rewardPower,power=b.rewardPower||82;
+        const next=this.make(b.col,b.row,{bomb,power});
+        if(bomb)this.emit('created',{x:next.x,y:next.y,power});
+        return next;
       });
     }
   }
@@ -138,12 +138,12 @@
   const palette=['#83f5cc','#c3a1ff','#ff9bbd','#ffe08e'],colorNames=['ミント','むらさき','ピンク','きいろ'];
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let sound=true;try{const s=JSON.parse(localStorage.getItem('chain-forge-v1'));if(s?.sound===false)sound=false;}catch{}
-  let world,worldHeight=500,pixelWidth=360,pixelHeight=500,scale=1,offsetX=0,offsetY=0,raf=0,last=0,now=0,hold=0,shake=0,shoutUntil=0;
-  let run,boardSeed=107,boardBest=0,scored=false,keyboardDrawing=false,keyboardAim=false,lastReal=0,lastSecond=10;
-  try{const b=JSON.parse(localStorage.getItem('chain-forge-rush10-v1'));if(Number.isInteger(b?.seed))boardSeed=b.seed;if(Number.isInteger(b?.best))boardBest=Math.max(0,b.best);}catch{}
+  let world,worldHeight=500,pixelWidth=360,pixelHeight=500,scale=1,offsetX=0,offsetY=0,raf=0,last=0,now=0,shake=0,shoutUntil=0;
+  let run,boardSeed=107,boardBest=0,scored=false,keyboardDrawing=false,keyboardAim=false,lastReal=0,lastSecond=15;
+  try{const b=JSON.parse(localStorage.getItem('chain-forge-rush15-v1'));if(Number.isInteger(b?.seed))boardSeed=b.seed;if(Number.isInteger(b?.best))boardBest=Math.max(0,b.best);}catch{}
   let pointer=null,aim={x:180,y:250,until:Infinity},strokes=[];
   let particles=[],rings=[],sparks=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
-  function persistBoard(){try{localStorage.setItem('chain-forge-rush10-v1',JSON.stringify({seed:boardSeed,best:boardBest}));}catch{}}
+  function persistBoard(){try{localStorage.setItem('chain-forge-rush15-v1',JSON.stringify({seed:boardSeed,best:boardBest}));}catch{}}
   const clock=()=>window.performance?.now?.()??Date.now();
   function advanceGame(time=clock()){
     if(run?.phase==='running')run.update(Math.max(0,(time-lastReal)/1000));lastReal=time;
@@ -154,38 +154,40 @@
     $('burst').hidden=run.phase!=='result';$('gesture-prompt').hidden=run.phase==='result';$('new-board').hidden=run.phase!=='result';
     $('combo').textContent=run.score.toLocaleString('ja-JP');
     if(run.phase==='running'){
-      $('gesture-prompt').textContent=run.chainColor===null?'同じ色を、なぞってつなごう':colorNames[run.chainColor]+' '+run.chainCount+' CHAIN'+(run.chainCount<3?' — あと'+(3-run.chainCount)+'体！':' — そのまま、つなげよう！');
+      $('gesture-prompt').textContent=run.chainColor===null?'同じ色を、なぞってつなごう':colorNames[run.chainColor]+' '+run.chainCount+' CHAIN — '+(7-run.chainCount%7)+'体で強ボム！';
       $('combo-caption').textContent=run.combo+' COMBO  ×'+run.multiplier+(run.fast?'  SPEED ×2':'')+(run.fever?'  FEVER ×2':'');
       $('arena').classList[run.fever?'add':'remove']('fever');
     }
   }
   function newWave(){
-    run=new RapidRun({seed:boardSeed});world=run;scored=false;keyboardDrawing=false;keyboardAim=false;lastReal=clock();lastSecond=10;persistBoard();
-    particles=[];rings=[];sparks=[];strokes=[];hold=0;shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
-    $('announcer').textContent='';$('board-name').textContent='10秒、消しまくれ！';$('combo').textContent='0';$('combo-caption').textContent='BEST '+boardBest.toLocaleString('ja-JP');
-    $('burst').textContent='もう一度、10秒！';$('gesture-prompt').textContent='なぞった瞬間、10秒スタート';$('instruction').textContent='同じ色を3体。その後はつなぐたび即消し！';$('arena').classList.remove('fever');$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
+    run=new RapidRun({seed:boardSeed});world=run;scored=false;keyboardDrawing=false;keyboardAim=false;lastReal=clock();lastSecond=15;persistBoard();
+    particles=[];rings=[];sparks=[];strokes=[];shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
+    $('announcer').textContent='';$('board-name').textContent='15秒、消しまくれ！';$('combo').textContent='0';$('combo-caption').textContent='BEST '+boardBest.toLocaleString('ja-JP');
+    $('burst').textContent='もう一度、15秒！';$('gesture-prompt').textContent='触れた瞬間、15秒スタート';$('instruction').textContent='同じ色をなぞって即消し。7つつなぐと強ボム！';$('arena').classList.remove('fever');$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
     ambient=Array.from({length:22},()=>({x:Math.random()*360,y:Math.random()*worldHeight,r:.5+Math.random()*1.3,phase:Math.random()*6.3}));renderRun();
+    if(!audio&&sound){if(window.requestIdleCallback)window.requestIdleCallback(()=>prepareAudio(),{timeout:300});else window.setTimeout?.(()=>prepareAudio(),0);}
   }
   function finishRun(){
     if(scored)return;scored=true;const record=run.score>boardBest;boardBest=Math.max(boardBest,run.score);persistBoard();
     $('combo-caption').textContent=(record?'NEW BEST! ':'BEST ')+boardBest.toLocaleString('ja-JP');
     $('instruction').textContent=run.popped+'体撃破 / 最大'+run.maxCombo+' COMBO';shout(record?'NEW RECORD!':'TIME UP!',true);
-    $('announcer').textContent='10秒終了。'+run.score+'点。ベスト'+boardBest+'点。';renderRun();
+    $('announcer').textContent='15秒終了。'+run.score+'点。ベスト'+boardBest+'点。';renderRun();
   }
   function resize(){
     const rect=canvas.getBoundingClientRect();pixelWidth=rect.width||360;pixelHeight=rect.height||500;worldHeight=500;
     const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(pixelWidth*dpr);canvas.height=Math.round(pixelHeight*dpr);scale=Math.min(canvas.width/360,canvas.height/500);offsetX=(canvas.width-360*scale)/2;offsetY=(canvas.height-500*scale)/2;
     if(world)cancelPointer({type:'pointercancel'});
   }
-  function initAudio(){
-    if(!sound)return;
+  function prepareAudio(force=false){
+    if(!sound||audio||(run?.phase==='running'&&force!==true))return;
     try{
-      if(!audio){
-        audio=new(window.AudioContext||window.webkitAudioContext)();const compressor=audio.createDynamicsCompressor();audioBus=audio.createGain();audioBus.gain.value=.65;audioBus.connect(compressor);compressor.connect(audio.destination);
-        noise=audio.createBuffer(1,Math.floor(audio.sampleRate*.22),audio.sampleRate);const data=noise.getChannelData(0);let value=0;for(let i=0;i<data.length;i++){value=(value+(Math.random()*2-1)*.12)/1.05;data[i]=value*3;}
-      }
-      if(audio.state==='suspended')audio.resume().catch(()=>{});
+      audio=new(window.AudioContext||window.webkitAudioContext)();const compressor=audio.createDynamicsCompressor();audioBus=audio.createGain();audioBus.gain.value=.65;audioBus.connect(compressor);compressor.connect(audio.destination);
+      noise=audio.createBuffer(1,Math.floor(audio.sampleRate*.22),audio.sampleRate);const data=noise.getChannelData(0);let value=0;for(let i=0;i<data.length;i++){value=(value+(Math.random()*2-1)*.12)/1.05;data[i]=value*3;}
     }catch{audio=null;}
+  }
+  function initAudio(){
+    if(!sound||!audio)return;
+    if(audio.state==='suspended')audio.resume().catch(()=>{});
   }
   function tone(freq,duration=.12,volume=.07,type='sine',delay=0){
     if(!sound||!audio)return;
@@ -204,7 +206,7 @@
     $('sound').innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11 4-5 4H3v8h3l5 4z"/>'+ (sound?'<path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>':'<path d="m16 9 6 6m0-6-6 6"/>')+'</svg>';
     $('sound').setAttribute('aria-label',sound?'音をオフにする':'音をオンにする');$('sound').setAttribute('aria-pressed',String(sound));
   }
-  $('sound').onclick=()=>{sound=!sound;renderSound();try{const s=JSON.parse(localStorage.getItem('chain-forge-v1'))||{};localStorage.setItem('chain-forge-v1',JSON.stringify({...s,sound}));}catch{}if(sound){initAudio();tone(660,.1);}else if(audio)audio.suspend().catch(()=>{});};
+  $('sound').onclick=()=>{sound=!sound;renderSound();try{const s=JSON.parse(localStorage.getItem('chain-forge-v1'))||{};localStorage.setItem('chain-forge-v1',JSON.stringify({...s,sound}));}catch{}if(sound){prepareAudio(true);initAudio();tone(660,.1);}else if(audio)audio.suspend().catch(()=>{});};
   function ring(x,y,r,color,life=.45,width=3){rings.push({x,y,r,color,life,max:life,width});}
   function bits(x,y,color,count,big=false){
     const n=motion?Math.min(3,count):count;
@@ -216,17 +218,18 @@
     if(particles.length>420)particles.splice(0,particles.length-420);
   }
   function shout(text,finished=false){
-    const el=$('shout');el.textContent=text;el.classList.remove('show','finished');if(finished)el.classList.add('finished');void el.offsetWidth;el.classList.add('show');shoutUntil=now+.85;
+    const el=$('shout');el.textContent=text;el.classList.remove('show','finished');if(finished)el.classList.add('finished');el.classList.add('show');shoutUntil=now+.85;
   }
   function handleEvents(){
     const events=world.drain();let hits=0;
     for(const e of events){
-      if(e.type==='begin'){shout('GO!');$('instruction').textContent='同じ色をつなごう。指を離すと別の色へ。金色はボム！';}
-      if(e.type==='connect'&&e.count<3){ring(e.x,e.y,24,palette[e.color],.16,2);popSound(e.count*2);}
+      if(e.type==='begin'){shout('GO!');$('instruction').textContent='同じ色をつなぐ。7つで強ボム！ 指を離すと別の色へ。';}
+      if(e.type==='bomb-earned'){shout(e.count+' CHAIN → POWER!');ring(e.x,e.y,48,'#ffe9a1',.25,3);}
+      if(e.type==='created'){ring(e.x,e.y,40,'#ffe9a1',.3,3);}
       if(e.type==='touch'){
         strokes.push({ax:e.fromX,ay:e.fromY,bx:e.x,by:e.y,r:e.radius,life:.14,max:.14});if(strokes.length>40)strokes.shift();
       }
-      if(e.type==='bomb'){ring(e.x,e.y,e.radius,'#ffe7a3',.4,5);boom(true);if(!motion)shake=Math.max(shake,3);}
+      if(e.type==='bomb'){ring(e.x,e.y,e.radius,'#ffe7a3',.4,e.radius>=112?8:5);if(e.radius>=112){ring(e.x,e.y,e.radius*.7,'#ffacdd',.3,4);shout('POWER BOMB!');}boom(true);if(!motion)shake=Math.max(shake,e.radius>=112?4.5:3);}
       if(e.type==='fever'){shout('F E V E R !');boom(true);}
       if(e.type==='pop'){
         const color=palette[e.color];bits(e.x,e.y,color,e.bomb?18:5,e.bomb);ring(e.x,e.y,e.reach,color,e.bomb?.4:.2,e.bomb?5:2);popSound(e.combo);hits++;
@@ -238,7 +241,7 @@
   }
   function react(){handleEvents();$('tap-hint').hidden=true;renderRun();}
   function startStroke(x,y){
-    advanceGame();if(!['ready','running'].includes(run.phase))return false;initAudio();if(!run.start(x,y))return false;aim={x,y,until:Infinity};react();return true;
+    advanceGame();if(!['ready','running'].includes(run.phase))return false;if(!run.start(x,y))return false;aim={x,y,until:Infinity};react();initAudio();return true;
   }
   function moveStroke(x,y){
     advanceGame();if(run.phase!=='running'||!run.active)return;run.move(x,y);aim={...run.last,until:Infinity};react();if(run.phase!=='running')cancelPointer();
@@ -272,7 +275,7 @@
   canvas.addEventListener('keyup',e=>{if(e.key===' '&&keyboardDrawing){e.preventDefault();cancelPointer();renderRun();}});
   $('burst').onclick=()=>{if(run.phase==='result')newWave();};
   $('new-board').onclick=async()=>{
-    const text='一筆で、大連鎖。10秒で '+run.score.toLocaleString('ja-JP')+'点！ 最大'+run.maxCombo+' COMBO https://meyonze.github.io/game/chain-forge-feel.html?v=9';
+    const text='一筆で、大連鎖。15秒で '+run.score.toLocaleString('ja-JP')+'点！ 最大'+run.maxCombo+' COMBO https://meyonze.github.io/game/chain-forge-feel.html?v=10';
     try{await navigator.clipboard.writeText(text);$('new-board').textContent='記録をコピーしました';}catch{$('announcer').textContent=text;$('instruction').textContent=text;}
   };
   function circle(x,y,r,fill){ctx.beginPath();ctx.arc(x,y,Math.max(.1,r),0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();}
@@ -281,7 +284,7 @@
     const hot=false;
     ctx.save();ctx.translate(b.x,b.y);ctx.rotate(motion?0:b.angle+wiggle);ctx.scale(birth,birth);
     if(b.bomb){
-      circle(0,0,r+3,'#f9cb78');circle(0,0,r,'#4c395f');ctx.fillStyle='#fff0ad';ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.fillText('ϟ',0,8);ctx.restore();return;
+      const power=b.power>=112;if(power){ctx.globalAlpha=.22;circle(0,0,r+9,'#ffce87');ctx.globalAlpha=1;}circle(0,0,r+(power?5:3),power?'#fff0ad':'#f9cb78');circle(0,0,r,power?'#8d476d':'#4c395f');ctx.fillStyle='#fff0ad';ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.fillText(power?'✦':'ϟ',0,8);ctx.restore();return;
     }
     // The silhouette squashes under impact; the face stays large enough to read.
     ctx.beginPath();ctx.moveTo(-r,-r*.08);ctx.bezierCurveTo(-r,-r*1.05,r*.5,-r*1.2,r*.92,-r*.15);ctx.bezierCurveTo(r*1.2,r*.8,r*.2,r*1.12,-r*.65,r*.75);ctx.bezierCurveTo(-r*.96,r*.6,-r*1.1,r*.38,-r,-r*.08);
@@ -317,10 +320,10 @@
     if(shake>.05&&!motion){ctx.translate(Math.sin(now*145)*shake,Math.cos(now*119)*shake*.6);shake*=Math.exp(-dt*17);}
     for(const a of ambient){ctx.globalAlpha=.12+Math.sin(now*.8+a.phase)*.08;circle(a.x,a.y,a.r,'#c6caff');}ctx.globalAlpha=1;
     for(const b of world.bodies)if(!b.dead){
-      const pending=run.pending.some(p=>p.id===b.id),matching=run.chainColor===null||b.color===run.chainColor||b.bomb;
+      const matching=run.chainColor===null||b.color===run.chainColor||b.bomb;
       ctx.globalAlpha=run.active&&!matching ? .45 : 1;jelly(b);ctx.globalAlpha=1;
-      if(run.active&&run.chainColor!==null&&matching&&(pending||run.anchor&&Math.hypot(b.x-run.anchor.x,b.y-run.anchor.y)<=run.bridge)){
-        ctx.strokeStyle=pending?'#fff4c0':palette[b.color];ctx.lineWidth=pending?3:1.5;ctx.beginPath();ctx.arc(b.x,b.y,b.r+3,0,Math.PI*2);ctx.stroke();
+      if(run.active&&run.chainColor!==null&&matching&&(run.anchor&&Math.hypot(b.x-run.anchor.x,b.y-run.anchor.y)<=run.bridge)){
+        ctx.strokeStyle=palette[b.color];ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(b.x,b.y,b.r+3,0,Math.PI*2);ctx.stroke();
       }
     }
     if(run.trace.length){ctx.save();ctx.strokeStyle=palette[run.chainColor];ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.globalAlpha=.75;ctx.beginPath();run.trace.slice(-8).forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.restore();}
