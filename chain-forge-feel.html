@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101527">
-<meta name="description" content="15秒のスコアアタック。指を離さず、同じ色を長くつないで高得点。金色ボムとフィーバーで高得点。">
-<meta name="chain-forge-version" content="16-restored-chain">
+<meta name="description" content="15秒のスコアアタック。指を離さず、同じ色を長くつないで高得点。横・縦・十字・同色全消しボムが誘爆。">
+<meta name="chain-forge-version" content="17-bomb-variety">
 <title>一筆で、大連鎖。 — 15秒ラッシュ</title>
 <style>
 :root{color-scheme:dark;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;color:#f7f2e5;background:#0c1020}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:radial-gradient(ellipse at 50% 30%,#292340,#0c1020 75%);-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #ffdb85;outline-offset:3px}[hidden]{display:none!important}.game{width:100%;max-width:480px;height:100vh;height:100dvh;margin:auto;padding:14px 16px max(12px,env(safe-area-inset-bottom));padding-top:max(14px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:12px;position:relative}.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}.brand{font:900 12px/1.1 Arial,sans-serif;letter-spacing:2px;color:#f8dfad;display:flex;align-items:center;gap:8px}.brand i{display:grid;place-items:center;width:24px;height:28px;border-radius:7px 7px 12px 12px;background:#ffd27a;color:#413049;font-style:normal;font-size:20px;box-shadow:0 2px 12px #ffc66b1c}.brand small{display:block;font:8px/1.4 monospace;letter-spacing:1.5px;color:#8e96b4;margin-top:3px}.top-tools{display:flex;align-items:center;gap:10px}.old-link{font-size:10px;color:#b8bbd0;text-decoration:none;padding:7px 2px}.sound{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;background:#1f263c;color:#e3d4b4}.sound svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.intro{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-shrink:0}.intro h1{font-size:21px;letter-spacing:1px;font-weight:800;margin:0}.intro span{font:9px monospace;color:#a4a2bf;letter-spacing:1px}.arena{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #535472;border-radius:24px;background:radial-gradient(ellipse at 50% 35%,#283350,#171e35 80%);box-shadow:inset 0 0 50px #090f2944,0 8px 35px #0002;isolation:isolate;transition:border-color .25s,box-shadow .25s}.arena:after{content:'';position:absolute;inset:0;border-radius:23px;box-shadow:inset 0 1px 0 #ffffff18;pointer-events:none;z-index:5}.arena.fever{border-color:#b383c6;box-shadow:0 0 24px #b059d622,inset 0 0 40px #71368918}.arena canvas{display:block;width:100%;height:100%;touch-action:none;outline-offset:-4px;cursor:crosshair}.combo-hud{position:absolute;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:3}.combo-line{display:flex;justify-content:center;align-items:baseline;gap:7px;height:62px}.combo-line b{font:italic 900 62px/.95 Arial,sans-serif;letter-spacing:-3px;color:#fff2c2;text-shadow:0 3px 0 #8c5149,0 0 20px #ffbd4b22;display:inline-block;min-width:42px}.combo-line span{font:italic 900 14px/1 Arial,sans-serif;letter-spacing:1px;color:#ffd589}.combo-hud p{font-size:10px;font-weight:700;letter-spacing:2px;color:#b8bdd4;margin:1px 0 0}.combo-line b.bump{animation:bump .10s ease-out}.tap-hint{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;text-align:center;white-space:nowrap;color:#fff2d5;text-shadow:0 2px 8px #161a32}.tap-hint .finger{position:relative;display:block;margin:0 auto 10px;width:48px;height:48px;border:2px solid #fff1b7;border-radius:50%;box-shadow:0 0 20px #ffd27555;animation:hint-ring 1.7s ease-in-out infinite}.tap-hint .finger:before{content:'';position:absolute;inset:12px;background:#ffe1a0;border-radius:50%;box-shadow:0 0 12px #ffc573}.tap-hint b{font-size:15px;font-weight:800;letter-spacing:2px}.tap-hint small{display:block;margin-top:6px;color:#d8d8e2;font-size:10px}.shout{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%) rotate(-7deg);pointer-events:none;z-index:4;opacity:0;white-space:nowrap;font:italic 900 clamp(28px,8vw,42px)/1 Arial,sans-serif;letter-spacing:-1px;color:#fff2c5;text-shadow:2px 3px #79405b,0 0 25px #ff8e9666}.shout.show{animation:shout .8s ease-out both}.shout.finished{font-family:'Yu Gothic',sans-serif;font-size:44px;letter-spacing:5px}.controls{flex-shrink:0;text-align:center;position:relative}.controls p{margin:0 0 9px;font-size:11px;letter-spacing:.5px;color:#c1c5d9;line-height:1.5}.burst-button{width:100%;height:56px;border:1px solid #ffe5a5;border-radius:17px;background:linear-gradient(115deg,#ffdc84,#ffb976);color:#523348;box-shadow:0 5px 0 #ac615c,0 0 24px #ffcd6014;display:flex;align-items:center;justify-content:center;gap:12px;font-size:21px;letter-spacing:3px;font-weight:900;position:relative;overflow:hidden}.burst-button:before{content:'';width:34px;height:34px;border:1px solid #7b435d55;border-radius:50%;background:radial-gradient(circle,#fff2bc 20%,#ffd78b 24%,transparent 28%);box-shadow:0 0 0 3px #ffffff2b}.burst-button:active{transform:translateY(3px);box-shadow:0 2px 0 #ac615c}.footnote{font-size:8px;letter-spacing:1px;margin:10px 0 0;color:#777e9b}.arena-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;color:#a3afc9;font-size:9px;letter-spacing:1px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@keyframes hint-ring{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.07);opacity:1}}@keyframes bump{0%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes shout{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4) rotate(-7deg)}18%,65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-7deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(.98) rotate(-7deg)}}
@@ -27,20 +27,21 @@
 
 .ink-track i{width:100%;transition:width .08s linear}.ink-track.low i{background:#ff7d7d}.ink-left{font-variant-numeric:tabular-nums}.combo-hud{top:6px}.combo-line b{font-size:42px;letter-spacing:-1px}.combo-line span{font-size:11px}.combo-hud p{font-size:8px;letter-spacing:.5px}.arena.fever{border-color:#ffd377;box-shadow:0 0 25px #ffb65b55,inset 0 0 55px #ac5f5c25}.intro span{min-width:47px;text-align:right}.shout.finished{font-size:29px;letter-spacing:0}.gesture-prompt{font-size:13px}.controls p{font-size:10px}
 @media(max-height:680px){.combo-line b{font-size:34px}.combo-hud p{font-size:7px}.gesture-prompt{font-size:11px}}
+.shout{font-size:clamp(18px,6vw,28px);max-width:calc(100% - 20px);text-align:center;letter-spacing:0}.arena-hint{letter-spacing:0;font-size:8px;background:#151d35cc;padding:3px 0}
 </style>
 </head>
 <body>
 <main class="game">
-  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>15 SECOND FLOW · 16</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge.html">配置モード</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
+  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>15 SECOND FLOW · 17</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge.html">配置モード</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
   <section class="intro"><h1 id="board-name">15秒、消しまくれ！</h1><span id="wave">15秒</span></section>
   <section class="arena" id="arena" aria-label="指で触れた場所から弾ける遊び場">
-    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。同じ色を7体つなぐと強力ボムが生まれます。別の色を2つ続けてなぞると、指を離さず色が切り替わります。最初のタッチから15秒の得点を競います。長い同色の接続ほど得点が伸びます。金色ボムに触れると大爆発。矢印で照準、Spaceを押しながら矢印でなぞる。離しても15秒の時計は続きます。"></canvas>
+    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。同じ色を7体つなぐたび、横・縦・同色全消し・十字の順でボムが生まれます。別の色を2つ続けてなぞると、指を離さず色が切り替わります。最初のタッチから15秒の得点を競います。長い同色の接続ほど得点が伸びます。矢印のボムは横か縦の一列、十字は縦横、二重丸はボムと同じ色を全消去。星は周囲を爆破。ボムに触れると起爆し、巻き込まれたボムも誘爆します。矢印で照準、Spaceを押しながら矢印でなぞる。離しても15秒の時計は続きます。"></canvas>
     <div class="combo-hud"><div class="combo-line"><b id="combo">0</b><span>PTS</span></div><p id="combo-caption">BEST 0</p></div>
-    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞって、消しまくれ</b><small>触れた瞬間から即消し。7つで強ボム！</small></div>
+    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞって、消しまくれ</b><small>触れた瞬間から即消し。7つでボム！</small></div>
     <div class="shout" id="shout" aria-hidden="true"></div>
-    <div class="arena-hint" id="arena-hint">別色2つで乗り換え · 同じ色7つで強ボム</div>
+    <div class="arena-hint" id="arena-hint">↔ 横一列　↕ 縦一列　✚ 十字　◎ ボムと同じ色を全消し</div>
   </section>
-  <section class="controls"><div class="ink-row"><span>残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">15.0秒</b></div><p id="instruction">長くつなぐほど高得点。別色2つで自動切替。</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">触れた瞬間、15秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、15秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
+  <section class="controls"><div class="ink-row"><span>残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">15.0秒</b></div><p id="instruction">7体つなぐとボム誕生。ボムは触れて起爆・誘爆！</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">触れた瞬間、15秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、15秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
 </main>
 <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
 <script>
@@ -51,20 +52,23 @@
   const position=(col,row)=>({x:29+col*37.75+(row%2?9.4:-9.4),y:86+row*35});
   function distance(b,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy,t=l?clamp(((b.x-ax)*dx+(b.y-ay)*dy)/l,0,1):0;return Math.hypot(b.x-ax-t*dx,b.y-ay-t*dy);}
   const chainValue=n=>n<3?n:5*n*(n-1)*(n-2);
+  const REWARDS=['row','column','color','cross'];
   class RapidRun{
     constructor({seed=107,duration=15}={}){
       this.seed=seed>>>0||1;this.initialSeed=this.seed;this.width=360;this.height=500;this.count=COLS*ROWS;this.duration=duration;this.time=0;this.remaining=duration;this.phase='ready';this.world=this;
       this.score=0;this.popped=0;this.combo=0;this.maxCombo=0;this.lastPop=-Infinity;this.feverUntil=0;this.feverProgress=0;this.active=false;this.events=[];this.nextId=0;this.bodies=[];this.fast=false;
-      this.chainColor=null;this.chainCount=0;this.anchor=null;this.trace=[];this.bridge=LINK;this.visited=new Set();this.pivot=null;
+      this.chainColor=null;this.chainCount=0;this.anchor=null;this.trace=[];this.bridge=LINK;this.visited=new Set();this.pivot=null;this.bombsEarned=0;
       for(let col=0;col<COLS;col++)for(let row=0;row<ROWS;row++)this.bodies.push(this.make(col,row,{spawnAt:-1}));
-      // A visible opening bomb teaches the only special target through touch.
+      // Specials are spread out; ordinary characters keep their independent random colors.
       Object.assign(this.bodies.find(b=>b.col===4&&b.row===5),{bomb:true,power:82});
+      for(const [col,row,kind] of [[1,3,'row'],[7,9,'column'],[1,10,'color']])Object.assign(this.bodies.find(b=>b.col===col&&b.row===row),{bomb:true,bombKind:kind});
     }
     random(){let n=this.seed;n^=n<<13;n^=n>>>17;n^=n<<5;this.seed=n>>>0;return this.seed/4294967296;}
     emit(type,data={}){this.events.push({type,...data});}
     drain(){const events=this.events;this.events=[];return events;}
     make(col,row,extra={}){const p=position(col,row);return{id:this.nextId++,col,row,...p,r:R,color:Math.floor(this.random()*4),angle:(this.random()-.5)*.15,bomb:false,power:82,dead:false,spawnAt:this.time,...extra};}
     get fever(){return this.time<this.feverUntil;}
+    get nextBombKind(){return REWARDS[this.bombsEarned%REWARDS.length];}
     get nextChainPoints(){return(chainValue(this.chainCount+1)-chainValue(this.chainCount))*(this.fever?2:1);}
     start(x,y){
       if(this.phase==='result'||![x,y].every(Number.isFinite)||x<0||x>360||y<50||y>500)return false;
@@ -119,14 +123,20 @@
       this.chainColor=b.color;this.anchor={x:b.x,y:b.y};this.bridge=LINK;this.pivot=null;this.visited.add(b.col+':'+b.row);
       this.trace.push({...this.anchor});if(this.trace.length>48)this.trace.shift();this.chainCount++;
       this.emit('connect',{x:b.x,y:b.y,color:b.color,count:this.chainCount});
-      if(this.chainCount%7===0){b.rewardPower=Math.min(152,112+(this.chainCount/7-1)*20);this.emit('bomb-earned',{x:b.x,y:b.y,power:b.rewardPower,count:this.chainCount});}
+      if(this.chainCount%7===0){b.rewardKind=this.nextBombKind;b.rewardColor=b.color;this.bombsEarned++;b.rewardPower=Math.min(152,112+(this.chainCount/7-1)*20);this.emit('bomb-earned',{x:b.x,y:b.y,kind:b.rewardKind,color:b.color,power:b.rewardPower,count:this.chainCount});}
       this.explode([b],b.id);
     }
     explode(hits,directId=null){
-      const queue=[...hits],seen=new Set();
+      const queue=[...hits],seen=new Set();let bombChain=0;
       for(let i=0;i<queue.length;i++){
         const b=queue[i];if(b.dead||seen.has(b.id))continue;seen.add(b.id);this.pop(b,b.id===directId);
-        if(b.bomb){if(this.chainColor!==null){this.anchor={x:b.x,y:b.y};this.bridge=b.power+63;}this.emit('bomb',{x:b.x,y:b.y,radius:b.power});for(const c of this.bodies)if(!c.dead&&!seen.has(c.id)&&Math.hypot(c.x-b.x,c.y-b.y)<=b.power+c.r*.5)queue.push(c);}
+        if(b.bomb){
+          const kind=b.bombKind||'area';
+          if(this.chainColor!==null&&kind==='area'){this.anchor={x:b.x,y:b.y};this.bridge=b.power+63;}
+          const targets=this.bodies.filter(c=>!c.dead&&!seen.has(c.id)&&(kind==='row'?c.row===b.row:kind==='column'?c.col===b.col:kind==='cross'?c.row===b.row||c.col===b.col:kind==='color'?c.color===b.color:Math.hypot(c.x-b.x,c.y-b.y)<=b.power+c.r*.5));
+          this.emit('bomb',{x:b.x,y:b.y,radius:b.power,kind,color:b.color,targets:targets.map(c=>({x:c.x,y:c.y})),chain:++bombChain});
+          queue.push(...targets);
+        }
       }
     }
     pop(b,direct=false){
@@ -150,8 +160,8 @@
       this.bodies=this.bodies.map(b=>{
         if(!b.dead||this.time<b.refillAt)return b;
         const bomb=!!b.rewardPower,power=b.rewardPower||82;
-        const next=this.make(b.col,b.row,{bomb,power});
-        if(bomb)this.emit('created',{x:next.x,y:next.y,power});
+        const next=this.make(b.col,b.row,{bomb,power,...(bomb?{bombKind:b.rewardKind,color:b.rewardColor}: {})});
+        if(bomb)this.emit('created',{x:next.x,y:next.y,power,kind:next.bombKind,color:next.color});
         return next;
       });
     }
@@ -166,13 +176,15 @@
   const $=id=>document.getElementById(id),canvas=$('field'),ctx=canvas.getContext('2d');
   const motion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
   const palette=['#83f5cc','#c3a1ff','#ff9bbd','#ffe08e'],colorNames=['ミント','むらさき','ピンク','きいろ'];
+  const bombNames={row:'横ライン',column:'縦ライン',cross:'十字',color:'同色全消し',area:'周囲爆発'};
+  const bombTint=(kind,color)=>kind==='color'?palette[color]:kind==='column'?'#a6caff':kind==='cross'?'#ffc2ec':'#ffe09a';
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let sound=true;try{const s=JSON.parse(localStorage.getItem('chain-forge-v1'));if(s?.sound===false)sound=false;}catch{}
   let world,worldHeight=500,pixelWidth=360,pixelHeight=500,scale=1,offsetX=0,offsetY=0,raf=0,last=0,now=0,shake=0,shoutUntil=0;
   let run,boardSeed=107,boardBest=0,scored=false,keyboardDrawing=false,keyboardAim=false,lastReal=0,lastSecond=15;
   try{const b=JSON.parse(localStorage.getItem('chain-forge-rush15-v2'));if(Number.isInteger(b?.seed))boardSeed=b.seed;if(Number.isInteger(b?.best))boardBest=Math.max(0,b.best);}catch{}
   let pointer=null,aim={x:180,y:250,until:Infinity},strokes=[];
-  let particles=[],rings=[],sparks=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
+  let particles=[],rings=[],sparks=[],beams=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
   function persistBoard(){try{localStorage.setItem('chain-forge-rush15-v2',JSON.stringify({seed:boardSeed,best:boardBest}));}catch{}}
   const clock=()=>window.performance?.now?.()??Date.now();
   function advanceGame(time=clock()){
@@ -184,16 +196,16 @@
     $('burst').hidden=run.phase!=='result';$('gesture-prompt').hidden=run.phase==='result';$('new-board').hidden=run.phase!=='result';
     $('combo').textContent=run.score.toLocaleString('ja-JP');
     if(run.phase==='running'){
-      $('gesture-prompt').textContent=run.pivot&&!run.pivot.dead?colorNames[run.pivot.color]+'をもう1体で乗り換え':run.chainColor===null?'同じ色を、なぞってつなごう':colorNames[run.chainColor]+' '+run.chainCount+' CHAIN — '+(7-run.chainCount%7)+'体で強ボム！';
+      $('gesture-prompt').textContent=run.pivot&&!run.pivot.dead?colorNames[run.pivot.color]+'をもう1体で乗り換え':run.chainColor===null?'同じ色を、なぞってつなごう':colorNames[run.chainColor]+' '+run.chainCount+' CHAIN · あと'+(7-run.chainCount%7)+'体で'+bombNames[run.nextBombKind];
       $('combo-caption').textContent=run.chainCount+' CHAIN · 次 +'+run.nextChainPoints.toLocaleString('ja-JP')+'点'+(run.fever?' · FEVER ×2':'');
       $('arena').classList[run.fever?'add':'remove']('fever');
     }
   }
   function newWave(){
     run=new RapidRun({seed:boardSeed});world=run;scored=false;keyboardDrawing=false;keyboardAim=false;lastReal=clock();lastSecond=15;persistBoard();
-    particles=[];rings=[];sparks=[];strokes=[];shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
+    particles=[];rings=[];sparks=[];beams=[];strokes=[];shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
     $('announcer').textContent='';$('board-name').textContent='15秒、消しまくれ！';$('combo').textContent='0';$('combo-caption').textContent='BEST '+boardBest.toLocaleString('ja-JP');
-    $('burst').textContent='もう一度、15秒！';$('gesture-prompt').textContent='触れた瞬間、15秒スタート';$('instruction').textContent='長くつなぐほど高得点。別色2つで自動切替。';$('arena').classList.remove('fever');$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
+    $('burst').textContent='もう一度、15秒！';$('gesture-prompt').textContent='触れた瞬間、15秒スタート';$('instruction').textContent='7体つなぐとボム誕生。ボムは触れて起爆・誘爆！';$('arena').classList.remove('fever');$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
     ambient=Array.from({length:22},()=>({x:Math.random()*360,y:Math.random()*worldHeight,r:.5+Math.random()*1.3,phase:Math.random()*6.3}));renderRun();
     if(!audio&&sound){if(window.requestIdleCallback)window.requestIdleCallback(()=>prepareAudio(),{timeout:300});else window.setTimeout?.(()=>prepareAudio(),0);}
   }
@@ -250,19 +262,36 @@
   function shout(text,finished=false){
     const el=$('shout');el.textContent=text;el.classList.remove('show','finished');if(finished)el.classList.add('finished');el.classList.add('show');shoutUntil=now+.85;
   }
+  function beam(ax,ay,bx,by,color,width=26){beams.push({ax,ay,bx,by,color,width,life:.38,max:.38});if(beams.length>100)beams.shift();}
+  function bombEffect(e){
+    const tint=bombTint(e.kind,e.color);
+    if(e.kind==='row'||e.kind==='cross')beam(0,e.y,360,e.y,tint,32);
+    if(e.kind==='column'||e.kind==='cross')beam(e.x,70,e.x,500,tint,32);
+    if(e.kind==='row'||e.kind==='column'||e.kind==='cross'){tone(440,.13,.08,'sawtooth');tone(e.kind==='cross'?1320:880,.12,.05,'triangle',.035);}
+    if(e.kind==='color'){
+      for(const p of e.targets)beam(e.x,e.y,p.x,p.y,tint,5);
+      ring(e.x,e.y,190,tint,.48,9);
+      tone(880,.18,.08,'triangle');tone(1320,.18,.05,'sine',.045);
+    }
+    if(e.kind==='area'){ring(e.x,e.y,e.radius,'#ffe7a3',.4,e.radius>=112?8:5);if(e.radius>=112)ring(e.x,e.y,e.radius*.7,'#ffacdd',.3,4);}
+    else ring(e.x,e.y,55,tint,.28,6);
+    bits(e.x,e.y,tint,20,true);
+    shout((e.kind==='area'?'POWER BOMB!':e.kind==='color'?colorNames[e.color]+' 全消し！':bombNames[e.kind]+'！')+(e.chain>1?' '+e.chain+'連爆':''));
+    boom(true);if(!motion)shake=Math.max(shake,Math.min(5,3+e.chain*.5));
+  }
   function handleEvents(){
     const events=world.drain();let hits=0;
     for(const e of events){
-      if(e.type==='begin'){shout('GO!');$('instruction').textContent='指を離さず次の色へ。同色を長くつないで強ボム！';}
-      if(e.type==='bomb-earned'){shout(e.count+' CHAIN → POWER!');ring(e.x,e.y,48,'#ffe9a1',.25,3);}
-      if(e.type==='created'){ring(e.x,e.y,40,'#ffe9a1',.3,3);}
+      if(e.type==='begin'){shout('GO!');$('instruction').textContent='同色を長く。別色2つで乗り換え。ボムは触れて起爆！';}
+      if(e.type==='bomb-earned'){shout(e.count+' CHAIN → '+bombNames[e.kind]+'！');ring(e.x,e.y,48,bombTint(e.kind,e.color),.25,3);}
+      if(e.type==='created'){ring(e.x,e.y,40,bombTint(e.kind,e.color),.3,3);}
       if(e.type==='touch'){
         strokes.push({ax:e.fromX,ay:e.fromY,bx:e.x,by:e.y,r:e.radius,life:.14,max:.14});if(strokes.length>40)strokes.shift();
       }
-      if(e.type==='bomb'){ring(e.x,e.y,e.radius,'#ffe7a3',.4,e.radius>=112?8:5);if(e.radius>=112){ring(e.x,e.y,e.radius*.7,'#ffacdd',.3,4);shout('POWER BOMB!');}boom(true);if(!motion)shake=Math.max(shake,e.radius>=112?4.5:3);}
+      if(e.type==='bomb')bombEffect(e);
       if(e.type==='fever'){shout('F E V E R !');boom(true);}
       if(e.type==='pop'){
-        const color=palette[e.color];bits(e.x,e.y,color,e.bomb?18:5,e.bomb);ring(e.x,e.y,e.reach,color,e.bomb?.4:.2,e.bomb?5:2);popSound(e.combo);hits++;
+        const color=palette[e.color];if(!e.bomb){bits(e.x,e.y,color,5);ring(e.x,e.y,e.reach,color,.2,2);}popSound(e.combo);hits++;
         if(!motion)shake=Math.max(shake,e.fast?1.5:.6);
       }
       if(e.type==='finish'){cancelPointer();finishRun();}
@@ -305,7 +334,7 @@
   canvas.addEventListener('keyup',e=>{if(e.key===' '&&keyboardDrawing){e.preventDefault();cancelPointer();renderRun();}});
   $('burst').onclick=()=>{if(run.phase==='result')newWave();};
   $('new-board').onclick=async()=>{
-    const text='一筆で、大連鎖。15秒で '+run.score.toLocaleString('ja-JP')+'点！ 最大'+run.maxCombo+' CHAIN https://meyonze.github.io/game/chain-forge-feel.html?v=16';
+    const text='一筆で、大連鎖。15秒で '+run.score.toLocaleString('ja-JP')+'点！ 最大'+run.maxCombo+' CHAIN https://meyonze.github.io/game/chain-forge-feel.html?v=17';
     try{await navigator.clipboard.writeText(text);$('new-board').textContent='記録をコピーしました';}catch{$('announcer').textContent=text;$('instruction').textContent=text;}
   };
   function circle(x,y,r,fill){ctx.beginPath();ctx.arc(x,y,Math.max(.1,r),0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();}
@@ -314,7 +343,14 @@
     const hot=false;
     ctx.save();ctx.translate(b.x,b.y);ctx.rotate(motion?0:b.angle+wiggle);ctx.scale(birth,birth);
     if(b.bomb){
-      const power=b.power>=112;if(power){ctx.globalAlpha=.22;circle(0,0,r+9,'#ffce87');ctx.globalAlpha=1;}circle(0,0,r+(power?5:3),power?'#fff0ad':'#f9cb78');circle(0,0,r,power?'#8d476d':'#4c395f');ctx.fillStyle='#fff0ad';ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.fillText(power?'✦':'ϟ',0,8);ctx.restore();return;
+      const kind=b.bombKind||'area',tint=bombTint(kind,b.color);
+      ctx.globalAlpha=.16;circle(0,0,r+7,tint);ctx.globalAlpha=1;circle(0,0,r+3,tint);circle(0,0,r,kind==='color'?palette[b.color]:'#343253');
+      ctx.strokeStyle=kind==='color'?'#343253':tint;ctx.lineWidth=3.5;ctx.lineCap='round';
+      const arrow=(vertical)=>{ctx.save();if(vertical)ctx.rotate(Math.PI/2);ctx.beginPath();ctx.moveTo(-11,0);ctx.lineTo(11,0);ctx.moveTo(-6,-5);ctx.lineTo(-11,0);ctx.lineTo(-6,5);ctx.moveTo(6,-5);ctx.lineTo(11,0);ctx.lineTo(6,5);ctx.stroke();ctx.restore();};
+      if(kind==='row'||kind==='cross')arrow(false);if(kind==='column'||kind==='cross')arrow(true);
+      if(kind==='color'){ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.stroke();circle(0,0,4,'#343253');}
+      if(kind==='area'){ctx.fillStyle=tint;ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.fillText('✦',0,8);}
+      ctx.restore();return;
     }
     // The silhouette squashes under impact; the face stays large enough to read.
     ctx.beginPath();ctx.moveTo(-r,-r*.08);ctx.bezierCurveTo(-r,-r*1.05,r*.5,-r*1.2,r*.92,-r*.15);ctx.bezierCurveTo(r*1.2,r*.8,r*.2,r*1.12,-r*.65,r*.75);ctx.bezierCurveTo(-r*.96,r*.6,-r*1.1,r*.38,-r,-r*.08);
@@ -328,6 +364,11 @@
     ctx.restore();
   }
   function drawEffects(dt){
+    for(const b of beams){
+      b.life-=dt;if(b.life<=0)continue;const t=1-b.life/b.max;
+      ctx.globalAlpha=(1-t)*(motion?.35:.65);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(b.ax,b.ay);ctx.lineTo(b.bx,b.by);ctx.lineWidth=b.width*(1-t*.8);ctx.strokeStyle=b.color;ctx.stroke();
+      ctx.globalAlpha=(1-t)*.85;ctx.lineWidth=Math.max(1,b.width*.24*(1-t));ctx.strokeStyle='#fff9e9';ctx.stroke();
+    }beams=beams.filter(b=>b.life>0);ctx.globalAlpha=1;
     for(const s of strokes){s.life-=dt;if(s.life<=0)continue;ctx.globalAlpha=s.life/s.max*.12;ctx.beginPath();ctx.moveTo(s.ax,s.ay);ctx.lineTo(s.bx,s.by);ctx.lineWidth=s.r*2;ctx.lineCap='round';ctx.strokeStyle='#ffe4a1';ctx.stroke();}strokes=strokes.filter(s=>s.life>0);ctx.globalAlpha=1;
     for(const p of particles){
       p.life-=dt;if(p.life<=0)continue;const t=1-p.life/p.max;ctx.globalAlpha=Math.min(1,p.life*5);
