@@ -1,8 +1,8 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 const root=path.join(__dirname,'..');
-module.exports=function boot({width=362,height=480,reduced=false,realCanvas=false,noStorage=false}={}){
+module.exports=function boot({width=362,height=480,reduced=false,realCanvas=false,noStorage=false,initialStorage=[]}={}){
   let clock=0,serial=1,depth=0,run=null,ctxCalls=0;
-  const frames=new Map(),intervals=new Map(),docEvents={},windowEvents={},viewportEvents={},elements=new Map(),storage=new Map(),audio=[];
+  const frames=new Map(),intervals=new Map(),docEvents={},windowEvents={},viewportEvents={},elements=new Map(),storage=new Map(initialStorage),audio=[];
   const nativeCanvas=realCanvas?require('@napi-rs/canvas').createCanvas(362,480):null;
   const state={globalAlpha:1},stack=[];
   const nativeCtx=nativeCanvas?.getContext('2d');
