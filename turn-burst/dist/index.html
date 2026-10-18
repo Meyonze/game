@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080e1c">
+  <meta name="description" content="考える間、世界は止まる。移動の一手で群れを吹き飛ばす、時間制限なしのターン制サバイバー。">
+  <title>TURN BURST — 一手で、殲滅。</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="game">
+  <header class="topbar">
+    <a class="back" href="./index.html" aria-label="ゲーム一覧">‹</a>
+    <div class="wordmark">TURN<span>BURST</span><i>01</i></div>
+    <button id="sound" class="icon-button" aria-label="サウンドを切り替え" aria-pressed="true">♪</button>
+    <button id="help" class="icon-button" aria-label="遊び方と装備を見る">?</button>
+  </header>
+  <section class="hud" aria-label="プレイ状況">
+    <div class="health-group"><div class="eyebrow">ARMOR <span id="hp-number">8 / 8</span></div><div id="health" class="health"></div></div>
+    <div class="score-group"><div class="eyebrow">SCORE</div><div id="score">0</div></div>
+  </section>
+  <section class="arena-shell">
+    <div class="stagebar"><span id="sector">01 <b>接敵</b></span><span id="turn">TURN 00</span><span id="clock-state" class="stopped"><i></i> TIME STOPPED</span></div>
+    <div class="arena" id="arena">
+      <canvas id="board" aria-label="戦場。隣のマスをタップして移動と攻撃。キーボードは矢印キー・QWEASDZXC。" tabindex="0"></canvas>
+      <div id="combo" aria-hidden="true"></div>
+      <div id="sector-banner" aria-hidden="true"></div>
+      <div id="boss-health" class="boss-health" hidden><div><span>THE HOLLOW KING</span><b id="boss-hp"></b></div><div class="boss-track"><i id="boss-fill"></i></div></div>
+    </div>
+  </section>
+  <section class="bottom-panel">
+    <div class="xp-row"><span id="level">CORE 01</span><div class="xp-track"><i id="xp"></i></div><span id="next-upgrade">あと6撃破で強化</span></div>
+    <div id="hint" class="hint" role="status">隣のマスをタップして、移動＋攻撃</div>
+    <div id="legend" class="legend"><span><i class="safe-dot"></i> 白枠＝移動先</span><span><i class="danger-dot"></i> 赤＝敵の次の攻撃</span></div>
+    <div id="loadout" class="loadout" aria-label="装備一覧"></div>
+  </section>
+  <div id="start-screen" class="screen title-screen">
+    <div class="title-copy">
+      <div class="pill">時間制限なし / 一手ずつ進むサバイバー</div>
+      <h1>止めて、狙って。<br>一手で、<em>殲滅。</em></h1>
+      <p class="lead">移動が、攻撃になる。<br>群れに飛び込み、自分だけの連鎖を育てよう。</p>
+    </div>
+    <div class="title-bottom">
+      <div class="instructions">
+        <div><span>01</span><p><b>隣のマスをタップ</b><small>移動した方向へ貫通射撃。周りにも衝撃波。</small></p></div>
+        <div><span>02</span><p><b>撃破して、武器を強化</b><small>連鎖爆発・分裂射撃・雷を組み合わせる。</small></p></div>
+        <div><span>03</span><p><b>赤い攻撃予告をかわす</b><small>考えている間は、敵も弾も動かない。</small></p></div>
+      </div>
+      <button id="start" class="primary-button">出撃する <span>↗</span></button>
+      <div class="title-foot">3エリア ＋ ボス戦 <span>音あり推奨 · 片手で遊べます</span></div>
+    </div>
+  </div>
+  <div id="upgrade-screen" class="screen modal-screen" hidden>
+    <div class="modal-content">
+      <div class="eyebrow accent">CORE UPGRADE <span id="upgrade-level"></span></div>
+      <h2>次の一手を、<br>もっと強く。</h2>
+      <p class="modal-sub">1つ選んで装備。すべての攻撃が毎回、自動で発動。</p>
+      <div id="choices"></div>
+      <div class="modal-foot">考える時間は、いくらでも。</div>
+    </div>
+  </div>
+  <div id="result-screen" class="screen modal-screen" hidden>
+    <div class="modal-content result-content">
+      <div id="result-tag" class="eyebrow accent"></div>
+      <h2 id="result-title"></h2>
+      <p id="result-copy" class="modal-sub"></p>
+      <div class="result-score" id="result-score"></div><div class="eyebrow">TOTAL SCORE</div>
+      <div class="result-stats"><div><b id="result-turn"></b><span>手数</span></div><div><b id="result-kills"></b><span>総撃破</span></div><div><b id="result-combo"></b><span>最大同時撃破</span></div></div>
+      <div id="result-build" class="result-build"></div>
+      <button id="retry" class="primary-button">別のビルドでもう一度 <span>↗</span></button>
+      <div id="best" class="modal-foot"></div>
+    </div>
+  </div>
+  <div id="help-screen" class="screen modal-screen" hidden>
+    <div class="modal-content help-content">
+      <div class="eyebrow accent">FIELD MANUAL</div><h2>一手の読み方。</h2>
+      <div class="manual-entry"><b>隣へ動く → 武器が全部発動 → 敵の番</b><p>上下左右・斜めの8方向へ移動できます。自分をタップすると、その場で向いている方向へ攻撃します。</p></div>
+      <div class="manual-entry"><b>長押しして、離す前に確認</b><p>移動先を押すと攻撃範囲・撃破数・受けるダメージが見えます。指を外へずらすとキャンセルできます。</p></div>
+      <div class="manual-entry"><b>赤い予告の敵を、先に倒してもOK</b><p>生き残った敵だけが予告どおりに攻撃します。緑の救急箱は踏むとHPが3回復。18手後にボスが出現します。</p></div>
+      <div id="equipment-help"></div>
+      <button id="close-help" class="primary-button">戦場に戻る <span>↗</span></button>
+    </div>
+  </div>
+</main>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
