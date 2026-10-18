@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101527">
-<meta name="description" content="同色をつなぐほど得点が跳ね上がる、3色なぞりラッシュ。10秒・30秒・1分・100万点タイムアタック。標準30秒。">
-<meta name="chain-forge-version" content="rift-5-flow-modes">
+<meta name="description" content="同色をつなぐほど得点が跳ね上がる、3色なぞりラッシュ。10秒・30秒・1分・1000万点タイムアタック。標準30秒。">
+<meta name="chain-forge-version" content="rift-6-target-balance">
 <title>一筆で、大連鎖。 — なぞりラッシュ</title>
 <style>
 :root{color-scheme:dark;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;color:#f7f2e5;background:#0c1020}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:radial-gradient(ellipse at 50% 30%,#292340,#0c1020 75%);-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #ffdb85;outline-offset:3px}[hidden]{display:none!important}.game{width:100%;max-width:480px;height:100vh;height:100dvh;margin:auto;padding:14px 16px max(12px,env(safe-area-inset-bottom));padding-top:max(14px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:12px;position:relative}.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}.brand{font:900 12px/1.1 Arial,sans-serif;letter-spacing:2px;color:#f8dfad;display:flex;align-items:center;gap:8px}.brand i{display:grid;place-items:center;width:24px;height:28px;border-radius:7px 7px 12px 12px;background:#ffd27a;color:#413049;font-style:normal;font-size:20px;box-shadow:0 2px 12px #ffc66b1c}.brand small{display:block;font:8px/1.4 monospace;letter-spacing:1.5px;color:#8e96b4;margin-top:3px}.top-tools{display:flex;align-items:center;gap:10px}.old-link{font-size:10px;color:#b8bbd0;text-decoration:none;padding:7px 2px}.sound{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;background:#1f263c;color:#e3d4b4}.sound svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.intro{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-shrink:0}.intro h1{font-size:21px;letter-spacing:1px;font-weight:800;margin:0}.intro span{font:9px monospace;color:#a4a2bf;letter-spacing:1px}.arena{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #535472;border-radius:24px;background:radial-gradient(ellipse at 50% 35%,#283350,#171e35 80%);box-shadow:inset 0 0 50px #090f2944,0 8px 35px #0002;isolation:isolate;transition:border-color .25s,box-shadow .25s}.arena:after{content:'';position:absolute;inset:0;border-radius:23px;box-shadow:inset 0 1px 0 #ffffff18;pointer-events:none;z-index:5}.arena.fever{border-color:#b383c6;box-shadow:0 0 24px #b059d622,inset 0 0 40px #71368918}.arena canvas{display:block;width:100%;height:100%;touch-action:none;outline-offset:-4px;cursor:crosshair}.combo-hud{position:absolute;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:3}.combo-line{display:flex;justify-content:center;align-items:baseline;gap:7px;height:62px}.combo-line b{font:italic 900 62px/.95 Arial,sans-serif;letter-spacing:-3px;color:#fff2c2;text-shadow:0 3px 0 #8c5149,0 0 20px #ffbd4b22;display:inline-block;min-width:42px}.combo-line span{font:italic 900 14px/1 Arial,sans-serif;letter-spacing:1px;color:#ffd589}.combo-hud p{font-size:10px;font-weight:700;letter-spacing:2px;color:#b8bdd4;margin:1px 0 0}.combo-line b.bump{animation:bump .10s ease-out}.tap-hint{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;text-align:center;white-space:nowrap;color:#fff2d5;text-shadow:0 2px 8px #161a32}.tap-hint .finger{position:relative;display:block;margin:0 auto 10px;width:48px;height:48px;border:2px solid #fff1b7;border-radius:50%;box-shadow:0 0 20px #ffd27555;animation:hint-ring 1.7s ease-in-out infinite}.tap-hint .finger:before{content:'';position:absolute;inset:12px;background:#ffe1a0;border-radius:50%;box-shadow:0 0 12px #ffc573}.tap-hint b{font-size:15px;font-weight:800;letter-spacing:2px}.tap-hint small{display:block;margin-top:6px;color:#d8d8e2;font-size:10px}.shout{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%) rotate(-7deg);pointer-events:none;z-index:4;opacity:0;white-space:nowrap;font:italic 900 clamp(28px,8vw,42px)/1 Arial,sans-serif;letter-spacing:-1px;color:#fff2c5;text-shadow:2px 3px #79405b,0 0 25px #ff8e9666}.shout.show{animation:shout .8s ease-out both}.shout.finished{font-family:'Yu Gothic',sans-serif;font-size:44px;letter-spacing:5px}.controls{flex-shrink:0;text-align:center;position:relative}.controls p{margin:0 0 9px;font-size:11px;letter-spacing:.5px;color:#c1c5d9;line-height:1.5}.burst-button{width:100%;height:56px;border:1px solid #ffe5a5;border-radius:17px;background:linear-gradient(115deg,#ffdc84,#ffb976);color:#523348;box-shadow:0 5px 0 #ac615c,0 0 24px #ffcd6014;display:flex;align-items:center;justify-content:center;gap:12px;font-size:21px;letter-spacing:3px;font-weight:900;position:relative;overflow:hidden}.burst-button:before{content:'';width:34px;height:34px;border:1px solid #7b435d55;border-radius:50%;background:radial-gradient(circle,#fff2bc 20%,#ffd78b 24%,transparent 28%);box-shadow:0 0 0 3px #ffffff2b}.burst-button:active{transform:translateY(3px);box-shadow:0 2px 0 #ac615c}.footnote{font-size:8px;letter-spacing:1px;margin:10px 0 0;color:#777e9b}.arena-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;color:#a3afc9;font-size:9px;letter-spacing:1px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@keyframes hint-ring{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.07);opacity:1}}@keyframes bump{0%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes shout{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4) rotate(-7deg)}18%,65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-7deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(.98) rotate(-7deg)}}
@@ -36,13 +36,13 @@
   <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>4 MODES · CHAIN RUSH</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge-feel.html?v=19">通常のなぞり版</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
   <section class="intro"><h1 id="board-name">30秒、消しまくれ！</h1><span id="wave">30秒</span></section>
   <section class="arena" id="arena" aria-label="指で触れた場所から弾ける遊び場">
-    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。同じ色を7体つなぐたび、周囲爆発・同色全消しの順でボムが生まれます。得点は7連鎖で2倍、10で4倍、13で8倍と大きく増えます。他の色には貫通できません。他色に触れても今の色と連鎖数は維持され、同色へ戻ると続きをつなげます。指を離すと別の色を選べます。10秒・30秒・1分は得点を競い、100万点は到達時間を競います。標準は30秒です。消した跡を戻ると、その場所から同色の別ルートへ連鎖を続けられます。長い同色の接続ほど得点が伸びます。二重丸はボムと同じ色を全消去。星は周囲を爆破。ボムに触れると起爆し、巻き込まれたボムも誘爆します。矢印で照準、Spaceを押しながら矢印でなぞる。離しても30秒の時計は続きます。"></canvas>
+    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。同じ色を7体つなぐたび、周囲爆発・同色全消しの順でボムが生まれます。得点は7連鎖で2倍、10で4倍、13で8倍と大きく増えます。他の色には貫通できません。他色に触れても今の色と連鎖数は維持され、同色へ戻ると続きをつなげます。指を離すと別の色を選べます。10秒・30秒・1分は得点を競い、1000万点は到達時間を競います。標準は30秒です。消した跡を戻ると、その場所から同色の別ルートへ連鎖を続けられます。長い同色の接続ほど得点が伸びます。二重丸はボムと同じ色を全消去。星は周囲を爆破。ボムに触れると起爆し、巻き込まれたボムも誘爆します。矢印で照準、Spaceを押しながら矢印でなぞる。離しても30秒の時計は続きます。"></canvas>
     <div class="combo-hud"><div class="combo-line"><b id="combo">0</b><span>PTS</span></div><p id="combo-caption">BEST 0</p></div>
     <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞって、消しまくれ</b><small>触れた瞬間から即消し。7つでボム！</small></div>
     <div class="shout" id="shout" aria-hidden="true"></div>
     <div class="arena-hint" id="arena-hint">消した跡へ戻って、別の方向にもつなげる</div>
   </section>
-  <section class="controls"><div class="mode-picker" role="group" aria-label="ゲームモード"><button id="mode-10" aria-pressed="false">10秒</button><button id="mode-30" aria-pressed="true">30秒</button><button id="mode-60" aria-pressed="false">1分</button><button id="mode-million" aria-pressed="false">100万点</button></div><div class="ink-row"><span id="clock-label">残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">30.0秒</b></div><p id="instruction">7連鎖から得点×2。10で×4、13で×8！</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">触れた瞬間、30秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、30秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
+  <section class="controls"><div class="mode-picker" role="group" aria-label="ゲームモード"><button id="mode-10" aria-pressed="false">10秒</button><button id="mode-30" aria-pressed="true">30秒</button><button id="mode-60" aria-pressed="false">1分</button><button id="mode-million" aria-pressed="false">1000万点</button></div><div class="ink-row"><span id="clock-label">残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">30.0秒</b></div><p id="instruction">7連鎖から得点×2。10で×4、13で×8！</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">触れた瞬間、30秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、30秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
 </main>
 <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
 <script>
@@ -185,13 +185,14 @@
 (function(root){
   'use strict';
   const key=(col,row)=>col+':'+row;
+  const RACE_TARGET=10000000;
   const multiplier=n=>Math.pow(2,Math.min(8,Math.max(0,Math.floor((n-4)/3))));
   const chainTotal=n=>(n<3?n:5*n*(n-1)*(n-2))*multiplier(n);
   function segmentDistance(b,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy,t=l?Math.max(0,Math.min(1,((b.x-ax)*dx+(b.y-ay)*dy)/l)):0;return Math.hypot(b.x-ax-t*dx,b.y-ay-t*dy);}
   class RiftRun extends root.RapidRun{
     constructor({mode='30',...options}={}){
       if(!['10','30','60','million'].includes(String(mode)))mode='30';mode=String(mode);
-      super({duration:mode==='million'?Infinity:Number(mode),...options});this.mode=mode;this.targetScore=mode==='million'?1000000:null;
+      super({duration:mode==='million'?Infinity:Number(mode),...options});this.mode=mode;this.targetScore=mode==='million'?RACE_TARGET:null;
       this.routeNodes=new Map();
       // Keep the two bomb types that do not erase rows or columns.
       for(const b of this.bodies)if(['row','column','cross'].includes(b.bombKind)){b.bomb=false;delete b.bombKind;}
@@ -260,7 +261,7 @@
     update(dt){super.update(dt);this.checkGoal();}
 
   }
-  root.RiftRun=RiftRun;
+  RiftRun.RACE_TARGET=RACE_TARGET;root.RiftRun=RiftRun;
 })(typeof globalThis!=='undefined'?globalThis:window);
 
 </script>
@@ -273,11 +274,12 @@
   const bombNames={color:'同色全消し',area:'周囲爆発'};
   const bombTint=(kind,color)=>kind==='color'?palette[color]:'#ffe09a';
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const targetScore=RiftRun.RACE_TARGET,targetLabel=(targetScore/10000)+'万点';
   const modes={
     '10':{label:'10秒',duration:10,storage:'chain-forge-rift-bonus10-v2'},
     '30':{label:'30秒',duration:30,storage:'chain-forge-rift-bonus30-v2'},
     '60':{label:'1分',duration:60,storage:'chain-forge-rift-bonus60-v2'},
-    million:{label:'100万点',duration:0,storage:'chain-forge-rift-million-v1'}
+    million:{label:targetLabel,duration:0,storage:'chain-forge-rift-target-'+targetScore+'-v1'}
   };
   let mode='30';
   const bestLabel=()=>mode==='million'?(boardBest===null?'—':(boardBest/1000).toFixed(2)+'秒'):boardBest.toLocaleString('ja-JP');
@@ -297,7 +299,7 @@
     if(run?.phase==='running')run.update(Math.max(0,(time-lastReal)/1000));lastReal=time;
   }
   function renderRun(){
-    const race=mode==='million',percent=race?Math.min(100,run.score/10000):Math.max(0,run.remaining/run.duration*100);$('ink-fill').style.width=percent+'%';$('ink-left').textContent=(race?run.time.toFixed(2):run.remaining.toFixed(1))+'秒';$('ink-track').setAttribute('aria-valuenow',String(Math.round(percent)));
+    const race=mode==='million',percent=race?Math.min(100,run.score/targetScore*100):Math.max(0,run.remaining/run.duration*100);$('ink-fill').style.width=percent+'%';$('ink-left').textContent=(race?run.time.toFixed(2):run.remaining.toFixed(1))+'秒';$('ink-track').setAttribute('aria-valuenow',String(Math.round(percent)));
     $('ink-track').classList[!race&&run.remaining<=5?'add':'remove']('low');$('wave').textContent=run.phase==='result'?(race?'GOAL!':'TIME UP'):race?run.time.toFixed(2)+'秒':Math.ceil(run.remaining)+'秒';
     for(const id of Object.keys(modes)){$('mode-'+id).setAttribute('aria-pressed',String(id===mode));}
     $('burst').hidden=run.phase!=='result';$('gesture-prompt').hidden=run.phase==='result';$('new-board').hidden=run.phase!=='result';
@@ -312,8 +314,8 @@
   function newWave(){
     run=new RiftRun({seed:boardSeed,mode});world=run;scored=false;keyboardDrawing=false;keyboardAim=false;lastReal=clock();lastSecond=modes[mode].duration;persistBoard();
     particles=[];rings=[];sparks=[];beams=[];bursts=[];labels=[];strokes=[];shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
-    $('announcer').textContent='';$('board-name').textContent=mode==='million'?'100万点、最速で！':modes[mode].label+'、消しまくれ！';$('combo').textContent='0';$('combo-caption').textContent='BEST '+bestLabel();
-    $('burst').textContent='もう一度、'+modes[mode].label+'！';$('gesture-prompt').textContent=mode==='million'?'触れた瞬間、計測スタート':'触れた瞬間、'+modes[mode].label+'スタート';$('clock-label').textContent=mode==='million'?'経過時間':'残り時間';$('ink-track').setAttribute('aria-label',mode==='million'?'100万点までの進捗':'残り時間の割合');$('instruction').textContent='7連鎖から得点×2。10で×4、13で×8！';$('arena').classList.remove('fever');$('arena-hint').textContent='消した跡へ戻って、別の方向にもつなげる';$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
+    $('announcer').textContent='';$('board-name').textContent=mode==='million'?targetLabel+'、最速で！':modes[mode].label+'、消しまくれ！';$('combo').textContent='0';$('combo-caption').textContent='BEST '+bestLabel();
+    $('burst').textContent='もう一度、'+modes[mode].label+'！';$('gesture-prompt').textContent=mode==='million'?'触れた瞬間、計測スタート':'触れた瞬間、'+modes[mode].label+'スタート';$('clock-label').textContent=mode==='million'?'経過時間':'残り時間';$('ink-track').setAttribute('aria-label',mode==='million'?targetLabel+'までの進捗':'残り時間の割合');$('instruction').textContent='7連鎖から得点×2。10で×4、13で×8！';$('arena').classList.remove('fever');$('arena-hint').textContent='消した跡へ戻って、別の方向にもつなげる';$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
     ambient=Array.from({length:22},()=>({x:Math.random()*360,y:Math.random()*worldHeight,r:.5+Math.random()*1.3,phase:Math.random()*6.3}));renderRun();
     if(!audio&&sound){if(window.requestIdleCallback)window.requestIdleCallback(()=>prepareAudio(),{timeout:300});else window.setTimeout?.(()=>prepareAudio(),0);}
   }
@@ -321,9 +323,10 @@
     if(scored)return;scored=true;const race=mode==='million',elapsed=Math.round(run.time*1000),record=race?boardBest===null||elapsed<boardBest:run.score>boardBest;
     boardBest=race?(boardBest===null?elapsed:Math.min(boardBest,elapsed)):Math.max(boardBest,run.score);persistBoard();
     $('combo-caption').textContent=(record?'NEW BEST! ':'BEST ')+bestLabel();
-    $('instruction').textContent=(race?'100万点まで '+(elapsed/1000).toFixed(2)+'秒 / ':'')+run.popped+'体撃破 / 最大'+run.maxCombo+' CHAIN';shout(record?'NEW RECORD!':race?'GOAL!':'TIME UP!',true);
-    $('announcer').textContent=race?'100万点達成。'+(elapsed/1000).toFixed(2)+'秒。ベスト'+bestLabel()+'。':modes[mode].label+'終了。'+run.score+'点。ベスト'+bestLabel()+'点。';renderRun();
+    $('instruction').textContent=(race?targetLabel+'まで '+(elapsed/1000).toFixed(2)+'秒 / ':'')+run.popped+'体撃破 / 最大'+run.maxCombo+' CHAIN';shout(record?'NEW RECORD!':race?'GOAL!':'TIME UP!',true);
+    $('announcer').textContent=race?targetLabel+'達成。'+(elapsed/1000).toFixed(2)+'秒。ベスト'+bestLabel()+'。':modes[mode].label+'終了。'+run.score+'点。ベスト'+bestLabel()+'点。';renderRun();
   }
+  $('mode-million').textContent=targetLabel;
   for(const id of Object.keys(modes))$('mode-'+id).onclick=()=>{if(id===mode)return;cancelPointer();mode=id;loadBoard();newWave();};
   function resize(){
     const rect=canvas.getBoundingClientRect();pixelWidth=rect.width||360;pixelHeight=rect.height||500;worldHeight=500;
@@ -454,8 +457,8 @@
   canvas.addEventListener('keyup',e=>{if(e.key===' '&&keyboardDrawing){e.preventDefault();cancelPointer();renderRun();}});
   $('burst').onclick=()=>{if(run.phase==='result')newWave();};
   $('new-board').onclick=async()=>{
-    const result=mode==='million'?'100万点まで '+run.time.toFixed(2)+'秒！':modes[mode].label+'で '+run.score.toLocaleString('ja-JP')+'点！';
-    const text='一筆で、大連鎖。'+result+' 最大'+run.maxCombo+' CHAIN https://meyonze.github.io/game/chain-forge-rift.html?v=5';
+    const result=mode==='million'?targetLabel+'まで '+run.time.toFixed(2)+'秒！':modes[mode].label+'で '+run.score.toLocaleString('ja-JP')+'点！';
+    const text='一筆で、大連鎖。'+result+' 最大'+run.maxCombo+' CHAIN https://meyonze.github.io/game/chain-forge-rift.html?v=6';
     try{await navigator.clipboard.writeText(text);$('new-board').textContent='記録をコピーしました';}catch{$('announcer').textContent=text;$('instruction').textContent=text;}
   };
   function circle(x,y,r,fill){ctx.beginPath();ctx.arc(x,y,Math.max(.1,r),0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();}
