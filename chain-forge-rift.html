@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101527">
-<meta name="description" content="いつもの3色なぞりラッシュに亀裂ボーナスを追加。同色の即消し、120ms補充、周囲爆発・同色全消しボムを保ち、跡がつながると塊を追加消去。">
-<meta name="chain-forge-version" content="rift-4-chain-boost">
-<title>一筆で、大連鎖。＋亀裂ボーナス</title>
+<meta name="description" content="同色をつなぐほど得点が跳ね上がる、3色なぞりラッシュ。10秒・30秒・1分・100万点タイムアタック。標準30秒。">
+<meta name="chain-forge-version" content="rift-5-flow-modes">
+<title>一筆で、大連鎖。 — なぞりラッシュ</title>
 <style>
 :root{color-scheme:dark;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;color:#f7f2e5;background:#0c1020}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:radial-gradient(ellipse at 50% 30%,#292340,#0c1020 75%);-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #ffdb85;outline-offset:3px}[hidden]{display:none!important}.game{width:100%;max-width:480px;height:100vh;height:100dvh;margin:auto;padding:14px 16px max(12px,env(safe-area-inset-bottom));padding-top:max(14px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:12px;position:relative}.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}.brand{font:900 12px/1.1 Arial,sans-serif;letter-spacing:2px;color:#f8dfad;display:flex;align-items:center;gap:8px}.brand i{display:grid;place-items:center;width:24px;height:28px;border-radius:7px 7px 12px 12px;background:#ffd27a;color:#413049;font-style:normal;font-size:20px;box-shadow:0 2px 12px #ffc66b1c}.brand small{display:block;font:8px/1.4 monospace;letter-spacing:1.5px;color:#8e96b4;margin-top:3px}.top-tools{display:flex;align-items:center;gap:10px}.old-link{font-size:10px;color:#b8bbd0;text-decoration:none;padding:7px 2px}.sound{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;background:#1f263c;color:#e3d4b4}.sound svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.intro{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-shrink:0}.intro h1{font-size:21px;letter-spacing:1px;font-weight:800;margin:0}.intro span{font:9px monospace;color:#a4a2bf;letter-spacing:1px}.arena{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #535472;border-radius:24px;background:radial-gradient(ellipse at 50% 35%,#283350,#171e35 80%);box-shadow:inset 0 0 50px #090f2944,0 8px 35px #0002;isolation:isolate;transition:border-color .25s,box-shadow .25s}.arena:after{content:'';position:absolute;inset:0;border-radius:23px;box-shadow:inset 0 1px 0 #ffffff18;pointer-events:none;z-index:5}.arena.fever{border-color:#b383c6;box-shadow:0 0 24px #b059d622,inset 0 0 40px #71368918}.arena canvas{display:block;width:100%;height:100%;touch-action:none;outline-offset:-4px;cursor:crosshair}.combo-hud{position:absolute;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:3}.combo-line{display:flex;justify-content:center;align-items:baseline;gap:7px;height:62px}.combo-line b{font:italic 900 62px/.95 Arial,sans-serif;letter-spacing:-3px;color:#fff2c2;text-shadow:0 3px 0 #8c5149,0 0 20px #ffbd4b22;display:inline-block;min-width:42px}.combo-line span{font:italic 900 14px/1 Arial,sans-serif;letter-spacing:1px;color:#ffd589}.combo-hud p{font-size:10px;font-weight:700;letter-spacing:2px;color:#b8bdd4;margin:1px 0 0}.combo-line b.bump{animation:bump .10s ease-out}.tap-hint{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;text-align:center;white-space:nowrap;color:#fff2d5;text-shadow:0 2px 8px #161a32}.tap-hint .finger{position:relative;display:block;margin:0 auto 10px;width:48px;height:48px;border:2px solid #fff1b7;border-radius:50%;box-shadow:0 0 20px #ffd27555;animation:hint-ring 1.7s ease-in-out infinite}.tap-hint .finger:before{content:'';position:absolute;inset:12px;background:#ffe1a0;border-radius:50%;box-shadow:0 0 12px #ffc573}.tap-hint b{font-size:15px;font-weight:800;letter-spacing:2px}.tap-hint small{display:block;margin-top:6px;color:#d8d8e2;font-size:10px}.shout{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%) rotate(-7deg);pointer-events:none;z-index:4;opacity:0;white-space:nowrap;font:italic 900 clamp(28px,8vw,42px)/1 Arial,sans-serif;letter-spacing:-1px;color:#fff2c5;text-shadow:2px 3px #79405b,0 0 25px #ff8e9666}.shout.show{animation:shout .8s ease-out both}.shout.finished{font-family:'Yu Gothic',sans-serif;font-size:44px;letter-spacing:5px}.controls{flex-shrink:0;text-align:center;position:relative}.controls p{margin:0 0 9px;font-size:11px;letter-spacing:.5px;color:#c1c5d9;line-height:1.5}.burst-button{width:100%;height:56px;border:1px solid #ffe5a5;border-radius:17px;background:linear-gradient(115deg,#ffdc84,#ffb976);color:#523348;box-shadow:0 5px 0 #ac615c,0 0 24px #ffcd6014;display:flex;align-items:center;justify-content:center;gap:12px;font-size:21px;letter-spacing:3px;font-weight:900;position:relative;overflow:hidden}.burst-button:before{content:'';width:34px;height:34px;border:1px solid #7b435d55;border-radius:50%;background:radial-gradient(circle,#fff2bc 20%,#ffd78b 24%,transparent 28%);box-shadow:0 0 0 3px #ffffff2b}.burst-button:active{transform:translateY(3px);box-shadow:0 2px 0 #ac615c}.footnote{font-size:8px;letter-spacing:1px;margin:10px 0 0;color:#777e9b}.arena-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;color:#a3afc9;font-size:9px;letter-spacing:1px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@keyframes hint-ring{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.07);opacity:1}}@keyframes bump{0%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes shout{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4) rotate(-7deg)}18%,65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-7deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(.98) rotate(-7deg)}}
 @media(min-width:600px){.game{max-width:480px;height:min(960px,100dvh);padding:22px 20px 18px}.intro h1{font-size:23px}.arena{border-radius:28px}}
@@ -28,20 +28,21 @@
 .ink-track i{width:100%;transition:width .08s linear}.ink-track.low i{background:#ff7d7d}.ink-left{font-variant-numeric:tabular-nums}.combo-hud{top:6px}.combo-line b{font-size:42px;letter-spacing:-1px}.combo-line span{font-size:11px}.combo-hud p{font-size:8px;letter-spacing:.5px}.arena.fever{border-color:#ffd377;box-shadow:0 0 25px #ffb65b55,inset 0 0 55px #ac5f5c25}.intro span{min-width:47px;text-align:right}.shout.finished{font-size:29px;letter-spacing:0}.gesture-prompt{font-size:13px}.controls p{font-size:10px}
 @media(max-height:680px){.combo-line b{font-size:34px}.combo-hud p{font-size:7px}.gesture-prompt{font-size:11px}}
 .shout{font-size:clamp(18px,6vw,28px);max-width:calc(100% - 20px);text-align:center;letter-spacing:0}.arena-hint{letter-spacing:0;font-size:8px;background:#151d35cc;padding:3px 0}
+.mode-picker{display:grid;grid-template-columns:1fr 1fr 1fr 1.4fr;gap:5px;margin-bottom:8px}.mode-picker button{height:29px;border:1px solid #8f8ba544;border-radius:8px;background:#1b2239;color:#c9cedf;font-size:11px;font-weight:700;padding:0 3px}.mode-picker button[aria-pressed="true"]{background:#ffdfa0;border-color:#ffe8b6;color:#46364d}.mode-picker button:disabled{cursor:default;opacity:.65}.mode-picker button[aria-pressed="true"]:disabled{opacity:1}.ink-row>b{min-width:65px}@media(max-height:680px){.mode-picker{margin-bottom:5px;gap:4px}.mode-picker button{height:26px;font-size:10px}}
 </style>
 </head>
 <body>
 <main class="game">
-  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>30 SECOND FLOW · BONUS 04</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge-feel.html?v=19">通常のなぞり版</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
+  <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>4 MODES · CHAIN RUSH</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge-feel.html?v=19">通常のなぞり版</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
   <section class="intro"><h1 id="board-name">30秒、消しまくれ！</h1><span id="wave">30秒</span></section>
   <section class="arena" id="arena" aria-label="指で触れた場所から弾ける遊び場">
-    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。同じ色を7体つなぐたび、周囲爆発・同色全消しの順でボムが生まれます。得点は7連鎖で2倍、10で4倍、13で8倍と大きく増えます。他の色には貫通できません。他色に触れても今の色と連鎖数は維持され、同色へ戻ると続きをつなげます。指を離すと別の色を選べます。消した跡に亀裂が残ります。亀裂で囲むか端までつないで切り離すと、3体以上の塊を色に関係なく追加消去します。亀裂は追加消去でリセットします。最初のタッチから30秒の得点を競います。長い同色の接続ほど得点が伸びます。二重丸はボムと同じ色を全消去。星は周囲を爆破。ボムに触れると起爆し、巻き込まれたボムも誘爆します。矢印で照準、Spaceを押しながら矢印でなぞる。離しても30秒の時計は続きます。"></canvas>
+    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。同じ色を7体つなぐたび、周囲爆発・同色全消しの順でボムが生まれます。得点は7連鎖で2倍、10で4倍、13で8倍と大きく増えます。他の色には貫通できません。他色に触れても今の色と連鎖数は維持され、同色へ戻ると続きをつなげます。指を離すと別の色を選べます。10秒・30秒・1分は得点を競い、100万点は到達時間を競います。標準は30秒です。消した跡を戻ると、その場所から同色の別ルートへ連鎖を続けられます。長い同色の接続ほど得点が伸びます。二重丸はボムと同じ色を全消去。星は周囲を爆破。ボムに触れると起爆し、巻き込まれたボムも誘爆します。矢印で照準、Spaceを押しながら矢印でなぞる。離しても30秒の時計は続きます。"></canvas>
     <div class="combo-hud"><div class="combo-line"><b id="combo">0</b><span>PTS</span></div><p id="combo-caption">BEST 0</p></div>
     <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞって、消しまくれ</b><small>触れた瞬間から即消し。7つでボム！</small></div>
     <div class="shout" id="shout" aria-hidden="true"></div>
-    <div class="arena-hint" id="arena-hint">いつもの連鎖 ＋ 亀裂で追加消去</div>
+    <div class="arena-hint" id="arena-hint">消した跡へ戻って、別の方向にもつなげる</div>
   </section>
-  <section class="controls"><div class="ink-row"><span>残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">30.0秒</b></div><p id="instruction">7連鎖から得点×2。10で×4、13で×8！</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">触れた瞬間、30秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、30秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
+  <section class="controls"><div class="mode-picker" role="group" aria-label="ゲームモード"><button id="mode-10" aria-pressed="false">10秒</button><button id="mode-30" aria-pressed="true">30秒</button><button id="mode-60" aria-pressed="false">1分</button><button id="mode-million" aria-pressed="false">100万点</button></div><div class="ink-row"><span id="clock-label">残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">30.0秒</b></div><p id="instruction">7連鎖から得点×2。10で×4、13で×8！</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">触れた瞬間、30秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、30秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
 </main>
 <div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
 <script>
@@ -186,16 +187,23 @@
   const key=(col,row)=>col+':'+row;
   const multiplier=n=>Math.pow(2,Math.min(8,Math.max(0,Math.floor((n-4)/3))));
   const chainTotal=n=>(n<3?n:5*n*(n-1)*(n-2))*multiplier(n);
-  function adjacent(col,row){const side=row%2?1:-1;return [[col-1,row],[col+1,row],[col,row-1],[col,row+1],[col+side,row-1],[col+side,row+1]].filter(([c,r])=>c>=0&&c<9&&r>=0&&r<12);}
+  function segmentDistance(b,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy,t=l?Math.max(0,Math.min(1,((b.x-ax)*dx+(b.y-ay)*dy)/l)):0;return Math.hypot(b.x-ax-t*dx,b.y-ay-t*dy);}
   class RiftRun extends root.RapidRun{
-    constructor(options={}){
-      super({duration:30,...options});this.cracks=new Map();this.crackRevision=0;this.checkedRevision=0;this.collapsed=0;this.collapseCount=0;this.biggestCollapse=0;
+    constructor({mode='30',...options}={}){
+      if(!['10','30','60','million'].includes(String(mode)))mode='30';mode=String(mode);
+      super({duration:mode==='million'?Infinity:Number(mode),...options});this.mode=mode;this.targetScore=mode==='million'?1000000:null;
+      this.routeNodes=new Map();
       // Keep the two bomb types that do not erase rows or columns.
       for(const b of this.bodies)if(['row','column','cross'].includes(b.bombKind)){b.bomb=false;delete b.bombKind;}
     }
     get nextBombKind(){return this.bombsEarned%2?'color':'area';}
     get chainMultiplier(){return multiplier(this.chainCount);}
     get nextChainPoints(){return (chainTotal(this.chainCount+1)-chainTotal(this.chainCount))*(this.fever?2:1);}
+    start(x,y){
+      if(this.phase!=='result'&&[x,y].every(Number.isFinite)&&x>=0&&x<=360&&y>=50&&y<=500)this.routeNodes.clear();
+      return super.start(x,y);
+    }
+    end(){super.end();this.routeNodes.clear();}
     pop(b,direct=false){
       if(b.dead)return;
       const before=this.score,index=this.events.length,fever=this.fever;
@@ -208,35 +216,51 @@
     }
     connect(b){
       const wasDead=b.dead;super.connect(b);
-      if(!wasDead&&b.dead){const slot=key(b.col,b.row);if(!this.cracks.has(slot)){this.cracks.set(slot,{col:b.col,row:b.row,x:b.x,y:b.y,color:b.color});this.crackRevision++;}}
+      if(!wasDead&&b.dead){const slot=key(b.col,b.row),point={col:b.col,row:b.row,x:b.x,y:b.y,color:b.color};this.routeNodes.set(slot,point);}
       if(!wasDead&&b.dead&&this.chainCount>=7&&this.chainCount<=28&&(this.chainCount-7)%3===0)this.emit('chain-boost',{x:b.x,y:b.y,count:this.chainCount,multiplier:this.chainMultiplier});
     }
-    touch(...args){super.touch(...args);if(this.cracks)this.resolveBonus();}
-    resolveBonus(){
-      if(this.phase!=='running'||this.crackRevision===this.checkedRevision)return;
-      this.checkedRevision=this.crackRevision;
-      // Refilled characters do not erase the trace. It is an extra layer over normal play.
-      const remaining=new Set();for(let c=0;c<9;c++)for(let r=0;r<12;r++)if(!this.cracks.has(key(c,r)))remaining.add(key(c,r));
-      const groups=[];
-      for(const slot of remaining){
-        const queue=[slot];remaining.delete(slot);
-        for(let i=0;i<queue.length;i++){const [c,r]=queue[i].split(':').map(Number);for(const [nc,nr] of adjacent(c,r)){const next=key(nc,nr);if(remaining.delete(next))queue.push(next);}}
-        groups.push(queue);
+    touch(ax,ay,bx,by,initial){
+      if(initial){super.touch(ax,ay,bx,by,true);this.checkGoal();return;}
+      if(this.phase!=='running')return;
+      const dx=bx-ax,dy=by-ay,length=dx*dx+dy*dy;
+      const hits=this.bodies.filter(b=>{
+        if(b.dead||!b.bomb&&this.visited.has(key(b.col,b.row)))return false;
+        const reach=b.r+(b.bomb||this.chainColor===null||b.color===this.chainColor?4:0);
+        return segmentDistance(b,ax,ay,bx,by)<=reach&&Math.hypot(b.x-ax,b.y-ay)>reach;
+      }).map(b=>({b,route:false}));
+      // The old trace is traversable even after differently colored characters refill its slots.
+      for(const point of this.routeNodes.values())if(segmentDistance(point,ax,ay,bx,by)<=18&&Math.hypot(point.x-ax,point.y-ay)>10)hits.push({b:point,route:true});
+      let nearest=null,best=Infinity;
+      for(const b of this.bodies){if(b.dead)continue;const d=Math.hypot(b.x-bx,b.y-by);if(d<best){nearest=b;best=d;}}
+      if(nearest&&!nearest.bomb&&nearest.color===this.chainColor&&!this.visited.has(key(nearest.col,nearest.row))&&best<=nearest.r+14&&!hits.some(h=>!h.route&&h.b===nearest))hits.push({b:nearest,route:false});
+      hits.sort((a,b)=>((a.b.x-ax)*dx+(a.b.y-ay)*dy-((b.b.x-ax)*dx+(b.b.y-ay)*dy))/Math.max(1,length));
+      if(hits.length)this.emit('touch',{fromX:ax,fromY:ay,x:bx,y:by,radius:14});
+      for(const hit of hits){
+        const b=hit.b;if(!hit.route&&b.dead)continue;
+        const obstruction=this.blocker(ax,ay,b.x,b.y)||(this.anchor&&this.blocker(this.anchor.x,this.anchor.y,b.x,b.y));
+        if(obstruction){this.blocked=obstruction;break;}
+        if(hit.route){
+          if(this.anchor&&Math.hypot(b.x-this.anchor.x,b.y-this.anchor.y)>1){
+            const from=this.anchor;this.anchor={x:b.x,y:b.y};this.bridge=this.LINK;this.blocked=null;this.trace.push({...this.anchor});if(this.trace.length>48)this.trace.shift();this.emit('reroute',{fromX:from.x,fromY:from.y,x:b.x,y:b.y,color:this.chainColor});
+          }
+          continue;
+        }
+        if(b.bomb){this.blocked=null;this.explode([b]);continue;}
+        if(this.chainColor===null){this.connect(b);continue;}
+        if(b.color!==this.chainColor){this.blocked=b;break;}
+        if(this.anchor&&Math.hypot(b.x-this.anchor.x,b.y-this.anchor.y)<=this.bridge)this.connect(b);
       }
-      groups.sort((a,b)=>b.length-a.length);
-      // The largest region stays; other regions of at least three live characters are bonus clears.
-      const detached=groups.slice(1).map(group=>{const slots=new Set(group);return this.bodies.filter(b=>!b.dead&&slots.has(key(b.col,b.row)));}).filter(group=>group.length>=3);
-      if(!detached.length)return;
-      this.cracks.clear();this.crackRevision++;this.checkedRevision=this.crackRevision;
-      for(const group of detached){
-        const live=group.filter(b=>!b.dead);if(!live.length)continue;
-        const cells=live.map(b=>({...b})),count=cells.length,bonus=count*20;
-        this.explode(live);this.score+=bonus;this.collapsed+=count;this.collapseCount++;this.biggestCollapse=Math.max(this.biggestCollapse,count);
-        this.emit('collapse',{count,bonus,score:this.score,cells,x:cells.reduce((n,b)=>n+b.x,0)/count,y:cells.reduce((n,b)=>n+b.y,0)/count});
-      }
+      
+      this.checkGoal();
     }
+    get LINK(){return root.RapidRun.LINK;}
+    checkGoal(){
+      if(this.phase==='running'&&this.targetScore!==null&&this.score>=this.targetScore){this.phase='result';this.active=false;this.emit('finish',{score:this.score,popped:this.popped,maxCombo:this.maxCombo,elapsed:this.time,target:this.targetScore});}
+    }
+    update(dt){super.update(dt);this.checkGoal();}
+
   }
-  RiftRun.adjacent=adjacent;root.RiftRun=RiftRun;
+  root.RiftRun=RiftRun;
 })(typeof globalThis!=='undefined'?globalThis:window);
 
 </script>
@@ -249,43 +273,58 @@
   const bombNames={color:'同色全消し',area:'周囲爆発'};
   const bombTint=(kind,color)=>kind==='color'?palette[color]:'#ffe09a';
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const modes={
+    '10':{label:'10秒',duration:10,storage:'chain-forge-rift-bonus10-v2'},
+    '30':{label:'30秒',duration:30,storage:'chain-forge-rift-bonus30-v2'},
+    '60':{label:'1分',duration:60,storage:'chain-forge-rift-bonus60-v2'},
+    million:{label:'100万点',duration:0,storage:'chain-forge-rift-million-v1'}
+  };
+  let mode='30';
+  const bestLabel=()=>mode==='million'?(boardBest===null?'—':(boardBest/1000).toFixed(2)+'秒'):boardBest.toLocaleString('ja-JP');
+  function loadBoard(){
+    boardSeed=107;boardBest=mode==='million'?null:0;
+    try{const b=JSON.parse(localStorage.getItem(modes[mode].storage));if(Number.isInteger(b?.seed))boardSeed=b.seed;if(mode==='million'){if(Number.isFinite(b?.bestMs)&&b.bestMs>=0)boardBest=b.bestMs;}else if(Number.isInteger(b?.best))boardBest=Math.max(0,b.best);}catch{}
+  }
   let sound=true;try{const s=JSON.parse(localStorage.getItem('chain-forge-v1'));if(s?.sound===false)sound=false;}catch{}
   let world,worldHeight=500,pixelWidth=360,pixelHeight=500,scale=1,offsetX=0,offsetY=0,raf=0,last=0,now=0,shake=0,shoutUntil=0;
   let run,boardSeed=107,boardBest=0,scored=false,keyboardDrawing=false,keyboardAim=false,lastReal=0,lastSecond=30;
-  try{const b=JSON.parse(localStorage.getItem('chain-forge-rift-bonus30-v2'));if(Number.isInteger(b?.seed))boardSeed=b.seed;if(Number.isInteger(b?.best))boardBest=Math.max(0,b.best);}catch{}
+
   let pointer=null,aim={x:180,y:250,until:Infinity},strokes=[];
-  let particles=[],rings=[],sparks=[],beams=[],falling=[],labels=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
-  function persistBoard(){try{localStorage.setItem('chain-forge-rift-bonus30-v2',JSON.stringify({seed:boardSeed,best:boardBest}));}catch{}}
+  let particles=[],rings=[],sparks=[],beams=[],bursts=[],labels=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
+  function persistBoard(){try{localStorage.setItem(modes[mode].storage,JSON.stringify(mode==='million'?{seed:boardSeed,bestMs:boardBest}:{seed:boardSeed,best:boardBest}));}catch{}}
   const clock=()=>window.performance?.now?.()??Date.now();
   function advanceGame(time=clock()){
     if(run?.phase==='running')run.update(Math.max(0,(time-lastReal)/1000));lastReal=time;
   }
   function renderRun(){
-    const percent=Math.max(0,run.remaining/run.duration*100);$('ink-fill').style.width=percent+'%';$('ink-left').textContent=run.remaining.toFixed(1)+'秒';$('ink-track').setAttribute('aria-valuenow',String(Math.round(percent)));
-    $('ink-track').classList[run.remaining<=5?'add':'remove']('low');$('wave').textContent=run.phase==='result'?'TIME UP':Math.ceil(run.remaining)+'秒';
+    const race=mode==='million',percent=race?Math.min(100,run.score/10000):Math.max(0,run.remaining/run.duration*100);$('ink-fill').style.width=percent+'%';$('ink-left').textContent=(race?run.time.toFixed(2):run.remaining.toFixed(1))+'秒';$('ink-track').setAttribute('aria-valuenow',String(Math.round(percent)));
+    $('ink-track').classList[!race&&run.remaining<=5?'add':'remove']('low');$('wave').textContent=run.phase==='result'?(race?'GOAL!':'TIME UP'):race?run.time.toFixed(2)+'秒':Math.ceil(run.remaining)+'秒';
+    for(const id of Object.keys(modes)){$('mode-'+id).setAttribute('aria-pressed',String(id===mode));}
     $('burst').hidden=run.phase!=='result';$('gesture-prompt').hidden=run.phase==='result';$('new-board').hidden=run.phase!=='result';
     $('combo').textContent=run.score.toLocaleString('ja-JP');$('combo').style.fontSize=run.score>=1e9?'26px':run.score>=1e6?'32px':'';
     if(run.phase==='running'){
       $('gesture-prompt').textContent=run.chainColor===null?'同じ色を、なぞってつなごう':colorNames[run.chainColor]+' '+run.chainCount+' CHAIN · '+(run.blocked&&!run.blocked.dead?'他色は通れない。同色へ戻ろう':'あと'+(7-run.chainCount%7)+'体で'+bombNames[run.nextBombKind]);
       $('combo-caption').textContent=run.chainCount+' CHAIN'+(run.chainMultiplier>1?' ×'+run.chainMultiplier:'')+' · 次 +'+run.nextChainPoints.toLocaleString('ja-JP')+'点'+(run.fever?' · FEVER ×2':'');
       $('arena').classList[run.fever?'add':'remove']('fever');
-      $('arena-hint').textContent=run.cracks.size?'亀裂 '+run.cracks.size+'か所 · 囲むか端までつなぐと追加消去':'いつもの連鎖 ＋ 亀裂で追加消去';
+      $('arena-hint').textContent='消した跡へ戻って、別の方向にもつなげる';
     }
   }
   function newWave(){
-    run=new RiftRun({seed:boardSeed});world=run;scored=false;keyboardDrawing=false;keyboardAim=false;lastReal=clock();lastSecond=30;persistBoard();
-    particles=[];rings=[];sparks=[];beams=[];falling=[];labels=[];strokes=[];shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
-    $('announcer').textContent='';$('board-name').textContent='30秒、消しまくれ！';$('combo').textContent='0';$('combo-caption').textContent='BEST '+boardBest.toLocaleString('ja-JP');
-    $('burst').textContent='もう一度、30秒！';$('gesture-prompt').textContent='触れた瞬間、30秒スタート';$('instruction').textContent='7連鎖から得点×2。10で×4、13で×8！';$('arena').classList.remove('fever');$('arena-hint').textContent='いつもの連鎖 ＋ 亀裂で追加消去';$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
+    run=new RiftRun({seed:boardSeed,mode});world=run;scored=false;keyboardDrawing=false;keyboardAim=false;lastReal=clock();lastSecond=modes[mode].duration;persistBoard();
+    particles=[];rings=[];sparks=[];beams=[];bursts=[];labels=[];strokes=[];shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
+    $('announcer').textContent='';$('board-name').textContent=mode==='million'?'100万点、最速で！':modes[mode].label+'、消しまくれ！';$('combo').textContent='0';$('combo-caption').textContent='BEST '+bestLabel();
+    $('burst').textContent='もう一度、'+modes[mode].label+'！';$('gesture-prompt').textContent=mode==='million'?'触れた瞬間、計測スタート':'触れた瞬間、'+modes[mode].label+'スタート';$('clock-label').textContent=mode==='million'?'経過時間':'残り時間';$('ink-track').setAttribute('aria-label',mode==='million'?'100万点までの進捗':'残り時間の割合');$('instruction').textContent='7連鎖から得点×2。10で×4、13で×8！';$('arena').classList.remove('fever');$('arena-hint').textContent='消した跡へ戻って、別の方向にもつなげる';$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
     ambient=Array.from({length:22},()=>({x:Math.random()*360,y:Math.random()*worldHeight,r:.5+Math.random()*1.3,phase:Math.random()*6.3}));renderRun();
     if(!audio&&sound){if(window.requestIdleCallback)window.requestIdleCallback(()=>prepareAudio(),{timeout:300});else window.setTimeout?.(()=>prepareAudio(),0);}
   }
   function finishRun(){
-    if(scored)return;scored=true;const record=run.score>boardBest;boardBest=Math.max(boardBest,run.score);persistBoard();
-    $('combo-caption').textContent=(record?'NEW BEST! ':'BEST ')+boardBest.toLocaleString('ja-JP');
-    $('instruction').textContent=run.popped+'体撃破 / 最大'+run.maxCombo+' CHAIN / 追加消去 '+run.collapsed+'体';shout(record?'NEW RECORD!':'TIME UP!',true);
-    $('announcer').textContent='30秒終了。'+run.score+'点。ベスト'+boardBest+'点。';renderRun();
+    if(scored)return;scored=true;const race=mode==='million',elapsed=Math.round(run.time*1000),record=race?boardBest===null||elapsed<boardBest:run.score>boardBest;
+    boardBest=race?(boardBest===null?elapsed:Math.min(boardBest,elapsed)):Math.max(boardBest,run.score);persistBoard();
+    $('combo-caption').textContent=(record?'NEW BEST! ':'BEST ')+bestLabel();
+    $('instruction').textContent=(race?'100万点まで '+(elapsed/1000).toFixed(2)+'秒 / ':'')+run.popped+'体撃破 / 最大'+run.maxCombo+' CHAIN';shout(record?'NEW RECORD!':race?'GOAL!':'TIME UP!',true);
+    $('announcer').textContent=race?'100万点達成。'+(elapsed/1000).toFixed(2)+'秒。ベスト'+bestLabel()+'。':modes[mode].label+'終了。'+run.score+'点。ベスト'+bestLabel()+'点。';renderRun();
   }
+  for(const id of Object.keys(modes))$('mode-'+id).onclick=()=>{if(id===mode)return;cancelPointer();mode=id;loadBoard();newWave();};
   function resize(){
     const rect=canvas.getBoundingClientRect();pixelWidth=rect.width||360;pixelHeight=rect.height||500;worldHeight=500;
     const dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(pixelWidth*dpr);canvas.height=Math.round(pixelHeight*dpr);scale=Math.min(canvas.width/360,canvas.height/500);offsetX=(canvas.width-360*scale)/2;offsetY=(canvas.height-500*scale)/2;
@@ -312,8 +351,8 @@
     try{const n=audio.createBufferSource(),g=audio.createGain(),t=audio.currentTime;n.buffer=noise;g.gain.setValueAtTime(big?.25:.13,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);n.connect(g);g.connect(audioBus);n.start(t);n.stop(t+.22);tone(big?90:150,.22,.2,'triangle');}catch{}
   }
   function popSound(combo){
-    if(!sound||!audio||now-lastNote<.045)return;lastNote=now;
-    try{const notes=[0,3,5,7,10,12],i=Math.floor(combo/2),f=220*Math.pow(2,(notes[i%6]+Math.min(2,Math.floor(combo/24))*12)/12);tone(f,.105,.085);tone(f*2,.065,.022,'triangle');}catch{}
+    if(!sound||!audio||now-lastNote<.032)return;lastNote=now;
+    try{const notes=[0,3,5,7,10,12],i=Math.floor(combo/2),f=220*Math.pow(2,(notes[i%6]+Math.min(2,Math.floor(combo/24))*12)/12);tone(f,.105,.095);tone(f*2,.065,.03,'triangle');tone(f*3,.035,.025,'triangle');}catch{}
   }
   function renderSound(){
     $('sound').innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11 4-5 4H3v8h3l5 4z"/>'+ (sound?'<path d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>':'<path d="m16 9 6 6m0-6-6 6"/>')+'</svg>';
@@ -334,6 +373,7 @@
     const el=$('shout');el.textContent=text;el.classList.remove('show','finished');if(finished)el.classList.add('finished');el.classList.add('show');shoutUntil=now+.85;
   }
   function beam(ax,ay,bx,by,color,width=26){beams.push({ax,ay,bx,by,color,width,life:.38,max:.38});if(beams.length>100)beams.shift();}
+  function burst(x,y,r,color,strong=false){bursts.push({x,y,r,color,strong,life:motion?.12:.24,max:motion?.12:.24});if(bursts.length>64)bursts.shift();}
   function bombEffect(e){
     const tint=bombTint(e.kind,e.color);
     if(e.kind==='color'){
@@ -344,11 +384,12 @@
     if(e.kind==='area'){ring(e.x,e.y,e.radius,'#ffe7a3',.4,e.radius>=112?8:5);if(e.radius>=112)ring(e.x,e.y,e.radius*.7,'#ffacdd',.3,4);}
     else ring(e.x,e.y,55,tint,.28,6);
     bits(e.x,e.y,tint,20,true);
+    burst(e.x,e.y,34,tint,true);
     shout((e.kind==='area'?'POWER BOMB!':e.kind==='color'?colorNames[e.color]+' 全消し！':bombNames[e.kind]+'！')+(e.chain>1?' '+e.chain+'連爆':''));
     boom(true);if(!motion)shake=Math.max(shake,Math.min(5,3+e.chain*.5));
   }
   function handleEvents(){
-    const events=world.drain(),fallingIds=new Set(events.filter(e=>e.type==='collapse').flatMap(e=>e.cells.map(b=>b.id)));let hits=0;
+    const events=world.drain();let hits=0;
     for(const e of events){
       if(e.type==='begin'){shout('GO!');$('instruction').textContent='同色を長くつなぐほど、得点が跳ね上がる！';}
       if(e.type==='bomb-earned'){shout(e.count+' CHAIN → '+bombNames[e.kind]+'！');ring(e.x,e.y,48,bombTint(e.kind,e.color),.25,3);}
@@ -359,17 +400,11 @@
       if(e.type==='touch'){
         strokes.push({ax:e.fromX,ay:e.fromY,bx:e.x,by:e.y,r:e.radius,life:.14,max:.14});if(strokes.length>40)strokes.shift();
       }
+      if(e.type==='reroute'){ring(e.x,e.y,25,palette[e.color],.14,2);}
       if(e.type==='bomb')bombEffect(e);
       if(e.type==='fever'){shout('F E V E R !');boom(true);}
-      if(e.type==='collapse'){
-        falling.push({cells:e.cells,x:e.x,y:e.y,life:.55,max:.55,spin:(e.x<180?-1:1)*.2});if(falling.length>12)falling.shift();
-        labels.push({x:e.x,y:e.y,text:e.count+'体 追加消去！',life:.7,max:.7});
-        ring(e.x,e.y,Math.min(150,35+e.count*2),'#ffd19a',.32,5);boom(true);tone(120,.18,.14,'triangle');tone(660,.14,.06,'sine',.045);
-        shout('＋'+e.count+'体 BONUS!');if(!motion)shake=Math.max(shake,Math.min(4.5,2+e.count*.08));
-        $('announcer').textContent='亀裂がつながり'+e.count+'体を追加消去。';
-      }
       if(e.type==='pop'){
-        const color=palette[e.color];if(!e.bomb&&!fallingIds.has(e.id)){bits(e.x,e.y,color,5);ring(e.x,e.y,e.reach,color,.2,2);}popSound(e.combo);hits++;
+        const color=palette[e.color];if(!e.bomb){bits(e.x,e.y,color,e.direct&&e.combo>=7?12:8,e.direct&&e.combo>=7);burst(e.x,e.y,e.r,color,e.direct&&e.combo>=7);ring(e.x,e.y,e.direct&&e.combo>=7?42:31,color,.22,3);}popSound(e.combo);hits++;
         if(e.direct&&e.combo>=7){labels.push({x:e.x,y:e.y,text:'+'+e.points.toLocaleString('ja-JP'),life:.5,max:.5});if(labels.length>16)labels.shift();}
         if(!motion)shake=Math.max(shake,e.fast?1.5:.6);
       }
@@ -379,10 +414,10 @@
   }
   function react(){handleEvents();$('tap-hint').hidden=true;renderRun();}
   function startStroke(x,y){
-    advanceGame();if(!['ready','running'].includes(run.phase))return false;if(!run.start(x,y))return false;aim={x,y,until:Infinity};react();initAudio();return true;
+    advanceGame();if(!['ready','running'].includes(run.phase))return false;if(!run.start(x,y))return false;aim={x,y,until:Infinity};react();initAudio();return run.phase==='running';
   }
-  function moveStroke(x,y){
-    advanceGame();if(run.phase!=='running'||!run.active)return;run.move(x,y);aim={...run.last,until:Infinity};react();if(run.phase!=='running')cancelPointer();
+  function moveStroke(x,y,refresh=true){
+    advanceGame();if(run.phase!=='running'||!run.active)return;run.move(x,y);aim={...run.last,until:Infinity};if(refresh)react();if(run.phase!=='running')cancelPointer();
   }
   function point(e){const r=canvas.getBoundingClientRect(),s=Math.min(r.width/360,r.height/500),px=(r.width-360*s)/2,py=(r.height-500*s)/2;return{x:(e.clientX-r.left-px)/s,y:(e.clientY-r.top-py)/s};}
   function cancelPointer(e){
@@ -396,7 +431,13 @@
   });
   canvas.addEventListener('pointermove',e=>{
     const p=point(e);if(!pointer){if(e.pointerType!=='touch'&&['ready','running'].includes(run.phase))aim={...p,until:Infinity};return;}
-    if(e.pointerId!==pointer.id)return;e.preventDefault();moveStroke(p.x,p.y);if(pointer)pointer={...pointer,x:run.last.x,y:run.last.y};
+    if(e.pointerId!==pointer.id)return;e.preventDefault();
+    let samples=[];try{samples=e.getCoalescedEvents?.()||[];}catch{}
+    if(samples.length){
+      samples=samples.slice(-32);const tail=samples.at(-1);if(tail.clientX!==e.clientX||tail.clientY!==e.clientY)samples.push(e);
+      for(const sample of samples){if(!pointer||run.phase!=='running')break;const at=point(sample);moveStroke(at.x,at.y,false);}react();
+    }else moveStroke(p.x,p.y);
+    if(pointer)pointer={...pointer,x:run.last.x,y:run.last.y};
   });
   function endPointer(e){
     if(!pointer||e.pointerId!==pointer.id)return;
@@ -413,7 +454,8 @@
   canvas.addEventListener('keyup',e=>{if(e.key===' '&&keyboardDrawing){e.preventDefault();cancelPointer();renderRun();}});
   $('burst').onclick=()=>{if(run.phase==='result')newWave();};
   $('new-board').onclick=async()=>{
-    const text='一筆で、大連鎖。亀裂ボーナス付き30秒で '+run.score.toLocaleString('ja-JP')+'点！ 最大'+run.maxCombo+' CHAIN https://meyonze.github.io/game/chain-forge-rift.html?v=4';
+    const result=mode==='million'?'100万点まで '+run.time.toFixed(2)+'秒！':modes[mode].label+'で '+run.score.toLocaleString('ja-JP')+'点！';
+    const text='一筆で、大連鎖。'+result+' 最大'+run.maxCombo+' CHAIN https://meyonze.github.io/game/chain-forge-rift.html?v=5';
     try{await navigator.clipboard.writeText(text);$('new-board').textContent='記録をコピーしました';}catch{$('announcer').textContent=text;$('instruction').textContent=text;}
   };
   function circle(x,y,r,fill){ctx.beginPath();ctx.arc(x,y,Math.max(.1,r),0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();}
@@ -441,6 +483,16 @@
     ctx.restore();
   }
   function drawEffects(dt){
+    for(const b of bursts){
+      b.life-=dt;if(b.life<=0)continue;const t=1-b.life/b.max;
+      if(motion){ctx.globalAlpha=(1-t)*.3;circle(b.x,b.y,b.r,b.color);continue;}
+      const reach=b.r*(1+t*(b.strong?2.1:1.5));ctx.save();ctx.translate(b.x,b.y);
+      ctx.globalAlpha=(1-t)*.75;ctx.strokeStyle=b.color;ctx.lineWidth=(b.strong?5:3)*(1-t);ctx.beginPath();ctx.arc(0,0,reach,0,Math.PI*2);ctx.stroke();
+      ctx.fillStyle=b.color;ctx.globalAlpha=(1-t)*.9;
+      for(let i=0;i<6;i++){const a=i*Math.PI/3,dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx,w=(b.strong?5:3)*(1-t),inner=b.r*(.25+t),outer=reach*(b.strong?1.45:1.3);ctx.beginPath();ctx.moveTo(dx*inner+px*w,dy*inner+py*w);ctx.lineTo(dx*outer,dy*outer);ctx.lineTo(dx*inner-px*w,dy*inner-py*w);ctx.closePath();ctx.fill();}
+      if(t<.45){ctx.globalAlpha=(1-t/.45)*.85;circle(0,0,b.r*(.8+t*.5),'#fff9e5');}
+      ctx.restore();
+    }bursts=bursts.filter(b=>b.life>0);ctx.globalAlpha=1;
     for(const b of beams){
       b.life-=dt;if(b.life<=0)continue;const t=1-b.life/b.max;
       ctx.globalAlpha=(1-t)*(motion?.35:.65);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(b.ax,b.ay);ctx.lineTo(b.bx,b.by);ctx.lineWidth=b.width*(1-t*.8);ctx.strokeStyle=b.color;ctx.stroke();
@@ -463,18 +515,6 @@
     rings=rings.filter(r=>r.life>0).slice(-75);ctx.globalAlpha=1;
     for(const s of sparks){s.life-=dt;if(s.life<=0)continue;const t=1-s.life/s.max,px=s.x+(s.tx-s.x)*t,py=s.y+(s.ty-s.y)*t-Math.sin(t*Math.PI)*16;ctx.globalAlpha=(1-t)*.7;ctx.beginPath();ctx.moveTo(px-(s.tx-s.x)*.1,py-(s.ty-s.y)*.1);ctx.lineTo(px,py);ctx.lineWidth=2;ctx.strokeStyle=s.color;ctx.stroke();circle(px,py,2.3,'#fff1c8');}sparks=sparks.filter(s=>s.life>0);ctx.globalAlpha=1;
   }
-  function drawCracks(){
-    if(!run.cracks.size)return;
-    ctx.save();ctx.lineCap='round';ctx.lineJoin='round';ctx.globalAlpha=.6;ctx.strokeStyle='#ffd39e';ctx.lineWidth=2;
-    ctx.beginPath();
-    for(const cut of run.cracks.values()){
-      ctx.moveTo(cut.x-5,cut.y-7);ctx.lineTo(cut.x+1,cut.y);ctx.lineTo(cut.x-2,cut.y+4);ctx.lineTo(cut.x+5,cut.y+8);
-      for(const [c,r] of RiftRun.adjacent(cut.col,cut.row)){
-        const next=run.cracks.get(c+':'+r);if(!next||next.row<cut.row||next.row===cut.row&&next.col<cut.col)continue;
-        const mx=(cut.x+next.x)/2,my=(cut.y+next.y)/2;ctx.moveTo(cut.x,cut.y);ctx.lineTo(mx-2,my+2);ctx.lineTo(next.x,next.y);
-      }
-    }ctx.stroke();ctx.restore();
-  }
   function draw(dt){
     ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,canvas.width,canvas.height);ctx.setTransform(scale,0,0,scale,offsetX,offsetY);ctx.save();ctx.beginPath();ctx.rect(0,0,360,500);ctx.clip();
     if(shake>.05&&!motion){ctx.translate(Math.sin(now*145)*shake,Math.cos(now*119)*shake*.6);shake*=Math.exp(-dt*17);}
@@ -487,13 +527,11 @@
       }
     }
     if(run.blocked&&!run.blocked.dead){ctx.strokeStyle='#f4d7c5';ctx.lineWidth=2;ctx.beginPath();ctx.arc(run.blocked.x,run.blocked.y,run.blocked.r+3,0,Math.PI*2);ctx.stroke();}
+    if(run.active&&run.anchor&&run.chainColor!==null){
+      ctx.save();ctx.strokeStyle=palette[run.chainColor];ctx.globalAlpha=.7;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(run.anchor.x,run.anchor.y,23,0,Math.PI*2);ctx.stroke();
+      if(Math.hypot(aim.x-run.anchor.x,aim.y-run.anchor.y)<=run.bridge&&!run.blocker(run.anchor.x,run.anchor.y,aim.x,aim.y)){ctx.globalAlpha=.4;ctx.beginPath();ctx.moveTo(run.anchor.x,run.anchor.y);ctx.lineTo(aim.x,aim.y);ctx.stroke();}ctx.restore();
+    }
     if(run.trace.length){ctx.save();ctx.strokeStyle=palette[run.chainColor];ctx.lineWidth=5;ctx.lineCap='round';ctx.lineJoin='round';ctx.globalAlpha=.75;ctx.beginPath();run.trace.slice(-8).forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.restore();}
-    drawCracks();
-    for(const group of falling){
-      group.life-=dt;if(group.life<=0)continue;const t=1-group.life/group.max;ctx.save();ctx.globalAlpha=(1-t)*(motion?.4:.9);
-      if(!motion){ctx.translate(group.x,group.y+20*t+440*t*t);ctx.rotate(group.spin*t);ctx.translate(-group.x,-group.y);}
-      for(const b of group.cells)jelly(b);ctx.restore();
-    }falling=falling.filter(g=>g.life>0);
     drawEffects(dt);
     for(const label of labels){label.life-=dt;if(label.life<=0)continue;const t=1-label.life/label.max;ctx.globalAlpha=Math.min(1,label.life*4);ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.lineWidth=4;ctx.strokeStyle='#172039';const x=clamp(label.x,90,270),y=clamp(label.y,105,440)-(motion?0:t*25);ctx.strokeText(label.text,x,y);ctx.fillStyle='#ffe8b5';ctx.fillText(label.text,x,y);}labels=labels.filter(l=>l.life>0);ctx.globalAlpha=1;
     ctx.restore();
@@ -511,7 +549,7 @@
   }
   document.addEventListener('visibilitychange',()=>{if(document.hidden){advanceGame();cancelPointer({type:'pointercancel'});cancelAnimationFrame(raf);raf=0;last=0;if(audio)audio.suspend().catch(()=>{});}else if(!raf){last=0;raf=requestAnimationFrame(frame);}});
   window.addEventListener('resize',resize);
-  renderSound();resize();newWave();raf=requestAnimationFrame(frame);
+  loadBoard();renderSound();resize();newWave();raf=requestAnimationFrame(frame);
 })();
 
 </script>
