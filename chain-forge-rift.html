@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101527">
 <meta name="description" content="同色をつなぐほど得点が跳ね上がる、3色なぞりラッシュ。10秒・30秒・1分・1000万点タイムアタック。標準30秒。">
-<meta name="chain-forge-version" content="rift-7-safe-flow">
+<meta name="chain-forge-version" content="rift-8-no-bombs">
 <title>一筆で、大連鎖。 — なぞりラッシュ</title>
 <style>
 :root{color-scheme:dark;font-family:'Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;color:#f7f2e5;background:#0c1020}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:radial-gradient(ellipse at 50% 30%,#292340,#0c1020 75%);-webkit-tap-highlight-color:transparent}button,a{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #ffdb85;outline-offset:3px}[hidden]{display:none!important}.game{width:100%;max-width:480px;height:100vh;height:100dvh;margin:auto;padding:14px 16px max(12px,env(safe-area-inset-bottom));padding-top:max(14px,env(safe-area-inset-top));display:flex;flex-direction:column;gap:12px;position:relative}.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}.brand{font:900 12px/1.1 Arial,sans-serif;letter-spacing:2px;color:#f8dfad;display:flex;align-items:center;gap:8px}.brand i{display:grid;place-items:center;width:24px;height:28px;border-radius:7px 7px 12px 12px;background:#ffd27a;color:#413049;font-style:normal;font-size:20px;box-shadow:0 2px 12px #ffc66b1c}.brand small{display:block;font:8px/1.4 monospace;letter-spacing:1.5px;color:#8e96b4;margin-top:3px}.top-tools{display:flex;align-items:center;gap:10px}.old-link{font-size:10px;color:#b8bbd0;text-decoration:none;padding:7px 2px}.sound{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff24;border-radius:50%;background:#1f263c;color:#e3d4b4}.sound svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.intro{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-shrink:0}.intro h1{font-size:21px;letter-spacing:1px;font-weight:800;margin:0}.intro span{font:9px monospace;color:#a4a2bf;letter-spacing:1px}.arena{position:relative;flex:1;min-height:0;overflow:hidden;border:1px solid #535472;border-radius:24px;background:radial-gradient(ellipse at 50% 35%,#283350,#171e35 80%);box-shadow:inset 0 0 50px #090f2944,0 8px 35px #0002;isolation:isolate;transition:border-color .25s,box-shadow .25s}.arena:after{content:'';position:absolute;inset:0;border-radius:23px;box-shadow:inset 0 1px 0 #ffffff18;pointer-events:none;z-index:5}.arena.fever{border-color:#b383c6;box-shadow:0 0 24px #b059d622,inset 0 0 40px #71368918}.arena canvas{display:block;width:100%;height:100%;touch-action:none;outline-offset:-4px;cursor:crosshair}.combo-hud{position:absolute;top:14px;left:0;right:0;text-align:center;pointer-events:none;z-index:3}.combo-line{display:flex;justify-content:center;align-items:baseline;gap:7px;height:62px}.combo-line b{font:italic 900 62px/.95 Arial,sans-serif;letter-spacing:-3px;color:#fff2c2;text-shadow:0 3px 0 #8c5149,0 0 20px #ffbd4b22;display:inline-block;min-width:42px}.combo-line span{font:italic 900 14px/1 Arial,sans-serif;letter-spacing:1px;color:#ffd589}.combo-hud p{font-size:10px;font-weight:700;letter-spacing:2px;color:#b8bdd4;margin:1px 0 0}.combo-line b.bump{animation:bump .10s ease-out}.tap-hint{position:absolute;left:50%;top:53%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;text-align:center;white-space:nowrap;color:#fff2d5;text-shadow:0 2px 8px #161a32}.tap-hint .finger{position:relative;display:block;margin:0 auto 10px;width:48px;height:48px;border:2px solid #fff1b7;border-radius:50%;box-shadow:0 0 20px #ffd27555;animation:hint-ring 1.7s ease-in-out infinite}.tap-hint .finger:before{content:'';position:absolute;inset:12px;background:#ffe1a0;border-radius:50%;box-shadow:0 0 12px #ffc573}.tap-hint b{font-size:15px;font-weight:800;letter-spacing:2px}.tap-hint small{display:block;margin-top:6px;color:#d8d8e2;font-size:10px}.shout{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%) rotate(-7deg);pointer-events:none;z-index:4;opacity:0;white-space:nowrap;font:italic 900 clamp(28px,8vw,42px)/1 Arial,sans-serif;letter-spacing:-1px;color:#fff2c5;text-shadow:2px 3px #79405b,0 0 25px #ff8e9666}.shout.show{animation:shout .8s ease-out both}.shout.finished{font-family:'Yu Gothic',sans-serif;font-size:44px;letter-spacing:5px}.controls{flex-shrink:0;text-align:center;position:relative}.controls p{margin:0 0 9px;font-size:11px;letter-spacing:.5px;color:#c1c5d9;line-height:1.5}.burst-button{width:100%;height:56px;border:1px solid #ffe5a5;border-radius:17px;background:linear-gradient(115deg,#ffdc84,#ffb976);color:#523348;box-shadow:0 5px 0 #ac615c,0 0 24px #ffcd6014;display:flex;align-items:center;justify-content:center;gap:12px;font-size:21px;letter-spacing:3px;font-weight:900;position:relative;overflow:hidden}.burst-button:before{content:'';width:34px;height:34px;border:1px solid #7b435d55;border-radius:50%;background:radial-gradient(circle,#fff2bc 20%,#ffd78b 24%,transparent 28%);box-shadow:0 0 0 3px #ffffff2b}.burst-button:active{transform:translateY(3px);box-shadow:0 2px 0 #ac615c}.footnote{font-size:8px;letter-spacing:1px;margin:10px 0 0;color:#777e9b}.arena-hint{position:absolute;bottom:12px;left:0;right:0;pointer-events:none;text-align:center;color:#a3afc9;font-size:9px;letter-spacing:1px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@keyframes hint-ring{0%,100%{transform:scale(.88);opacity:.7}50%{transform:scale(1.07);opacity:1}}@keyframes bump{0%{transform:scale(1.15)}100%{transform:scale(1)}}@keyframes shout{0%{opacity:0;transform:translate(-50%,-50%) scale(1.4) rotate(-7deg)}18%,65%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(-7deg)}100%{opacity:0;transform:translate(-50%,-65%) scale(.98) rotate(-7deg)}}
@@ -44,11 +44,11 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
   <header class="topline"><div class="brand"><i aria-hidden="true">ϟ</i><div>CHAIN FORGE<small>4 MODES · CHAIN RUSH</small></div></div><div class="top-tools"><a class="old-link" href="chain-forge-feel.html?v=19">通常のなぞり版</a><button class="sound" id="sound" aria-label="音を切り替える" aria-pressed="true"></button></div></header>
   <section class="intro"><h1 id="board-name">30秒、消しまくれ！</h1><span id="wave">30秒</span></section>
   <section class="arena" id="arena" aria-label="指で触れた場所から弾ける遊び場">
-    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。同じ色を7体つなぐたび、周囲爆発・同色全消しの順でボムが生まれます。得点は7連鎖で2倍、10で4倍、13で8倍と大きく増えます。他の色には貫通できません。他色に触れても今の色と連鎖数は維持され、同色へ戻ると続きをつなげます。指を離すと別の色を選べます。10秒・30秒・1分は得点を競い、1000万点は到達時間を競います。標準は30秒です。消した跡を戻ると、その場所から同色の別ルートへ連鎖を続けられます。長い同色の接続ほど得点が伸びます。二重丸はボムと同じ色を全消去。星は周囲を爆破。ボムは指を離してからタップすると起爆します。なぞっている途中はボムを通過して連鎖を続けます。爆風に巻き込まれたボムは誘爆します。矢印で照準、Spaceを押しながら矢印でなぞる。離しても30秒の時計は続きます。"></canvas>
+    <canvas id="field" tabindex="0" role="button" aria-label="最初の1体から即座に消去。得点は7連鎖で2倍、10で4倍、13で8倍と大きく増えます。他の色には貫通できません。他色に触れても今の色と連鎖数は維持され、同色へ戻ると続きをつなげます。指を離すと別の色を選べます。10秒・30秒・1分は得点を競い、1000万点は到達時間を競います。標準は30秒です。消した跡を戻ると、その場所から同色の別ルートへ連鎖を続けられます。長い同色の接続ほど得点が伸びます。矢印で照準、Spaceを押しながら矢印でなぞる。離しても30秒の時計は続きます。"></canvas>
     <div class="combo-hud"><div class="combo-line"><b id="combo">0</b><span>PTS</span></div><p id="combo-caption">BEST 0</p></div>
-    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞって、消しまくれ</b><small>触れた瞬間から即消し。7つでボム！</small></div>
+    <div class="tap-hint" id="tap-hint" aria-hidden="true"><i class="finger"></i><b>なぞって、消しまくれ</b><small>同じ色を長くつなぐほど高得点！</small></div>
     <div class="shout" id="shout" aria-hidden="true"></div>
-    <div class="arena-hint" id="arena-hint">跡を戻ってつなぐ · ボムはタップで起爆</div>
+    <div class="arena-hint" id="arena-hint">同じ色をなぞる · 消した跡を戻ってつなぐ</div>
   </section>
   <section class="controls"><div class="mode-picker" role="group" aria-label="ゲームモード"><button id="mode-10" aria-pressed="false">10秒</button><button id="mode-30" aria-pressed="true">30秒</button><button id="mode-60" aria-pressed="false">1分</button><button id="mode-million" aria-pressed="false">1000万点</button></div><div class="ink-row"><span id="clock-label">残り時間</span><div class="ink-track" id="ink-track" role="progressbar" aria-label="残り時間の割合" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><i id="ink-fill"></i></div><b id="ink-left">30.0秒</b></div><p id="instruction">7連鎖から得点×2。10で×4、13で×8！</p><div class="button-slot"><div class="gesture-prompt" id="gesture-prompt">触れた瞬間、30秒スタート</div><button class="burst-button" id="burst" hidden>もう一度、30秒！</button></div><button class="new-board" id="new-board">記録をコピー</button></section>
 </main>
@@ -202,10 +202,9 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
       if(!['10','30','60','million'].includes(String(mode)))mode='30';mode=String(mode);
       super({duration:mode==='million'?Infinity:Number(mode),...options});this.mode=mode;this.targetScore=mode==='million'?RACE_TARGET:null;
       this.routeNodes=new Map();this.strokePath=[];
-      // Keep the two bomb types that do not erase rows or columns.
-      for(const b of this.bodies)if(['row','column','cross'].includes(b.bombKind)){b.bomb=false;delete b.bombKind;}
+      for(const b of this.bodies){b.bomb=false;delete b.bombKind;}
     }
-    get nextBombKind(){return this.bombsEarned%2?'color':'area';}
+    make(col,row,extra={}){const b=super.make(col,row,extra);b.bomb=false;delete b.bombKind;return b;}
     get chainMultiplier(){return multiplier(this.chainCount);}
     get nextChainPoints(){return (chainTotal(this.chainCount+1)-chainTotal(this.chainCount))*(this.fever?2:1);}
     start(x,y){
@@ -225,24 +224,27 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
       }
     }
     connect(b){
-      const wasDead=b.dead;super.connect(b);
-      if(!wasDead&&b.dead){const slot=key(b.col,b.row),point={col:b.col,row:b.row,x:b.x,y:b.y,color:b.color};this.routeNodes.set(slot,point);this.appendStroke(point);}
-      if(!wasDead&&b.dead&&this.chainCount>=7&&this.chainCount<=28&&(this.chainCount-7)%3===0)this.emit('chain-boost',{x:b.x,y:b.y,count:this.chainCount,multiplier:this.chainMultiplier});
+      if(b.dead)return;
+      this.chainColor=b.color;this.anchor={x:b.x,y:b.y};this.bridge=this.LINK;this.blocked=null;this.visited.add(key(b.col,b.row));
+      this.trace.push({...this.anchor});if(this.trace.length>48)this.trace.shift();this.chainCount++;
+      this.emit('connect',{x:b.x,y:b.y,color:b.color,count:this.chainCount});this.pop(b,true);
+      const point={col:b.col,row:b.row,x:b.x,y:b.y,color:b.color};this.routeNodes.set(key(b.col,b.row),point);this.appendStroke(point);
+      if(this.chainCount>=7&&this.chainCount<=28&&(this.chainCount-7)%3===0)this.emit('chain-boost',{x:b.x,y:b.y,count:this.chainCount,multiplier:this.chainMultiplier});
     }
     touch(ax,ay,bx,by,initial){
       if(initial){super.touch(ax,ay,bx,by,true);this.checkGoal();return;}
       if(this.phase!=='running')return;
       const dx=bx-ax,dy=by-ay,length=dx*dx+dy*dy;
       const hits=this.bodies.filter(b=>{
-        if(b.dead||!b.bomb&&this.visited.has(key(b.col,b.row)))return false;
-        const reach=b.r+(b.bomb||this.chainColor===null||b.color===this.chainColor?4:0);
+        if(b.dead||this.visited.has(key(b.col,b.row)))return false;
+        const reach=b.r+(this.chainColor===null||b.color===this.chainColor?4:0);
         return segmentDistance(b,ax,ay,bx,by)<=reach&&Math.hypot(b.x-ax,b.y-ay)>reach;
       }).map(b=>({b,route:false}));
       // The old trace is traversable even after differently colored characters refill its slots.
       for(const point of this.routeNodes.values())if(segmentDistance(point,ax,ay,bx,by)<=18&&Math.hypot(point.x-ax,point.y-ay)>10)hits.push({b:point,route:true});
       let nearest=null,best=Infinity;
-      for(const b of this.bodies){if(b.dead||!b.bomb&&this.visited.has(key(b.col,b.row)))continue;const d=Math.hypot(b.x-bx,b.y-by);if(d<best){nearest=b;best=d;}}
-      if(nearest&&!nearest.bomb&&nearest.color===this.chainColor&&!this.visited.has(key(nearest.col,nearest.row))&&best<=nearest.r+14&&!hits.some(h=>!h.route&&h.b===nearest))hits.push({b:nearest,route:false});
+      for(const b of this.bodies){if(b.dead||this.visited.has(key(b.col,b.row)))continue;const d=Math.hypot(b.x-bx,b.y-by);if(d<best){nearest=b;best=d;}}
+      if(nearest&&nearest.color===this.chainColor&&best<=nearest.r+14&&!hits.some(h=>!h.route&&h.b===nearest))hits.push({b:nearest,route:false});
       hits.sort((a,b)=>((a.b.x-ax)*dx+(a.b.y-ay)*dy-((b.b.x-ax)*dx+(b.b.y-ay)*dy))/Math.max(1,length));
       if(hits.length)this.emit('touch',{fromX:ax,fromY:ay,x:bx,y:by,radius:14});
       for(const hit of hits){
@@ -252,13 +254,6 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
         if(hit.route){
           if(this.anchor&&Math.hypot(b.x-this.anchor.x,b.y-this.anchor.y)>1){
             const from=this.anchor;this.anchor={x:b.x,y:b.y};this.bridge=this.LINK;this.blocked=null;this.trace.push({...this.anchor});if(this.trace.length>48)this.trace.shift();this.appendStroke(this.anchor);this.emit('reroute',{fromX:from.x,fromY:from.y,x:b.x,y:b.y,color:this.chainColor});
-          }
-          continue;
-        }
-        if(b.bomb){
-          // A swipe passes over bombs. Only starting a fresh touch on one detonates it.
-          if(this.chainColor!==null&&this.anchor&&Math.hypot(b.x-this.anchor.x,b.y-this.anchor.y)<=this.bridge){
-            this.anchor={x:b.x,y:b.y};this.bridge=this.LINK;this.blocked=null;this.appendStroke(this.anchor);this.emit('bomb-pass',{x:b.x,y:b.y,color:this.chainColor});
           }
           continue;
         }
@@ -286,15 +281,13 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
   const $=id=>document.getElementById(id),canvas=$('field'),ctx=canvas.getContext('2d');
   const motion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
   const palette=['#83f5cc','#c3a1ff','#ff9bbd'],colorNames=['ミント','むらさき','ピンク'];
-  const bombNames={color:'同色全消し',area:'周囲爆発'};
-  const bombTint=(kind,color)=>kind==='color'?palette[color]:'#ffe09a';
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   const targetScore=RiftRun.RACE_TARGET,targetLabel=(targetScore/10000)+'万点';
   const modes={
-    '10':{label:'10秒',duration:10,storage:'chain-forge-rift-bonus10-v2'},
-    '30':{label:'30秒',duration:30,storage:'chain-forge-rift-bonus30-v2'},
-    '60':{label:'1分',duration:60,storage:'chain-forge-rift-bonus60-v2'},
-    million:{label:targetLabel,duration:0,storage:'chain-forge-rift-target-'+targetScore+'-v1'}
+    '10':{label:'10秒',duration:10,storage:'chain-forge-rift-bonus10-v3'},
+    '30':{label:'30秒',duration:30,storage:'chain-forge-rift-bonus30-v3'},
+    '60':{label:'1分',duration:60,storage:'chain-forge-rift-bonus60-v3'},
+    million:{label:targetLabel,duration:0,storage:'chain-forge-rift-target-'+targetScore+'-v2'}
   };
   let mode='30';
   const bestLabel=()=>mode==='million'?(boardBest===null?'—':(boardBest/1000).toFixed(2)+'秒'):boardBest.toLocaleString('ja-JP');
@@ -307,7 +300,7 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
   let run,boardSeed=107,boardBest=0,scored=false,keyboardDrawing=false,keyboardAim=false,lastReal=0,lastSecond=30;
 
   let pointer=null,aim={x:180,y:250,until:Infinity},strokes=[];
-  let particles=[],rings=[],sparks=[],beams=[],bursts=[],labels=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
+  let particles=[],rings=[],sparks=[],bursts=[],labels=[],ambient=[],audio=null,audioBus=null,noise=null,lastNote=-1000,lastBoom=-1000;
   function persistBoard(){try{localStorage.setItem(modes[mode].storage,JSON.stringify(mode==='million'?{seed:boardSeed,bestMs:boardBest}:{seed:boardSeed,best:boardBest}));}catch{}}
   const clock=()=>window.performance?.now?.()??Date.now();
   function advanceGame(time=clock()){
@@ -320,17 +313,17 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
     $('burst').hidden=run.phase!=='result';$('gesture-prompt').hidden=run.phase==='result';$('new-board').hidden=run.phase!=='result';
     $('combo').textContent=run.score.toLocaleString('ja-JP');$('combo').style.fontSize=run.score>=1e9?'26px':run.score>=1e6?'32px':'';
     if(run.phase==='running'){
-      $('gesture-prompt').textContent=run.chainColor===null?'同じ色を、なぞってつなごう':colorNames[run.chainColor]+' '+run.chainCount+' CHAIN · '+(run.blocked&&!run.blocked.dead?'他色は通れない。同色へ戻ろう':'あと'+(7-run.chainCount%7)+'体で'+bombNames[run.nextBombKind]);
+      $('gesture-prompt').textContent=run.chainColor===null?'同じ色を、なぞってつなごう':colorNames[run.chainColor]+' '+run.chainCount+' CHAIN · '+(run.blocked&&!run.blocked.dead?'他色は通れない。同色へ戻ろう':'長くつなぐほど高得点');
       $('combo-caption').textContent=run.chainCount+' CHAIN'+(run.chainMultiplier>1?' ×'+run.chainMultiplier:'')+' · 次 +'+run.nextChainPoints.toLocaleString('ja-JP')+'点'+(run.fever?' · FEVER ×2':'');
       $('arena').classList[run.fever?'add':'remove']('fever');
-      $('arena-hint').textContent='跡を戻ってつなぐ · ボムはタップで起爆';
+      $('arena-hint').textContent='同じ色をなぞる · 消した跡を戻ってつなぐ';
     }
   }
   function newWave(){
     run=new RiftRun({seed:boardSeed,mode});world=run;scored=false;keyboardDrawing=false;keyboardAim=false;lastReal=clock();lastSecond=modes[mode].duration;persistBoard();
-    particles=[];rings=[];sparks=[];beams=[];bursts=[];labels=[];strokes=[];shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
+    particles=[];rings=[];sparks=[];bursts=[];labels=[];strokes=[];shake=0;pointer=null;aim={x:180,y:worldHeight/2,until:Infinity};
     $('announcer').textContent='';$('board-name').textContent=mode==='million'?targetLabel+'、最速で！':modes[mode].label+'、消しまくれ！';$('combo').textContent='0';$('combo-caption').textContent='BEST '+bestLabel();
-    $('burst').textContent='もう一度、'+modes[mode].label+'！';$('gesture-prompt').textContent=mode==='million'?'触れた瞬間、計測スタート':'触れた瞬間、'+modes[mode].label+'スタート';$('clock-label').textContent=mode==='million'?'経過時間':'残り時間';$('ink-track').setAttribute('aria-label',mode==='million'?targetLabel+'までの進捗':'残り時間の割合');$('instruction').textContent='7連鎖から得点×2。10で×4、13で×8！';$('arena').classList.remove('fever');$('arena-hint').textContent='跡を戻ってつなぐ · ボムはタップで起爆';$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
+    $('burst').textContent='もう一度、'+modes[mode].label+'！';$('gesture-prompt').textContent=mode==='million'?'触れた瞬間、計測スタート':'触れた瞬間、'+modes[mode].label+'スタート';$('clock-label').textContent=mode==='million'?'経過時間':'残り時間';$('ink-track').setAttribute('aria-label',mode==='million'?targetLabel+'までの進捗':'残り時間の割合');$('instruction').textContent='7連鎖から得点×2。10で×4、13で×8！';$('arena').classList.remove('fever');$('arena-hint').textContent='同じ色をなぞる · 消した跡を戻ってつなぐ';$('shout').classList.remove('show','finished');$('tap-hint').hidden=true;$('new-board').textContent='記録をコピー';
     ambient=Array.from({length:22},()=>({x:Math.random()*360,y:Math.random()*worldHeight,r:.5+Math.random()*1.3,phase:Math.random()*6.3}));renderRun();
     if(!audio&&sound){if(window.requestIdleCallback)window.requestIdleCallback(()=>prepareAudio(),{timeout:300});else window.setTimeout?.(()=>prepareAudio(),0);}
   }
@@ -398,40 +391,21 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
   function shout(text,finished=false){
     const el=$('shout');el.textContent=text;el.classList.remove('show','finished');if(finished)el.classList.add('finished');el.classList.add('show');shoutUntil=now+.85;
   }
-  function beam(ax,ay,bx,by,color,width=26){beams.push({ax,ay,bx,by,color,width,life:.38,max:.38});if(beams.length>100)beams.shift();}
   function burst(x,y,r,color,strong=false){bursts.push({x,y,r,color,strong,life:motion?.12:.24,max:motion?.12:.24});if(bursts.length>64)bursts.shift();}
-  function bombEffect(e){
-    const tint=bombTint(e.kind,e.color);
-    if(e.kind==='color'){
-      for(const p of e.targets)beam(e.x,e.y,p.x,p.y,tint,5);
-      ring(e.x,e.y,190,tint,.48,9);
-      tone(880,.18,.08,'triangle');tone(1320,.18,.05,'sine',.045);
-    }
-    if(e.kind==='area'){ring(e.x,e.y,e.radius,'#ffe7a3',.4,e.radius>=112?8:5);if(e.radius>=112)ring(e.x,e.y,e.radius*.7,'#ffacdd',.3,4);}
-    else ring(e.x,e.y,55,tint,.28,6);
-    bits(e.x,e.y,tint,20,true);
-    burst(e.x,e.y,34,tint,true);
-    shout((e.kind==='area'?'POWER BOMB!':e.kind==='color'?colorNames[e.color]+' 全消し！':bombNames[e.kind]+'！')+(e.chain>1?' '+e.chain+'連爆':''));
-    boom(true);if(!motion)shake=Math.max(shake,Math.min(5,3+e.chain*.5));
-  }
   function handleEvents(){
     const events=world.drain();let hits=0;
     for(const e of events){
       if(e.type==='begin'){shout('GO!');$('instruction').textContent='同色を長くつなぐほど、得点が跳ね上がる！';}
-      if(e.type==='bomb-earned'){shout(e.count+' CHAIN → '+bombNames[e.kind]+'！');ring(e.x,e.y,48,bombTint(e.kind,e.color),.25,3);}
       if(e.type==='chain-boost'){
         shout(e.count+' CHAIN ×'+e.multiplier+'！');ring(e.x,e.y,60,'#fff0b5',.3,5);bits(e.x,e.y,'#ffe6a1',12,true);tone(660,.14,.09,'triangle');tone(990,.13,.06,'sine',.035);
       }
-      if(e.type==='created'){ring(e.x,e.y,40,bombTint(e.kind,e.color),.3,3);}
       if(e.type==='touch'){
         strokes.push({ax:e.fromX,ay:e.fromY,bx:e.x,by:e.y,r:e.radius,life:.14,max:.14});if(strokes.length>40)strokes.shift();
       }
       if(e.type==='reroute'){ring(e.x,e.y,25,palette[e.color],.14,2);}
-      if(e.type==='bomb-pass'){ring(e.x,e.y,24,palette[e.color],.12,1.5);}
-      if(e.type==='bomb')bombEffect(e);
       if(e.type==='fever'){shout('F E V E R !');boom(true);}
       if(e.type==='pop'){
-        const color=palette[e.color];if(!e.bomb){bits(e.x,e.y,color,e.direct&&e.combo>=7?12:8,e.direct&&e.combo>=7);burst(e.x,e.y,e.r,color,e.direct&&e.combo>=7);ring(e.x,e.y,e.direct&&e.combo>=7?42:31,color,.22,3);}popSound(e.combo);hits++;
+        const color=palette[e.color];bits(e.x,e.y,color,e.direct&&e.combo>=7?12:8,e.direct&&e.combo>=7);burst(e.x,e.y,e.r,color,e.direct&&e.combo>=7);ring(e.x,e.y,e.direct&&e.combo>=7?42:31,color,.22,3);popSound(e.combo);hits++;
         if(e.direct&&e.combo>=7){labels.push({x:e.x,y:e.y,text:'+'+e.points.toLocaleString('ja-JP'),life:.5,max:.5});if(labels.length>16)labels.shift();}
         if(!motion)shake=Math.max(shake,e.fast?1.5:.6);
       }
@@ -482,7 +456,7 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
   $('burst').onclick=()=>{if(run.phase==='result')newWave();};
   $('new-board').onclick=async()=>{
     const result=mode==='million'?targetLabel+'まで '+run.time.toFixed(2)+'秒！':modes[mode].label+'で '+run.score.toLocaleString('ja-JP')+'点！';
-    const text='一筆で、大連鎖。'+result+' 最大'+run.maxCombo+' CHAIN https://meyonze.github.io/game/chain-forge-rift.html?v=7';
+    const text='一筆で、大連鎖。'+result+' 最大'+run.maxCombo+' CHAIN https://meyonze.github.io/game/chain-forge-rift.html?v=8';
     try{await navigator.clipboard.writeText(text);$('new-board').textContent='記録をコピーしました';}catch{$('announcer').textContent=text;$('instruction').textContent=text;}
   };
   function circle(x,y,r,fill){ctx.beginPath();ctx.arc(x,y,Math.max(.1,r),0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();}
@@ -490,14 +464,6 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
     const color=palette[b.color],r=b.r,age=Math.max(0,run.time-b.spawnAt),birth=motion?1:Math.min(1,.65+age*3),wiggle=motion?0:Math.sin(now*2+b.id)*.025;
     const hot=false;
     ctx.save();ctx.translate(b.x,b.y);ctx.rotate(motion?0:b.angle+wiggle);ctx.scale(birth,birth);
-    if(b.bomb){
-      const kind=b.bombKind||'area',tint=bombTint(kind,b.color);
-      ctx.globalAlpha=.16;circle(0,0,r+7,tint);ctx.globalAlpha=1;circle(0,0,r+3,tint);circle(0,0,r,kind==='color'?palette[b.color]:'#343253');
-      ctx.strokeStyle=kind==='color'?'#343253':tint;ctx.lineWidth=3.5;ctx.lineCap='round';
-      if(kind==='color'){ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.stroke();circle(0,0,4,'#343253');}
-      if(kind==='area'){ctx.fillStyle=tint;ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.fillText('✦',0,8);}
-      ctx.restore();return;
-    }
     // The silhouette squashes under impact; the face stays large enough to read.
     ctx.beginPath();ctx.moveTo(-r,-r*.08);ctx.bezierCurveTo(-r,-r*1.05,r*.5,-r*1.2,r*.92,-r*.15);ctx.bezierCurveTo(r*1.2,r*.8,r*.2,r*1.12,-r*.65,r*.75);ctx.bezierCurveTo(-r*.96,r*.6,-r*1.1,r*.38,-r,-r*.08);
     ctx.fillStyle=color;ctx.fill();ctx.lineWidth=1.2;ctx.strokeStyle=hot?'#ffeab2':'#ffffff40';ctx.stroke();
@@ -520,11 +486,6 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
       if(t<.45){ctx.globalAlpha=(1-t/.45)*.85;circle(0,0,b.r*(.8+t*.5),'#fff9e5');}
       ctx.restore();
     }bursts=bursts.filter(b=>b.life>0);ctx.globalAlpha=1;
-    for(const b of beams){
-      b.life-=dt;if(b.life<=0)continue;const t=1-b.life/b.max;
-      ctx.globalAlpha=(1-t)*(motion?.35:.65);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(b.ax,b.ay);ctx.lineTo(b.bx,b.by);ctx.lineWidth=b.width*(1-t*.8);ctx.strokeStyle=b.color;ctx.stroke();
-      ctx.globalAlpha=(1-t)*.85;ctx.lineWidth=Math.max(1,b.width*.24*(1-t));ctx.strokeStyle='#fff9e9';ctx.stroke();
-    }beams=beams.filter(b=>b.life>0);ctx.globalAlpha=1;
     for(const s of strokes){s.life-=dt;if(s.life<=0)continue;ctx.globalAlpha=s.life/s.max*.12;ctx.beginPath();ctx.moveTo(s.ax,s.ay);ctx.lineTo(s.bx,s.by);ctx.lineWidth=s.r*2;ctx.lineCap='round';ctx.strokeStyle='#ffe4a1';ctx.stroke();}strokes=strokes.filter(s=>s.life>0);ctx.globalAlpha=1;
     for(const p of particles){
       p.life-=dt;if(p.life<=0)continue;const t=1-p.life/p.max;ctx.globalAlpha=Math.min(1,p.life*5);
@@ -547,8 +508,8 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
     if(shake>.05&&!motion){if(!run.active)ctx.translate(Math.sin(now*145)*shake,Math.cos(now*119)*shake*.6);shake*=Math.exp(-dt*17);}
     for(const a of ambient){ctx.globalAlpha=.12+Math.sin(now*.8+a.phase)*.08;circle(a.x,a.y,a.r,'#c6caff');}ctx.globalAlpha=1;
     for(const b of world.bodies)if(!b.dead){
-      if(run.active&&!b.bomb&&run.visited.has(b.col+':'+b.row))continue;
-      const matching=run.chainColor===null||b.color===run.chainColor||b.bomb;
+      if(run.active&&run.visited.has(b.col+':'+b.row))continue;
+      const matching=run.chainColor===null||b.color===run.chainColor;
       ctx.globalAlpha=run.active&&!matching ? .45 : 1;jelly(b);ctx.globalAlpha=1;
       if(run.active&&run.chainColor!==null&&matching&&run.anchor&&Math.hypot(b.x-run.anchor.x,b.y-run.anchor.y)<=run.bridge&&!run.blocker(run.anchor.x,run.anchor.y,b.x,b.y)){
         ctx.strokeStyle=palette[b.color];ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(b.x,b.y,b.r+3,0,Math.PI*2);ctx.stroke();
