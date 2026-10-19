@@ -14,7 +14,7 @@ test('four weapon families remain distinct while support upgrades use no weapon 
 test('boss weak sides reward positioning and never point outside the board',()=>{
   const totals=[];
   for(const side of ['S','N']){const g=empty(),b=g.addEnemy(3,2,'boss');b.weakSide=side;b.intent={kind:'boss',cells:[]};g.step(3,4);totals.push(b.maxHp-b.hp);}
-  assert(totals[0]>totals[1]*2);
+  assert(totals[0]===totals[1]*2);
   for(const y of [1,7]){const g=empty();g.sectorIndex=19;const b=g.addEnemy(3,y,'boss');b.variant='origin';b.bornTurn=0;for(let t=0;t<12;t++){g.sectorTurn=t;g.planEnemies();assert.notEqual(b.weakSide,y===1?'N':'S');}}
 });
 test('frost allows two enemy turns between freezes instead of permanent stun',()=>{

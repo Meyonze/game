@@ -272,7 +272,7 @@
     }
     if(e.type==='boom'){emit(p.x,p.y,C.orange,12,1.3);if(animation.soundedBooms++<3)sound.fx('boom');}
     if(e.type==='hurt'){shake=6;sound.fx('hurt');floats.push({x:p.x,y:p.y-tile*.45,text:'−'+e.amount,color:C.pink,born:now});}
-    if(e.type==='heal'){emit(p.x,p.y,C.green,18);floats.push({x:p.x,y:p.y-tile*.45,text:'+3',color:C.green,born:now});}
+    if(e.type==='heal'){emit(p.x,p.y,C.green,18);floats.push({x:p.x,y:p.y-tile*.45,text:'+'+e.amount,color:C.green,born:now});}
     if(e.type==='hit'&&e.boss){
       animation.bossFloats??=new Set();
       if(!animation.bossFloats.has(e.id)){
@@ -470,7 +470,7 @@
     $('rest-screen').hidden=false;sound.fx('upgrade');$('clear-number').textContent=`${sectorLabel(game.sector)} / ${STAGES.length}`;
     $('clear-title').textContent=game.stage.name+'、突破。';$('journey').innerHTML=STAGES.map((_,i)=>`<span class="${i<game.sector?'done':''}"></span>`).join('');
     const next=STAGES[game.sector];$('next-name').textContent=`${sectorLabel(game.sector+1)} / ${next.name}`;$('next-description').textContent=next.subtitle+(game.sector+1===6?'。主力武器の覚醒が解禁。':'');
-    $('supply-note').textContent=game.stage.boss&&!game.buildComplete?'HPを3回復 ＋ ボス撃破の強化権1回':'HPを3回復。武装を引き継いで次の戦場へ';
+    $('supply-note').textContent=game.stage.boss&&!game.buildComplete?'HPを全回復 ＋ ボス撃破の強化権1回':'HPを全回復。武装を引き継いで次の戦場へ';
   }
   $('next-sector').addEventListener('click',()=>{
     if(animation||!game.nextSector())return;$('rest-screen').hidden=true;selection=null;pointer=null;announcedSector=game.sector;

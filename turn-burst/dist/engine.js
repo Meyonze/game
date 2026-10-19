@@ -52,13 +52,14 @@
       this.enemies = []; this.pickups = []; this.events = [];
       this.weapons = Object.fromEntries(UPGRADES.map(u=>[u.id,0]));
       this.slotLimit=4;this.experience=0;this.boosted=[];
+      this.balanceVersion=6;
       this.kills = 0; this.score = 0; this.bestCombo = 0; this.lastKills = 0;
       this.level = 0; this.xpLevel=0; this.bonusUpgrades=0; this.pendingBonus=false;
       this.thresholds = Array.from({length:32},(_,i)=>i===0?6:Math.round(6+12*i+6*i*i));
       this.offers = []; this.bossSpawned = false; this.bossDead = false;
       this.sectorIndex=0;this.sectorTurn=0;this.bossesDefeated=0;this.clearedSectors=0;this.fires=[];this.splits=[];
       [[3,4],[3,3],[3,2],[2,3],[4,3],[1,5],[0,5],[5,5],[6,5],[1,1],[5,1],[3,0],
-       [2,2],[4,2],[1,3],[5,3],[0,4],[6,4],[1,6],[5,6],[2,8],[4,8]].forEach(([x,y])=>this.addEnemy(x,y,'mite'));
+       [2,2],[4,2],[1,3],[5,3],[2,8],[4,8]].forEach(([x,y])=>this.addEnemy(x,y,'mite'));
       this.planEnemies();
     }
     random() { this.seed = (Math.imul(this.seed,1664525) + 1013904223) >>> 0; return this.seed / 4294967296; }
@@ -85,6 +86,11 @@
         if(!legacy&&(!integer(s.slotLimit)||s.slotLimit<4||s.slotLimit>9||owned>s.slotLimit||!integer(s.experience)))return null;
         for(const k of Object.keys(g))if(k!=='thresholds'&&Object.hasOwn(s,k))g[k]=JSON.parse(JSON.stringify(s[k]));
         if(legacy){g.slotLimit=Math.max(4,owned);g.experience=integer(s.experience)?s.experience:s.kills;}
+        if(s.balanceVersion!==6){
+          g.player.hp=g.player.maxHp;
+          for(const e of g.enemies){e.maxHp=Math.max(1,Math.ceil(e.maxHp*.8));e.hp=Math.max(1,Math.min(e.maxHp,Math.ceil(e.hp*.8)));}
+        }
+        g.balanceVersion=6;
         g.events=[];g.explosions=[];g.splits=[];g.boosted=[];
         if(legacy&&g.phase==='upgrade'){
           if(!g.pendingBonus)g.bonusUpgrades++;
@@ -110,7 +116,7 @@
     occupied(x,y,ignore) { return this.enemies.some(e=>e.id!==ignore && this.enemyAt(e,x,y)); }
     addEnemy(x,y,type='mite') {
       const scaling=Math.min(8,Math.max(0,this.sector-2))+Math.max(0,this.sector-10)*.5;
-      const maxHp = {mite:1, brute:4+Math.ceil(scaling*1.2), gunner:2+Math.floor(scaling*.65), runner:2+Math.floor(scaling*.5), splitter:5+Math.ceil(scaling*.9), mortar:3+Math.floor(scaling*.6),warder:6+Math.ceil(scaling*.6),boss:85}[type];
+      const maxHp = {mite:1, brute:4+Math.ceil(scaling*.9), gunner:2+Math.floor(scaling*.5), runner:2+Math.floor(scaling*.4), splitter:5+Math.ceil(scaling*.65), mortar:3+Math.floor(scaling*.45),warder:4+Math.ceil(scaling*.4),boss:85}[type];
       const enemy = {id:this.nextId++, x,y,type,hp:maxHp,maxHp,intent:null};
       this.enemies.push(enemy); return enemy;
     }
@@ -149,7 +155,7 @@
       const reserved=new Set();
       for(const e of this.enemies) {
         if(e.type==='boss') {
-          if(e.variant){const sides=e.y<4?['S','E','W']:['N','W','E'];e.weakSide=sides[Math.floor(Math.max(0,this.sectorTurn-(e.bornTurn||0))/3)%sides.length];}
+          if(e.variant){const sides=e.y<4?['S','E','W']:['N','W','E'];e.weakSide=sides[Math.floor(Math.max(0,this.sectorTurn-(e.bornTurn||0))/4)%sides.length];}
           const mode=(this.sectorTurn-(e.bornTurn||0))%3,cells=[];
           for(let y=0;y<H;y++)for(let x=0;x<W;x++) {
             let hit=mode===0?(x===this.player.x||y===this.player.y):mode===1?(x%2===0):(y%2===0);
@@ -167,13 +173,13 @@
             if(e.variant==='origin')hit=mode===0?x===this.player.x||y===this.player.y:mode===1?(x+y)%3===this.sectorTurn%3:x===0||x===W-1||y===0||y===H-1;
             if(hit)cells.push({x,y});
           }
-          e.intent={kind:'boss',cells};continue;
+          e.intent={kind:'boss',cells:(this.sectorTurn-(e.bornTurn||0))%4===3?[]:cells};continue;
         }
-        if(e.type==='warder'&&(this.turn+e.id)%2===0){e.intent={kind:'shot',cells:Array.from({length:W},(_,x)=>({x,y:this.player.y}))};continue;}
-        if(e.type==='mortar'&&(this.turn+e.id)%2===0){
+        if(e.type==='warder'&&(this.turn+e.id)%3===0){e.intent={kind:'shot',cells:Array.from({length:W},(_,x)=>({x,y:this.player.y}))};continue;}
+        if(e.type==='mortar'&&(this.turn+e.id)%3===0){
           e.intent={kind:'shell',cells:this.area(this.player.x,this.player.y,1).filter(p=>p.x===this.player.x||p.y===this.player.y)};continue;
         }
-        if(e.type==='gunner'&&(this.turn+e.id)%3!==0) {
+        if(e.type==='gunner'&&(this.turn+e.id)%3===0) {
           const dx=Math.sign(this.player.x-e.x),dy=Math.sign(this.player.y-e.y);
           // An aimed eight-direction shot, with every hit cell shown before the turn.
           const aligned=e.x===this.player.x||e.y===this.player.y||Math.abs(e.x-this.player.x)===Math.abs(e.y-this.player.y);
@@ -204,7 +210,7 @@
       if(e.hp<=0)return;
       if(!this.boosted.includes(e.id)){amount+=this.weapons.overclock||0;this.boosted.push(e.id);}
       if(e.type==='warder'&&['blast','fire'].includes(source))amount=Math.max(1,Math.floor(amount/3));
-      if(e.type==='boss'&&e.weakSide)amount=Math.max(1,Math.floor(amount*(this.onWeakSide(e)?2:.65)));
+      if(e.type==='boss'&&e.weakSide&&this.onWeakSide(e))amount*=2;
       const dealt=Math.min(e.hp,amount); e.hp-=amount;
       if(this.weapons.frost&&!['boss','warder'].includes(e.type)&&e.hp>0&&this.turn>=(e.thawAt||0)){e.frozen=this.weapons.frost;e.thawAt=this.turn+this.weapons.frost+2;}
       this.events.push({type:'hit',id:e.id,x:e.x,y:e.y,amount:dealt,depth,boss:e.type==='boss'});
@@ -225,7 +231,7 @@
       this.turn++;
       this.sectorTurn++;
       const heal=this.pickups.find(p=>p.x===x&&p.y===y);
-      if(heal){this.player.hp=Math.min(this.player.maxHp,this.player.hp+3);this.pickups=this.pickups.filter(p=>p!==heal);this.events.push({type:'heal',x,y,amount:3});}
+      if(heal){const amount=Math.min(4,this.player.maxHp-this.player.hp);this.player.hp+=amount;this.pickups=this.pickups.filter(p=>p!==heal);this.events.push({type:'heal',x,y,amount});}
       for(const cells of attack.beams) {
         this.events.push({type:'beam',x,y,cells});
         this.hitCells(cells,[2,3,5,8][this.weapons.lance]);
@@ -274,7 +280,7 @@
         else this.events.push({type:'enemyAttack',id:e.id,x:e.x,y:e.y,kind:intent.kind,cells:intent.cells});
       }
       const armor=this.weapons.armor&&this.turn%(this.weapons.armor>1?2:3)===0?1:0;
-      damage=Math.max(0,Math.min(3,damage)-armor);
+      damage=Math.max(0,Math.min(2,damage)-armor);
       if(damage){this.player.hp-=damage;this.events.push({type:'hurt',x,y,amount:damage});}
       if(this.player.hp<=0){this.player.hp=0;this.phase='lost';return true;}
       for(const s of this.splits)for(const [dx,dy] of DIRS){
@@ -287,20 +293,20 @@
       if(this.sectorTurn>=this.stage.turns&&!this.stage.boss){this.clearSector();return true;}
       if(this.sectorTurn===this.stage.turns&&this.stage.boss)this.spawnBoss();
       this.spawnWave();
-      if(this.sectorTurn%6===5)this.spawnMedkit();
+      if(this.sectorTurn%4===3)this.spawnMedkit();
       this.planEnemies();
       this.checkUpgrade();
       return true;
     }
     spawnWave() {
-      const count=this.bossSpawned?2:this.sector<3?3:[2,5,3,4][this.sectorTurn%4];
+      const count=this.bossSpawned?this.sectorTurn%2:this.sector<3?2:[1,4,2,3][this.sectorTurn%4];
       const edges=[];
       for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(x===0||x===W-1||y===0||y===H-1)edges.push({x,y});
       // Fisher–Yates keeps seeded runs reproducible across browsers.
       for(let i=edges.length-1;i>0;i--){const j=Math.floor(this.random()*(i+1));[edges[i],edges[j]]=[edges[j],edges[i]];}
       let spawned=0;
       for(const p of edges) {
-        if(spawned>=count||this.enemies.length>=28)break;
+        if(spawned>=count||this.enemies.length>=22)break;
         if(this.occupied(p.x,p.y)||dist(p,this.player)<2||this.pickups.some(q=>q.x===p.x&&q.y===p.y))continue;
         const types=this.stage.enemies;
         const type=types[Math.floor(this.random()*types.length)];
@@ -314,7 +320,7 @@
       this.enemies=this.enemies.filter(e=>Math.max(Math.abs(e.x-3),Math.abs(e.y-y))>1);
       this.pickups=this.pickups.filter(p=>Math.max(Math.abs(p.x-3),Math.abs(p.y-y))>1);
       const boss=this.addEnemy(3,y,'boss');
-      boss.variant=this.stage.boss||'king';boss.maxHp=boss.hp={gate:75,storm:110,king:145,reaper:175,prism:210,core:240,bastion:280,hydra:320,oracle:350,forge:390,eclipse:450,origin:520}[boss.variant];boss.bornTurn=this.sectorTurn;
+      boss.variant=this.stage.boss||'king';boss.maxHp=boss.hp={gate:60,storm:90,king:120,reaper:145,prism:175,core:200,bastion:230,hydra:265,oracle:290,forge:325,eclipse:375,origin:430}[boss.variant];boss.bornTurn=this.sectorTurn;
       this.events.push({type:'bossEnter',id:boss.id,x:3,y});
     }
     clearSector(){
@@ -327,13 +333,13 @@
       if(this.phase!=='rest')return false;
       this.sectorIndex++;this.sectorTurn=0;this.bossSpawned=false;this.bossDead=false;
       this.enemies=[];this.pickups=[];this.fires=[];this.events=[];this.player.x=3;this.player.y=5;this.player.dx=0;this.player.dy=-1;
-      this.player.hp=Math.min(this.player.maxHp,this.player.hp+3);
+      this.player.hp=this.player.maxHp;
       if(STAGES[this.sectorIndex-1].boss&&!this.buildComplete)this.bonusUpgrades++;
       this.phase='play';
       const candidates=[];
       for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dist({x,y},this.player)>=2)candidates.push({x,y});
       for(let i=candidates.length-1;i>0;i--){const j=Math.floor(this.random()*(i+1));[candidates[i],candidates[j]]=[candidates[j],candidates[i]];}
-      candidates.slice(0,Math.min(22,12+this.sector)).forEach((p,i)=>this.addEnemy(p.x,p.y,this.stage.enemies[i%this.stage.enemies.length]));
+      candidates.slice(0,Math.min(16,9+this.sector)).forEach((p,i)=>this.addEnemy(p.x,p.y,this.stage.enemies[i%this.stage.enemies.length]));
       this.planEnemies();this.checkUpgrade();return true;
     }
     spawnMedkit() {

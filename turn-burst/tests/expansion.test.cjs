@@ -6,7 +6,7 @@ function empty(){const g=new Game(12);g.enemies=[];g.spawnWave=()=>{};g.spawnMed
 test('clearing a sector pauses for supplies and preserves the build into the next sector',()=>{
   const g=empty();g.weapons.blast=1;g.player.hp=3;g.sectorIndex=1;g.sectorTurn=9;g.clearSector();
   assert.equal(g.phase,'rest');assert.equal(g.clearedSectors,2);assert.equal(g.step(3,4),false);
-  const score=g.score,xp=g.xpLevel,kills=g.kills;g.nextSector();assert.equal(g.sector,3);assert.equal(g.sectorTurn,0);assert.equal(g.player.hp,6);assert.equal(g.weapons.blast,1);assert.equal(g.score,score);assert.equal(g.kills,kills);assert.equal(g.phase,'upgrade');assert(g.pendingBonus);
+  const score=g.score,xp=g.xpLevel,kills=g.kills;g.nextSector();assert.equal(g.sector,3);assert.equal(g.sectorTurn,0);assert.equal(g.player.hp,8);assert.equal(g.weapons.blast,1);assert.equal(g.score,score);assert.equal(g.kills,kills);assert.equal(g.phase,'upgrade');assert(g.pendingBonus);
   g.choose(g.offers[0]);assert.equal(g.xpLevel,xp,'supply upgrade does not consume kill XP');assert.equal(g.bonusUpgrades,0);assert.equal(g.phase,'play');
 });
 test('mid-boss defeat clears its sector while the final boss ends the campaign',()=>{
@@ -36,7 +36,7 @@ test('awakenings unlock in sector six and produce distinct upgraded attacks',()=
 });
 test('boss variants have different health, names and telegraphed patterns',()=>{
   const patterns=[];
-  for(const index of [1,3,4]){const g=empty();g.sectorIndex=index;g.sectorTurn=12;g.spawnBoss();const b=g.enemies[0];assert(BOSS_NAMES[b.variant]);assert(b.hp>=75);g.sectorTurn++;g.planEnemies();patterns.push(JSON.stringify(b.intent.cells));}
+  for(const index of [1,3,4]){const g=empty();g.sectorIndex=index;g.sectorTurn=12;g.spawnBoss();const b=g.enemies[0];assert(BOSS_NAMES[b.variant]);assert(b.hp>=60);g.sectorTurn++;g.planEnemies();patterns.push(JSON.stringify(b.intent.cells));}
   assert.equal(new Set(patterns).size,3);assert.equal(STAGES.length,20);
 });
 test('save and resume retain RNG and preview results across play, upgrades and sector breaks',()=>{

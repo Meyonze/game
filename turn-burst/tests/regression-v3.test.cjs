@@ -51,7 +51,7 @@ test('old five-sector saves keep their progress and can continue through the new
 });
 test('sector twenty restores late upgrades and has a valid final boss and attack forecast',()=>{
   const g=new Game(99);g.enemies=[];g.sectorIndex=19;g.weapons.overclock=3;g.player.maxHp=g.player.hp=12;g.spawnBoss();g.planEnemies();
-  assert.equal(g.enemies[0].variant,'origin');assert.equal(g.enemies[0].hp,520);const restored=Game.restore(g.save());assert(restored);assert.equal(restored.sector,20);assert.equal(restored.weapons.overclock,3);assert.deepEqual(restored.preview(2,4),g.preview(2,4));assert.equal(STAGES.length,20);
+  assert.equal(g.enemies[0].variant,'origin');assert.equal(g.enemies[0].hp,430);const restored=Game.restore(g.save());assert(restored);assert.equal(restored.sector,20);assert.equal(restored.weapons.overclock,3);assert.deepEqual(restored.preview(2,4),g.preview(2,4));assert.equal(STAGES.length,20);
 });
 test('sector transition displays 09/20 and 10/20 and resumes the late campaign',()=>{
   const h=boot();h.click('start');h.game.sectorIndex=8;h.game.enemies=[];const b=h.game.addEnemy(3,2,'boss');b.hp=1;b.intent={kind:'boss',cells:[]};h.tap(3,4);h.tick(850);
