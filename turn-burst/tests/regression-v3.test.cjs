@@ -5,12 +5,12 @@ function upgrade(){const h=boot();h.click('start');h.tap(3,4);h.tick(850);assert
 
 test('rapid taps immediately after the upgrade appears cannot choose any card',()=>{
   const h=upgrade();
-  for(let i=0;i<5;i++){h.choiceDown('blast');h.choiceUp('blast');h.choiceClick('blast');h.tick(80);}
+  for(let i=0;i<5;i++){h.choiceDown('blast');h.choiceUp('blast');h.choiceClick('blast');h.tick(60);}
   assert.equal(h.game.level,0);assert.equal(h.game.weapons.blast,0);assert.equal(h.game.phase,'upgrade');
-  h.tick(150);h.choiceDown('blast');h.choiceUp('blast');h.choiceClick('blast');assert.equal(h.game.level,1);
+  h.tick(50);h.choiceDown('blast');h.choiceUp('blast');h.choiceClick('blast');assert.equal(h.game.level,1);
 });
 test('a press started during the protected interval stays rejected after the interval ends',()=>{
-  const h=upgrade();h.tick(490);h.choiceDown('blast');h.tick(100);h.choiceUp('blast');h.choiceClick('blast');assert.equal(h.game.level,0);
+  const h=upgrade();h.tick(340);h.choiceDown('blast');h.tick(100);h.choiceUp('blast');h.choiceClick('blast');assert.equal(h.game.level,0);
   h.choiceDown('blast');h.choiceUp('blast');h.choiceClick('blast');assert.equal(h.game.level,1);
 });
 test('release or click carried from the battlefield cannot select a newly displayed upgrade',()=>{
