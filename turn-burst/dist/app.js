@@ -19,16 +19,24 @@
   try{soundEnabled=localStorage.getItem('turn-burst-sound')!=='off';}catch{}
 
   class Sound {
-    constructor(){this.ctx=null;this.timer=null;this.note=0;this.next=0;}
+    constructor(){this.ctx=null;this.music=null;}
     init(){
       if(!soundEnabled)return;
       try {
-        if(!this.ctx){this.ctx=new (window.AudioContext||window.webkitAudioContext)();this.master=this.ctx.createGain();this.master.gain.value=.22;this.master.connect(this.ctx.destination);}
+        if(!this.ctx){
+          this.ctx=new (window.AudioContext||window.webkitAudioContext)();
+          this.master=this.ctx.createGain();this.master.gain.value=.6;
+          const limiter=this.ctx.createDynamicsCompressor();
+          limiter.threshold.value=-14;limiter.knee.value=12;limiter.ratio.value=4;limiter.attack.value=.008;limiter.release.value=.16;
+          this.master.connect(limiter);limiter.connect(this.ctx.destination);
+          this.music=new window.TurnBurstMusic.BattleMusic(this.ctx,this.master);
+        }
         if(this.ctx.state==='suspended')this.ctx.resume().catch(()=>{});
       }catch{}
     }
     tone(freq,duration=.1,type='sine',volume=.2,delay=0,endFreq=null){
       if(!soundEnabled||!this.ctx||this.ctx.state!=='running')return;
+      volume*=.37; // Keep effects near their previous level alongside the new music mix.
       const t=this.ctx.currentTime+delay,o=this.ctx.createOscillator(),g=this.ctx.createGain();
       o.type=type;o.frequency.setValueAtTime(freq,t);if(endFreq)o.frequency.exponentialRampToValueAtTime(Math.max(20,endFreq),t+duration);
       g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(volume,t+.007);g.gain.exponentialRampToValueAtTime(.001,t+duration);
@@ -44,26 +52,13 @@
       if(type==='win')[523,659,784,1046,1318].forEach((f,i)=>this.tone(f,.55,'triangle',.3,i*.12));
       if(type==='lose')[220,196,164].forEach((f,i)=>this.tone(f,.5,'triangle',.22,i*.15));
     }
-    start(){
-      this.init();if(this.timer||!soundEnabled||!this.ctx)return;
-      this.next=this.ctx.currentTime+.05;
-      this.timer=setInterval(()=>{
-        if(!this.ctx||this.ctx.state!=='running'||!soundEnabled)return;
-        const t=this.ctx.currentTime;
-        if(this.next<t-.1)this.next=t+.05;
-        while(this.next<t+.16){
-          const n=this.note++,beat=n%16,bar=Math.floor(n/16)%4,root=[130.81,110,146.83,98][bar];
-          const delay=Math.max(0,this.next-t);
-          if(beat%4===0)this.tone(root,.34,'triangle',.16,delay);
-          const seq=[0,7,12,19,12,7,15,12];
-          if(beat%2===0)this.tone(root*2*Math.pow(2,seq[(beat/2)%8]/12),.22,'sine',.07,delay);
-          if(beat%4===0)this.tone(65,.1,'sine',.16,delay,30);
-          if(beat%4===2)this.tone(930,.035,'triangle',.025,delay,400);
-          this.next+=60/112/4;
-        }
-      },80);
+    mode(){return game.bossSpawned&&!game.bossDead?'boss':'normal';}
+    sync(){this.music?.setMode(this.mode());}
+    start(reset=false){
+      this.init();if(!soundEnabled||!this.music)return;
+      this.music.start(this.mode(),reset);
     }
-    stop(){if(this.timer)clearInterval(this.timer);this.timer=null;}
+    stop(){this.music?.stop();}
   }
   const sound=new Sound();
   function updateSound(){ $('sound').setAttribute('aria-pressed',String(soundEnabled));$('sound').textContent=soundEnabled?'♪':'♩'; }
@@ -424,7 +419,7 @@
     $('clock-state').classList.add('running');$('clock-state').innerHTML='<i></i> BURST';updateHint();
   }
   function finishTurn(){
-    updateHUD();updateHint();$('clock-state').classList.remove('running');$('clock-state').innerHTML='<i></i> TIME STOPPED';
+    sound.sync();updateHUD();updateHint();$('clock-state').classList.remove('running');$('clock-state').innerHTML='<i></i> TIME STOPPED';
     if(game.events.some(e=>e.type==='bossEnter'))banner('WARNING / '+BOSS_NAMES[game.stage.boss]);
     const end=game.events.find(e=>e.type==='reinforcementsEnd');
     if(end&&game.enemies.length)banner(`${end.bossDied?'ボス撃破':'増援終了'} / 残り${game.enemies.length}体`);
@@ -476,7 +471,7 @@
     $('supply-note').textContent=game.stage.boss&&!game.buildComplete?'HPを全回復 ＋ ボス撃破の強化権1回':'HPを全回復。武装を引き継いで次の戦場へ';
   }
   $('next-sector').addEventListener('click',()=>{
-    if(animation||!game.nextSector())return;$('rest-screen').hidden=true;selection=null;pointer=null;announcedSector=game.sector;
+    if(animation||!game.nextSector())return;sound.sync();$('rest-screen').hidden=true;selection=null;pointer=null;announcedSector=game.sector;
     saveRun();
     updateHUD();updateHint();banner(`SECTOR ${sectorLabel(game.sector)} / ${game.stage.name}`);if(game.phase==='upgrade')showUpgrade();
   });
@@ -494,7 +489,7 @@
     game=new Game(Date.now());started=true;selection=null;pointer=null;animation=null;particles=[];floats=[];announcedSector=1;
     for(const id of ['start-screen','upgrade-screen','result-screen','help-screen','rest-screen'])$(id).hidden=true;
     helpOpen=false;$('combo').classList.remove('show');$('sector-banner').classList.remove('show');
-    sound.start();updateHUD();updateHint();banner('READY / 一手ずつ、進め');resize();saveRun();
+    sound.start(true);updateHUD();updateHint();banner('READY / 一手ずつ、進め');resize();saveRun();
   }
   $('start').addEventListener('click',start);$('retry').addEventListener('click',start);
   $('continue').addEventListener('click',()=>{
@@ -516,5 +511,5 @@
   window.addEventListener('pagehide',()=>{saveRun();sound.stop();});
   updateHUD();resize();requestAnimationFrame(render);
   // Read-only diagnostics help check viewport fit and turn progression without an autoplay mode.
-  window.turnBurstDebug=()=>({turn:game.turn,sector:game.sector,sectorTurn:game.sectorTurn,bossesDefeated:game.bossesDefeated,phase:game.phase,started,busy:!!animation,player:{...game.player},enemies:game.enemies.map(e=>({...e})),weapons:{...game.weapons},kills:game.kills,score:game.score,canvas:{width,height},offers:[...game.offers]});
+  window.turnBurstDebug=()=>({turn:game.turn,sector:game.sector,sectorTurn:game.sectorTurn,bossesDefeated:game.bossesDefeated,phase:game.phase,started,busy:!!animation,player:{...game.player},enemies:game.enemies.map(e=>({...e})),weapons:{...game.weapons},kills:game.kills,score:game.score,canvas:{width,height},offers:[...game.offers],music:sound.music?{mode:sound.music.mode,pending:sound.music.pending,step:sound.music.step,playing:sound.music.timer!==null,voices:sound.music.sources.size}:null});
 })();

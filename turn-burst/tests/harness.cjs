@@ -36,8 +36,15 @@ module.exports=function boot({width=362,height=480,reduced=false,realCanvas=fals
     constructor(){this.state='suspended';this.destination={};this.oscillators=[];audio.push(this);}
     get currentTime(){return clock/1000;}
     resume(){this.state='running';return Promise.resolve();}suspend(){this.state='suspended';return Promise.resolve();}
-    createGain(){return{gain:{value:1,setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(v){assert(v>0);}},connect(){},disconnect(){}};}
-    createOscillator(){const o={frequency:{setValueAtTime(v){assert(v>0);},exponentialRampToValueAtTime(v){assert(v>0);}},connect(){},disconnect(){o.disconnected=true;},start(t){o.startAt=t;},stop(t){o.stopAt=t;assert(t>o.startAt);}};this.oscillators.push(o);return o;}
+    createBuffer(channels,length,rate){return {sampleRate:rate,length,getChannelData:()=>new Float32Array(length)};}
+    get sampleRate(){return 22050;}
+    createBufferSource(){return this.createOscillator();}
+    createBiquadFilter(){return {type:'lowpass',frequency:{value:0},Q:{value:0},connect(){},disconnect(){}};}
+    createStereoPanner(){return {pan:{value:0},connect(){},disconnect(){}};}
+    createDelay(){return {delayTime:{value:0,setValueAtTime(v){assert(v>=0);}},connect(){},disconnect(){}};}
+    createDynamicsCompressor(){return {threshold:{},knee:{},ratio:{},attack:{},release:{},connect(){},disconnect(){}};}
+    createGain(){return{gain:{value:1,cancelScheduledValues(){},setValueAtTime(){},linearRampToValueAtTime(){},exponentialRampToValueAtTime(v){assert(v>0);}},connect(){},disconnect(){}};}
+    createOscillator(){const o={frequency:{setValueAtTime(v){assert(v>0);},linearRampToValueAtTime(v){assert(v>0);},exponentialRampToValueAtTime(v){assert(v>0);}},connect(){},disconnect(){o.disconnected=true;},start(t){o.startAt=t;},stop(t){o.stopAt=t;assert(Number.isFinite(t)&&t>=0);}};this.oscillators.push(o);return o;}
   }
   const doc={hidden:false,getElementById:id=>elements.get(id),addEventListener:(k,f)=>docEvents[k]=f};
   class FakeDate extends Date{static now(){return 100;}}
@@ -46,6 +53,7 @@ module.exports=function boot({width=362,height=480,reduced=false,realCanvas=fals
   vm.runInContext(fs.readFileSync(path.join(root,'dist/engine.js'),'utf8'),vmContext);
   const Base=sandbox.window.TurnBurst.Game;
   sandbox.window.TurnBurst.Game=class extends Base{constructor(...args){super(...args);run=this;}};
+  vm.runInContext(fs.readFileSync(path.join(root,'dist/music.js'),'utf8'),vmContext);
   vm.runInContext(fs.readFileSync(path.join(root,'dist/app.js'),'utf8'),vmContext);
   const $=id=>elements.get(id);
   function tick(ms=16){clock+=ms;for(const i of intervals.values())if(clock>=i.next){i.next=clock+i.ms;i.f();}const jobs=[...frames.values()];frames.clear();jobs.forEach(f=>f(clock));assert.equal(depth,0,'balanced canvas saves');for(const a of audio)for(const o of a.oscillators)if(!o.ended&&o.stopAt<=a.currentTime){o.ended=true;o.onended?.();}}
