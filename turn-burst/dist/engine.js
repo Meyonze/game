@@ -10,9 +10,14 @@
     {name:'鉄壁の門',subtitle:'突進する敵と、最初の大型兵器',turns:10,color:'#ffbd65',boss:'gate',enemies:['mite','mite','brute','gunner','runner']},
     {name:'増殖庭園',subtitle:'分裂する群れを連鎖で一掃',turns:12,color:'#b4fc85',enemies:['mite','mite','splitter','splitter','runner','brute']},
     {name:'雷鳴回廊',subtitle:'砲撃の予告をくぐり抜ける',turns:12,color:'#c19aff',boss:'storm',enemies:['mite','gunner','mortar','runner','brute','splitter']},
-    {name:'王の領域',subtitle:'育てた武器で、最後の包囲を突破',turns:12,color:'#ff7597',boss:'king',enemies:['mite','mite','splitter','runner','mortar','brute']}
+    {name:'王の領域',subtitle:'空洞の王を倒し、深層への扉を開く',turns:12,color:'#ff7597',boss:'king',enemies:['mite','mite','splitter','runner','mortar','brute']},
+    {name:'灼熱回廊',subtitle:'砲撃の中を突破。オーバークロック解禁',turns:12,color:'#ff9d68',enemies:['mite','mite','mortar','mortar','splitter','brute']},
+    {name:'狩人の巣',subtitle:'突進の群れを迎え撃ち、刈り手を倒す',turns:12,color:'#a7f4bd',boss:'reaper',enemies:['mite','runner','runner','runner','splitter','brute']},
+    {name:'幻晶庭園',subtitle:'増殖する大群を、育てた火力で砕く',turns:13,color:'#c4afff',enemies:['mite','mite','splitter','splitter','mortar','gunner']},
+    {name:'虚空防壁',subtitle:'光の防壁をかわし、深層の番人へ',turns:13,color:'#8ee6ff',boss:'prism',enemies:['mite','brute','brute','gunner','runner','mortar']},
+    {name:'創世炉',subtitle:'すべての武器で、最後の核を撃ち抜く',turns:14,color:'#ffb5bd',boss:'core',enemies:['mite','mite','splitter','runner','mortar','brute','gunner']}
   ];
-  const BOSS_NAMES={gate:'IRON GATE',storm:'STORM FANG',king:'THE HOLLOW KING'};
+  const BOSS_NAMES={gate:'IRON GATE',storm:'STORM FANG',king:'THE HOLLOW KING',reaper:'THE REAPER',prism:'VOID PRISM',core:'GENESIS CORE'};
   const UPGRADES = [
     { id:'blast', name:'連鎖リアクター', icon:'✺', color:'#ffbd65', short:'倒した敵が爆発', desc:['倒した敵が周囲8マスに1ダメージ。爆発で倒した敵も、さらに爆発。','死亡爆発が2ダメージに。固い敵も連鎖に巻き込む。'], max:2 },
     { id:'cross', name:'スプリットランス', icon:'✳', color:'#6de4ff', short:'射撃が3方向に', desc:['移動方向に加え、左右90度にも貫通射撃。','後ろにも発射。4方向を一度に貫く。'], max:2 },
@@ -23,7 +28,8 @@
     { id:'armor', name:'リペアアーマー', icon:'✚', color:'#79edb9', short:'全回復＋装甲', desc:['HPを全回復。最大HP＋2。3手ごとに被ダメージを1軽減。','HPを全回復。最大HP＋2。装甲が2手ごとに働く。'], max:2 },
     { id:'meteor', name:'メテオストライク', icon:'☄', color:'#ffad75', short:'強敵の頭上に隕石', desc:['HPが最も高い敵に隕石。周囲8マスごと3ダメージ。','隕石が5ダメージに。大型の敵を巻き込んで砕く。'], max:2 },
     { id:'flame', name:'ブレイズトレイル', icon:'♨', color:'#ff826b', short:'移動した跡が燃える', desc:['移動先に3手残る炎。炎の上にいる敵へ毎回1ダメージ。','移動先と周囲8マスに炎。毎回2ダメージ。自分には無害。'], max:2 },
-    { id:'frost', name:'フロストコア', icon:'❄', color:'#a5e8ff', short:'撃ち漏らしを凍結', desc:['攻撃が当たって生き残った通常敵を1手凍結。次の行動を止める。','凍結が2手に延長。ボス以外の攻撃予告を連続で止める。'], max:2 }
+    { id:'frost', name:'フロストコア', icon:'❄', color:'#a5e8ff', short:'撃ち漏らしを凍結', desc:['攻撃が当たって生き残った通常敵を1手凍結。次の行動を止める。','凍結が2手に延長。ボス以外の攻撃予告を連続で止める。'], max:2 },
+    { id:'overclock', name:'オーバークロック', icon:'⇈', color:'#ffe39d', short:'全武器の火力を底上げ', desc:Array.from({length:6},(_,i)=>`すべての武器・炎・連鎖爆発のダメージが合計＋${i+1}に。強化済みの武器をさらに伸ばす。`), max:6, minSector:6 }
   ];
   const AWAKEN={blast:'死亡爆発が周囲2マス・3ダメージに。大きな群れを丸ごと連鎖。',cross:'8方向へ貫通射撃。移動の一手が全方位攻撃に。',pulse:'周囲2マスの衝撃波が4ダメージに。密集地を吹き飛ばす。',arc:'最大10体へ、各3ダメージの雷が連鎖。',lance:'貫通射撃が8ダメージ・射程9に。戦場の端まで撃ち抜く。',drone:'7体に各3ダメージ。遠くの敵まで同時に追撃。'};
   for(const u of UPGRADES)if(AWAKEN[u.id]){u.desc.push(AWAKEN[u.id]);u.max=3;}
@@ -37,7 +43,7 @@
       this.weapons = Object.fromEntries(UPGRADES.map(u=>[u.id,0]));
       this.kills = 0; this.score = 0; this.bestCombo = 0; this.lastKills = 0;
       this.level = 0; this.xpLevel=0; this.bonusUpgrades=0; this.pendingBonus=false;
-      this.thresholds = [6,15,27,42,60,84,112,145,184,226,272,322,376,434,496,562,632,706,784,866,952,1042,1136,1234,1336,1442];
+      this.thresholds = [6,15,27,42,60,84,112,145,184,226,272,322,376,434,496,562,632,706,784,866,952,1042,1136,1234,1336,1442,1552,1666,1784,1906,2032,2162];
       this.offers = []; this.bossSpawned = false; this.bossDead = false;
       this.sectorIndex=0;this.sectorTurn=0;this.bossesDefeated=0;this.clearedSectors=0;this.fires=[];this.splits=[];
       [[3,4],[3,3],[3,2],[2,3],[4,3],[1,5],[0,5],[5,5],[6,5],[1,1],[5,1],[3,0],
@@ -53,9 +59,11 @@
         const s=value.state,g=new Game(s.seed),integer=n=>Number.isSafeInteger(n)&&n>=0;
         if(!integer(s.seed)||s.seed>4294967295||!['play','upgrade','rest'].includes(s.phase)||!integer(s.turn)||!integer(s.sectorIndex)||s.sectorIndex>=STAGES.length||!integer(s.sectorTurn))return null;
         for(const k of ['kills','score','level','xpLevel','bonusUpgrades','nextId','bossesDefeated','clearedSectors'])if(!integer(s[k]))return null;
-        if(s.xpLevel>g.thresholds.length||s.level>30||s.bonusUpgrades>5)return null;
+        if(s.xpLevel>g.thresholds.length||s.level>40||s.bonusUpgrades>STAGES.length)return null;
         const p=s.player;if(!p||!inside(p.x,p.y)||!integer(p.x)||!integer(p.y)||!integer(p.hp)||p.hp<1||!integer(p.maxHp)||p.hp>p.maxHp||p.maxHp>12||![-1,0,1].includes(p.dx)||![-1,0,1].includes(p.dy)||(!p.dx&&!p.dy))return null;
-        if(!s.weapons||UPGRADES.some(u=>!integer(s.weapons[u.id])||s.weapons[u.id]>u.max))return null;
+        if(!s.weapons)return null;
+        if(!Object.hasOwn(s.weapons,'overclock'))s.weapons={...s.weapons,overclock:0};
+        if(UPGRADES.some(u=>!integer(s.weapons[u.id])||s.weapons[u.id]>u.max))return null;
         const cell=p=>p&&integer(p.x)&&integer(p.y)&&inside(p.x,p.y);
         if(!Array.isArray(s.enemies)||s.enemies.length>70||s.enemies.some(e=>!cell(e)||!['mite','brute','gunner','runner','splitter','mortar','boss'].includes(e.type)||!integer(e.hp)||e.hp<1||!integer(e.maxHp)||e.hp>e.maxHp||!integer(e.id)||e.id>=s.nextId||!e.intent||!Array.isArray(e.intent.cells)||e.intent.cells.some(p=>!cell(p))))return null;
         if(new Set(s.enemies.map(e=>e.id)).size!==s.enemies.length)return null;
@@ -115,6 +123,9 @@
             if(e.variant==='storm'&&mode===1)hit=(x+y)%3===this.sectorTurn%3;
             if(e.variant==='king'&&mode===1)hit=x%2===1||y%2===1;
             if(e.variant==='king'&&mode===2)hit=(x+y)%2===this.sectorTurn%2;
+            if(e.variant==='reaper')hit=mode===0?x-y===this.player.x-this.player.y:mode===1?y%3===this.sectorTurn%3:x===this.player.x||y===this.player.y;
+            if(e.variant==='prism')hit=mode===0?x%2===0:mode===1?(x+y)%3===this.sectorTurn%3:x===this.player.x||y===this.player.y;
+            if(e.variant==='core')hit=mode===0?x===this.player.x||y===this.player.y:mode===1?(x+y)%2===this.sectorTurn%2:x===0||x===W-1||y===0||y===H-1;
             if(hit)cells.push({x,y});
           }
           e.intent={kind:'boss',cells};continue;
@@ -151,6 +162,7 @@
     }
     hit(e,amount,depth=0) {
       if(e.hp<=0)return;
+      amount+=this.weapons.overclock||0;
       const dealt=Math.min(e.hp,amount); e.hp-=amount;
       if(this.weapons.frost&&e.type!=='boss'&&e.hp>0)e.frozen=Math.max(e.frozen||0,this.weapons.frost);
       this.events.push({type:'hit',id:e.id,x:e.x,y:e.y,amount:dealt,depth,boss:e.type==='boss'});
@@ -238,7 +250,7 @@
       return true;
     }
     spawnWave() {
-      const count=this.sector===1?3:this.sector===2?4:5;
+      const count=this.sector===1?3:this.sector===2?4:this.sector<6?5:6;
       const edges=[];
       for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(x===0||x===W-1||y===0||y===H-1)edges.push({x,y});
       // Fisher–Yates keeps seeded runs reproducible across browsers.
@@ -259,20 +271,21 @@
       this.enemies=this.enemies.filter(e=>Math.max(Math.abs(e.x-3),Math.abs(e.y-y))>1);
       this.pickups=this.pickups.filter(p=>Math.max(Math.abs(p.x-3),Math.abs(p.y-y))>1);
       const boss=this.addEnemy(3,y,'boss');
-      boss.variant=this.stage.boss||'king';boss.maxHp=boss.hp={gate:95,storm:220,king:360}[boss.variant];boss.bornTurn=this.sectorTurn;
+      boss.variant=this.stage.boss||'king';boss.maxHp=boss.hp={gate:95,storm:220,king:360,reaper:600,prism:820,core:1200}[boss.variant];boss.bornTurn=this.sectorTurn;
       this.events.push({type:'bossEnter',id:boss.id,x:3,y});
     }
     clearSector(){
       this.clearedSectors=this.sector;this.score+=this.sector*2000+this.player.hp*100;
       this.events.push({type:'sectorClear',sector:this.sector});
-      if(this.sector===STAGES.length){this.phase='won';this.score+=5000+Math.max(0,130-this.turn)*100;return;}
+      if(this.sector===STAGES.length){this.phase='won';this.score+=10000+Math.max(0,260-this.turn)*100;return;}
       this.phase='rest';this.offers=[];
     }
     nextSector(){
       if(this.phase!=='rest')return false;
       this.sectorIndex++;this.sectorTurn=0;this.bossSpawned=false;this.bossDead=false;
       this.enemies=[];this.pickups=[];this.fires=[];this.events=[];this.player.x=3;this.player.y=5;this.player.dx=0;this.player.dy=-1;
-      this.player.hp=Math.min(this.player.maxHp,this.player.hp+3);this.bonusUpgrades++;
+      this.player.hp=Math.min(this.player.maxHp,this.player.hp+3);
+      if(UPGRADES.some(u=>this.weapons[u.id]<u.max))this.bonusUpgrades++;
       this.phase='play';
       const candidates=[];
       for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(dist({x,y},this.player)>=2)candidates.push({x,y});
@@ -289,12 +302,12 @@
     }
     checkUpgrade() {
       if(this.phase!=='play'||(!this.bonusUpgrades&&(this.xpLevel>=this.thresholds.length||this.kills<this.thresholds[this.xpLevel])))return;
-      const available=UPGRADES.filter(u=>this.weapons[u.id]<u.max&&(this.weapons[u.id]<2||this.sector>=3));
+      const available=UPGRADES.filter(u=>this.weapons[u.id]<u.max&&this.sector>=(u.minSector||1)&&(u.id==='overclock'||this.weapons[u.id]<2||this.sector>=3));
       if(!available.length)return;
       this.pendingBonus=this.bonusUpgrades>0;
       for(let i=available.length-1;i>0;i--){const j=Math.floor(this.random()*(i+1));[available[i],available[j]]=[available[j],available[i]];}
       // First choice immediately exposes the three different ways a build can grow.
-      if(this.level===0)this.offers=['blast','cross','pulse'];
+      if(this.level===0&&['blast','cross','pulse'].every(id=>available.some(u=>u.id===id)))this.offers=['blast','cross','pulse'];
       else {
         this.offers=available.slice(0,3).map(u=>u.id);
         if(this.player.hp<=4&&this.weapons.armor<2&&!this.offers.includes('armor'))this.offers[2]='armor';
@@ -304,7 +317,7 @@
     choose(id) {
       if(this.phase!=='upgrade'||!this.offers.includes(id))return false;
       const upgrade=UPGRADES.find(u=>u.id===id);
-      if(!upgrade||this.weapons[id]>=upgrade.max||(this.weapons[id]>=2&&this.sector<3))return false;
+      if(!upgrade||this.weapons[id]>=upgrade.max||this.sector<(upgrade.minSector||1)||(id!=='overclock'&&this.weapons[id]>=2&&this.sector<3))return false;
       this.weapons[id]++;this.level++;if(this.pendingBonus)this.bonusUpgrades--;else this.xpLevel++;
       this.pendingBonus=false;this.offers=[];this.phase='play';
       if(id==='armor'){this.player.maxHp+=2;this.player.hp=this.player.maxHp;}

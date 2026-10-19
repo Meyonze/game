@@ -7,6 +7,9 @@
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let game=new Game(3863),started=false,helpOpen=false,selection=null,pointer=null,animation=null;
   let tile=48,width=336,height=432,dpr=1,now=0,particles=[],floats=[],shake=0,announcedSector=1;
+  const UPGRADE_SETTLE_MS=500;
+  let upgradeReadyAt=Infinity,upgradePress=null,upgradeSawPointer=false;
+  const sectorLabel=n=>String(n).padStart(2,'0');
   let soundEnabled=true;
   let savedRun=null;try{savedRun=Game.restore(JSON.parse(localStorage.getItem('turn-burst-run-v2')||'null'));}catch{}
   if(savedRun){$('continue').hidden=false;$('start').classList.add('secondary-button');$('start').innerHTML='最初から出撃 <span>↗</span>';}
@@ -125,6 +128,9 @@
       ring(0,0,52+Math.sin(t*.004)*2,'#ff65832b',1);
       if(e.variant==='gate'){rr(-42,-10,84,12,3,'#b29a80');rr(-16,-25,32,13,3,'#eec87c');rr(-7,-23,14,8,2,'#633c3b');}
       if(e.variant==='storm'){polygon([[-45,-10],[-61,-29],[-56,2],[-68,17],[-41,9]],'#9692d3','#e0cbff');polygon([[45,-10],[61,-29],[56,2],[68,17],[41,9]],'#9692d3','#e0cbff');}
+      if(e.variant==='reaper'){line(-43,19,-61,-29,'#a7f4bd',5);polygon([[-62,-28],[-40,-48],[-10,-44],[-39,-35]],'#bdffe1','#e7fff2');rr(-14,-13,28,11,3,'#173d36');line(-9,-7,9,-7,'#b6ffb8',3);}
+      if(e.variant==='prism'){polygon([[0,-62],[21,-39],[0,-20],[-21,-39]],'#8ee6ff88','#c8f6ff');ring(0,0,56,'#aeeeff',1.5);}
+      if(e.variant==='core'){ring(0,0,58,'#ffdaa4',3);ring(0,0,48,'#fff0c7',1);polygon([[0,-25],[22,0],[0,25],[-22,0]],'#ffd9a4','#fff5d5');ring(0,0,9,'#853756',5);}
     }
     if(e.type!=='mite'&&e.type!=='boss'){
       rr(-16,23,32,3,1,'#343043');rr(-16,23,32*Math.max(0,e.hp/e.maxHp),3,1,'#e6cee9');
@@ -319,6 +325,7 @@
       if(elapsed>170&&!animation.comboShown){animation.comboShown=true;updateHUD();if(game.lastKills>=3)showCombo(game.lastKills);}
       if(elapsed>animation.duration){animation=null;finishTurn();}
     }
+    if(game.phase==='upgrade'&&t>=upgradeReadyAt&&!$('upgrade-screen').hidden){$('choices').classList.remove('choices-locked');$('choices').setAttribute('aria-disabled','false');}
     requestAnimationFrame(render);
   }
   function showCombo(n){
@@ -331,12 +338,14 @@
     $('health').innerHTML=Array.from({length:game.player.maxHp},(_,i)=>`<i class="${i<game.player.hp?'on':''}"></i>`).join('');
     $('health').classList.toggle('low',game.player.hp<=3);$('hp-number').textContent=`${game.player.hp} / ${game.player.maxHp}`;
     $('score').textContent=game.score.toLocaleString();$('turn').textContent=`TURN ${String(game.turn).padStart(2,'0')}`;
-    $('sector').innerHTML=`0${game.sector}/05 <b>${game.stage.name}</b>`;
+    $('sector').innerHTML=`${sectorLabel(game.sector)}/${STAGES.length} <b>${game.stage.name}</b>`;
     $('turn').textContent=game.bossSpawned?'BOSS BATTLE':`WAVE ${String(game.sectorTurn).padStart(2,'0')}/${game.stage.turns}`;
     $('level').textContent=`CORE ${String(game.level+1).padStart(2,'0')}`;
     const prev=game.thresholds[game.xpLevel-1]||0,next=game.thresholds[game.xpLevel]||game.kills;
     $('xp').style.width=`${next===prev?100:Math.min(100,(game.kills-prev)/(next-prev)*100)}%`;
-    $('next-upgrade').textContent=game.xpLevel>=game.thresholds.length?'MAX CORE':`あと${Math.max(0,next-game.kills)}撃破で強化`;
+    const maxed=UPGRADES.every(u=>game.weapons[u.id]>=u.max);
+    $('next-upgrade').textContent=maxed||game.xpLevel>=game.thresholds.length?'MAX CORE':`あと${Math.max(0,next-game.kills)}撃破で強化`;
+    if(maxed)$('xp').style.width='100%';
     const boss=game.enemies.find(e=>e.type==='boss');$('boss-health').hidden=!boss;
     if(boss){$('boss-name').textContent=BOSS_NAMES[boss.variant]||BOSS_NAMES.king;$('boss-hp').textContent=`${boss.hp} / ${boss.maxHp}`;$('boss-fill').style.width=boss.hp/boss.maxHp*100+'%';}
     $('loadout').innerHTML='<button class="weapon-chip base" aria-label="基本装備を見る">↟ 射撃 ＋ ◎ 衝撃波</button>'+UPGRADES.filter(u=>game.weapons[u.id]).map(u=>`<button class="weapon-chip" style="color:${u.color}" aria-label="${u.name} レベル${game.weapons[u.id]}">${u.icon}<small>${game.weapons[u.id]}</small></button>`).join('');
@@ -397,33 +406,60 @@
     if(game.phase==='won'||game.phase==='lost')showResult();
   }
   function showUpgrade(){
+    upgradeReadyAt=performance.now()+UPGRADE_SETTLE_MS;upgradePress=null;upgradeSawPointer=false;
+    $('choices').classList.add('choices-locked');$('choices').setAttribute('aria-disabled','true');
     sound.fx('upgrade');$('upgrade-screen').hidden=false;$('upgrade-level').textContent=`${String(game.level+1).padStart(2,'0')} → ${String(game.level+2).padStart(2,'0')}`;
-    $('choices').innerHTML=game.offers.map(id=>{const u=UPGRADES.find(u=>u.id===id),level=game.weapons[id];return `<button class="upgrade-card${level===2?' awaken':''}" data-upgrade="${id}" style="--card:${u.color}"><span class="upgrade-icon">${u.icon}</span><span class="upgrade-copy"><span class="upgrade-top"><b>${u.name}</b><small>${level===2?'覚醒 LV.3':level?'LV.2':'NEW'}</small></span><span class="upgrade-short">${level===2?'AWAKENING':level?'さらに強化':u.short}</span><p>${u.desc[level]}</p></span></button>`;}).join('');
+    $('choices').innerHTML=game.offers.map(id=>{const u=UPGRADES.find(u=>u.id===id),level=game.weapons[id],awaken=level===2&&u.max===3;return `<button class="upgrade-card${awaken?' awaken':''}" data-upgrade="${id}" style="--card:${u.color}"><span class="upgrade-icon">${u.icon}</span><span class="upgrade-copy"><span class="upgrade-top"><b>${u.name}</b><small>${awaken?'覚醒 LV.3':level?'LV.'+(level+1):'NEW'}</small></span><span class="upgrade-short">${awaken?'AWAKENING':level?'さらに強化':u.short}</span><p>${u.desc[level]}</p></span></button>`;}).join('');
   }
   function chooseUpgrade(id){
-    if(animation||!game.choose(id))return;sound.init();sound.fx('select');updateHUD();selection=null;
+    if(animation||helpOpen||$('upgrade-screen').hidden||performance.now()<upgradeReadyAt||!game.choose(id))return;sound.init();sound.fx('select');updateHUD();selection=null;
+    upgradePress=null;
     saveRun();
     if(game.phase==='upgrade')showUpgrade();else{$('upgrade-screen').hidden=true;updateHint();}
   }
-  $('choices').addEventListener('click',e=>{const b=e.target.closest('[data-upgrade]');if(b)chooseUpgrade(b.dataset.upgrade);});
+  $('choices').addEventListener('pointerdown',e=>{
+    upgradeSawPointer=true;
+    if(e.isPrimary===false||(e.button!==undefined&&e.button!==0))return;
+    upgradePress=null;
+    const b=e.target.closest('[data-upgrade]');
+    if(b&&game.phase==='upgrade'&&!helpOpen&&!animation&&performance.now()>=upgradeReadyAt)upgradePress={id:b.dataset.upgrade,pointerId:e.pointerId,released:false};
+  });
+  $('choices').addEventListener('pointerup',e=>{
+    if(!upgradePress||e.pointerId!==upgradePress.pointerId)return;
+    const b=e.target.closest('[data-upgrade]');
+    if(b&&b.dataset.upgrade===upgradePress.id)upgradePress.released=true;else upgradePress=null;
+  });
+  $('choices').addEventListener('pointercancel',e=>{if(upgradePress?.pointerId===e.pointerId)upgradePress=null;});
+  $('choices').addEventListener('click',e=>{
+    const b=e.target.closest('[data-upgrade]');if(!b)return;
+    const fresh=upgradePress?.released&&upgradePress.id===b.dataset.upgrade&&(e.pointerId===undefined||e.pointerId===upgradePress.pointerId);
+    const accessible=e.detail===0&&!upgradeSawPointer;
+    if(fresh||accessible)chooseUpgrade(b.dataset.upgrade);
+    upgradePress=null;
+  });
+  $('choices').addEventListener('keydown',e=>{
+    if(e.repeat||!['Enter',' '].includes(e.key))return;
+    const b=e.target.closest('[data-upgrade]');if(b){e.preventDefault();chooseUpgrade(b.dataset.upgrade);}
+  });
   function showRest(){
-    $('rest-screen').hidden=false;sound.fx('upgrade');$('clear-number').textContent=`0${game.sector} / 05`;
+    $('rest-screen').hidden=false;sound.fx('upgrade');$('clear-number').textContent=`${sectorLabel(game.sector)} / ${STAGES.length}`;
     $('clear-title').textContent=game.stage.name+'、突破。';$('journey').innerHTML=STAGES.map((_,i)=>`<span class="${i<game.sector?'done':''}"></span>`).join('');
-    const next=STAGES[game.sector];$('next-name').textContent=`0${game.sector+1} / ${next.name}`;$('next-description').textContent=next.subtitle+(game.sector+1===3?'。主力武器の覚醒が解禁。':'');
+    const next=STAGES[game.sector];$('next-name').textContent=`${sectorLabel(game.sector+1)} / ${next.name}`;$('next-description').textContent=next.subtitle+(game.sector+1===3?'。主力武器の覚醒が解禁。':'');
+    $('supply-note').textContent=UPGRADES.every(u=>game.weapons[u.id]>=u.max)?'HPを3回復 / 全武器の強化が完了':'HPを3回復 ＋ 武器強化を1回獲得';
   }
   $('next-sector').addEventListener('click',()=>{
     if(animation||!game.nextSector())return;$('rest-screen').hidden=true;selection=null;pointer=null;announcedSector=game.sector;
     saveRun();
-    updateHUD();updateHint();banner(`SECTOR 0${game.sector} / ${game.stage.name}`);if(game.phase==='upgrade')showUpgrade();
+    updateHUD();updateHint();banner(`SECTOR ${sectorLabel(game.sector)} / ${game.stage.name}`);if(game.phase==='upgrade')showUpgrade();
   });
   function showResult(){
     sound.stop();const win=game.phase==='won';sound.fx(win?'win':'lose');$('result-screen').hidden=false;
     $('result-tag').textContent=win?'OPERATION COMPLETE':'SIGNAL LOST';
-    $('result-title').innerHTML=win?'王を、撃ち抜いた。':'次の一手が、ある。';
-    $('result-copy').textContent=win?'全5エリアと3体のボスを突破。その組み合わせが、群れを砕いた。':`エリア${game.sector} / ${game.stage.name}。長押しで被ダメージを確認して、次の突破へ。`;
+    $('result-title').innerHTML=win?'創世の核を、砕いた。':'次の一手が、ある。';
+    $('result-copy').textContent=win?`全${STAGES.length}エリアと${STAGES.filter(s=>s.boss).length}体のボスを突破。その組み合わせが、群れを砕いた。`:`エリア${game.sector} / ${game.stage.name}。長押しで被ダメージを確認して、次の突破へ。`;
     $('result-score').textContent=game.score.toLocaleString();$('result-turn').textContent=game.turn;$('result-kills').textContent=game.kills;$('result-combo').textContent=game.bestCombo;
     $('result-build').innerHTML=UPGRADES.filter(u=>game.weapons[u.id]).map(u=>`<span>${u.icon} ${u.name} ${game.weapons[u.id]}</span>`).join('');
-    let best=game.score;try{best=Math.max(game.score,Number(localStorage.getItem('turn-burst-best-v2'))||0);localStorage.setItem('turn-burst-best-v2',String(best));}catch{}
+    let best=game.score;try{best=Math.max(game.score,Number(localStorage.getItem('turn-burst-best-v3'))||0);localStorage.setItem('turn-burst-best-v3',String(best));}catch{}
     $('best').textContent=`BEST SCORE ${best.toLocaleString()}`;
   }
   function start(){
@@ -446,7 +482,7 @@
   function closeHelp(){helpOpen=false;$('help-screen').hidden=true;updateHint();}
   $('help').addEventListener('click',openHelp);$('close-help').addEventListener('click',closeHelp);$('loadout').addEventListener('click',openHelp);
   document.addEventListener('visibilitychange',()=>{
-    if(document.hidden){sound.stop();if(sound.ctx)sound.ctx.suspend().catch(()=>{});pointer=null;selection=null;}
+    if(document.hidden){sound.stop();if(sound.ctx)sound.ctx.suspend().catch(()=>{});pointer=null;selection=null;upgradePress=null;}
     else if(started&&!['won','lost'].includes(game.phase))sound.start();
   });
   window.addEventListener('pagehide',()=>{saveRun();sound.stop();});

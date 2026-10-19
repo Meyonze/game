@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const {Game,W,H,UPGRADES}=require('../dist/engine.js');
 
 function empty(){const g=new Game(100);g.enemies=[];g.player={x:3,y:5,hp:8,maxHp:8,dx:0,dy:-1};g.spawnWave=()=>{};g.spawnMedkit=()=>{};return g;}
-function choose(g){if(g.phase==='rest')g.nextSector();const order=g.player.hp<=4?['armor','blast','pulse','lance','cross','arc','meteor','drone','flame','frost']:['blast','pulse','lance','cross','arc','meteor','drone','flame','frost','armor'];while(g.phase==='upgrade')g.choose(order.find(id=>g.offers.includes(id)));}
+function choose(g){if(g.phase==='rest')g.nextSector();const order=g.player.hp<=4?['armor','overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost']:['overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost','armor'];while(g.phase==='upgrade')g.choose(order.find(id=>g.offers.includes(id)));}
 function moves(g){const out=[];for(let y=g.player.y-1;y<=g.player.y+1;y++)for(let x=g.player.x-1;x<=g.player.x+1;x++)if(g.canMove(x,y))out.push({x,y,p:g.preview(x,y)});return out;}
 
 test('first action visibly clears a group and only adjacent cells are legal',()=>{
@@ -18,7 +18,7 @@ test('preview does not advance time, change RNG, or mutate any state',()=>{
 test('preview predicts kills, boss damage and incoming damage throughout complete runs',()=>{
   for(let seed=1;seed<=8;seed++){
     const g=new Game(seed);
-    for(let t=0;t<160&&g.phase==='play';t++){
+    for(let t=0;t<360&&g.phase==='play';t++){
       const options=moves(g);
       for(const m of options){
         const copy=g.clone();copy.step(m.x,m.y);
@@ -53,7 +53,7 @@ test('boss receives damage once per weapon area even though its body covers nine
 test('boss arrival leaves the player safe from overlap and preserves board occupancy invariants',()=>{
   for(let seed=1;seed<=15;seed++){
     const g=new Game(seed);
-    while(g.turn<160&&g.phase==='play'){
+    while(g.turn<360&&g.phase==='play'){
       const options=moves(g).sort((a,b)=>(b.p.kills+b.p.bossDamage-b.p.damage*20)-(a.p.kills+a.p.bossDamage-a.p.damage*20));
       g.step(options[0].x,options[0].y);choose(g);
       const cells=new Set();
@@ -72,7 +72,7 @@ test('repair heals and maximum upgrade levels are respected',()=>{
   for(const u of UPGRADES)g.weapons[u.id]=u.max;g.kills=999;g.checkUpgrade();assert.equal(g.phase,'play');
 });
 test('victory cancels pending enemy attacks and cannot be advanced again',()=>{
-  const g=empty();g.sectorIndex=4;const boss=g.addEnemy(3,2,'boss');boss.hp=1;g.player.hp=1;boss.intent={kind:'boss',cells:[{x:3,y:4}]};
+  const g=empty();g.sectorIndex=9;const boss=g.addEnemy(3,2,'boss');boss.hp=1;g.player.hp=1;boss.intent={kind:'boss',cells:[{x:3,y:4}]};
   g.step(3,4);assert.equal(g.phase,'won');assert.equal(g.player.hp,1);assert.equal(g.step(3,5),false);
 });
 test('defeat stops further actions',()=>{
@@ -82,10 +82,10 @@ test('defeat stops further actions',()=>{
 test('seeded tactical play can finish the campaign without a forced damage trap',()=>{
   for(let seed=1;seed<=20;seed++){
     const g=new Game(seed);
-    while(g.turn<180&&g.phase==='play'){
+    while(g.turn<360&&g.phase==='play'){
       const options=moves(g).sort((a,b)=>(b.p.kills*3+b.p.bossDamage*2-b.p.damage*14+b.p.heal*9)-(a.p.kills*3+a.p.bossDamage*2-a.p.damage*14+a.p.heal*9));
       g.step(options[0].x,options[0].y);choose(g);
     }
-    assert.equal(g.phase,'won',`seed ${seed}`);assert(g.turn>=65&&g.turn<140);assert(g.level>=12);assert.equal(g.bossesDefeated,3);assert.equal(g.clearedSectors,5);
+    assert.equal(g.phase,'won',`seed ${seed}`);assert(g.turn>=140&&g.turn<320);assert(g.level>=12);assert.equal(g.bossesDefeated,6);assert.equal(g.clearedSectors,10);
   }
 });

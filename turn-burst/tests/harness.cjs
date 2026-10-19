@@ -50,7 +50,12 @@ module.exports=function boot({width=362,height=480,reduced=false,realCanvas=fals
   const $=id=>elements.get(id);
   function tick(ms=16){clock+=ms;for(const i of intervals.values())if(clock>=i.next){i.next=clock+i.ms;i.f();}const jobs=[...frames.values()];frames.clear();jobs.forEach(f=>f(clock));assert.equal(depth,0,'balanced canvas saves');for(const a of audio)for(const o of a.oscillators)if(!o.ended&&o.stopAt<=a.currentTime){o.ended=true;o.onended?.();}}
   function event(x,y,extra={}){const r=$('board').getBoundingClientRect();return{pointerId:1,pointerType:'touch',clientX:r.left+(x+.5)*r.width/7,clientY:r.top+(y+.5)*r.height/9,preventDefault(){},...extra};}
-  const api={$,doc,docEvents,windowEvents,storage,audio,intervals,tick,get game(){return run;},get calls(){return ctxCalls;},debug:()=>sandbox.window.turnBurstDebug(),click:id=>$(id).events.click({}),down:(x,y,extra)=>$('board').events.pointerdown(event(x,y,extra)),move:(x,y,extra)=>$('board').events.pointermove(event(x,y,extra)),up:(x,y,extra)=>$('board').events.pointerup(event(x,y,extra)),cancel:()=>$('board').events.pointercancel({}),key:key=>docEvents.keydown({key,preventDefault(){}}),choose(id){$('choices').events.click({target:{closest:()=>({dataset:{upgrade:id}})}});},resize(w,h){width=w;height=h;windowEvents.resize();},save(file){fs.writeFileSync(file,nativeCanvas.toBuffer('image/png'));}};
+  const api={$,doc,docEvents,windowEvents,storage,audio,intervals,tick,get game(){return run;},get calls(){return ctxCalls;},debug:()=>sandbox.window.turnBurstDebug(),click:id=>$(id).events.click({}),down:(x,y,extra)=>$('board').events.pointerdown(event(x,y,extra)),move:(x,y,extra)=>$('board').events.pointermove(event(x,y,extra)),up:(x,y,extra)=>$('board').events.pointerup(event(x,y,extra)),cancel:()=>$('board').events.pointercancel({}),key:key=>docEvents.keydown({key,preventDefault(){}}),choose(id){api.tick(550);api.choiceDown(id);api.choiceUp(id);api.choiceClick(id);},resize(w,h){width=w;height=h;windowEvents.resize();},save(file){fs.writeFileSync(file,nativeCanvas.toBuffer('image/png'));}};
+  const choiceEvent=(id,extra={})=>({target:{closest:()=>({dataset:{upgrade:id}})},pointerId:1,isPrimary:true,button:0,detail:1,preventDefault(){},...extra});
+  api.choiceDown=(id,extra)=>$('choices').events.pointerdown(choiceEvent(id,extra));
+  api.choiceUp=(id,extra)=>$('choices').events.pointerup(choiceEvent(id,extra));
+  api.choiceClick=(id,extra)=>$('choices').events.click(choiceEvent(id,extra));
+  api.choiceCancel=(extra={})=>$('choices').events.pointercancel({pointerId:1,...extra});
   api.tap=(x,y)=>{api.down(x,y);api.up(x,y);};
   return api;
 };

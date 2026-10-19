@@ -25,7 +25,7 @@ test('upgrade screen blocks movement and selecting an offered weapon resumes pla
   const h=boot();h.click('start');h.game.kills=5;h.tap(3,4);assert.equal(h.game.phase,'upgrade');h.key('1');assert.equal(h.game.level,0,'animation must finish first');h.tick(850);assert(!h.$('upgrade-screen').hidden);h.tap(3,3);assert.equal(h.game.turn,1);h.choose('blast');assert.equal(h.game.weapons.blast,1);assert.equal(h.game.phase,'play');assert(h.$('upgrade-screen').hidden);
 });
 test('result state is reachable and retry resets the campaign, weapons and score',()=>{
-  const h=boot();h.click('start');h.game.sectorIndex=4;h.game.enemies=[];const b=h.game.addEnemy(3,2,'boss');b.hp=1;b.intent={kind:'boss',cells:[]};h.tap(3,4);h.tick(850);assert.equal(h.game.phase,'won');assert(!h.$('result-screen').hidden);assert(h.storage.has('turn-burst-best-v2'));h.click('retry');assert.equal(h.game.turn,0);assert.equal(h.game.phase,'play');assert.equal(h.game.score,0);assert.equal(h.game.weapons.blast,0);assert(h.$('result-screen').hidden);
+  const h=boot();h.click('start');h.game.sectorIndex=9;h.game.enemies=[];const b=h.game.addEnemy(3,2,'boss');b.hp=1;b.intent={kind:'boss',cells:[]};h.tap(3,4);h.tick(850);assert.equal(h.game.phase,'won');assert(!h.$('result-screen').hidden);assert(h.storage.has('turn-burst-best-v3'));h.click('retry');assert.equal(h.game.turn,0);assert.equal(h.game.phase,'play');assert.equal(h.game.score,0);assert.equal(h.game.weapons.blast,0);assert(h.$('result-screen').hidden);
 });
 test('audio starts on a gesture, mutes, resumes and stops its scheduler in background',()=>{
   const h=boot();assert.equal(h.audio.length,0);h.click('start');h.tick(200);assert.equal(h.audio.length,1);assert(h.audio[0].oscillators.length>0);h.click('sound');const n=h.audio[0].oscillators.length;h.tick(1000);assert.equal(h.audio[0].oscillators.length,n);assert.equal(h.intervals.size,0);h.click('sound');h.tick(100);h.tick(100);h.tick(100);h.tick(100);assert(h.audio[0].oscillators.length>n);h.doc.hidden=true;h.docEvents.visibilitychange();assert.equal(h.intervals.size,0);assert.equal(h.audio[0].state,'suspended');h.doc.hidden=false;h.docEvents.visibilitychange();h.tick(200);assert.equal(h.intervals.size,1);h.windowEvents.pagehide();assert.equal(h.intervals.size,0);
@@ -38,11 +38,11 @@ test('storage blocked by browser privacy settings does not prevent play or retry
 });
 test('rendering a complete campaign uses finite canvas coordinates and balanced save/restore',()=>{
   const h=boot();h.click('start');
-  while(h.game.phase==='play'&&h.game.turn<180){
+  while(h.game.phase==='play'&&h.game.turn<360){
     const g=h.game,options=[];for(let y=g.player.y-1;y<=g.player.y+1;y++)for(let x=g.player.x-1;x<=g.player.x+1;x++)if(g.canMove(x,y)){const p=g.preview(x,y);options.push({x,y,s:p.kills*3+p.bossDamage*2-p.damage*14+p.heal*9});}
     options.sort((a,b)=>b.s-a.s);h.tap(options[0].x,options[0].y);for(let i=0;i<9;i++)h.tick(100);
     if(g.phase==='rest')h.click('next-sector');
-    while(g.phase==='upgrade'){const order=g.player.hp<4?['armor','blast','pulse','lance','cross','arc','meteor','drone','flame','frost']:['blast','pulse','lance','cross','arc','meteor','drone','flame','frost','armor'];h.choose(order.find(id=>g.offers.includes(id)));}
+    while(g.phase==='upgrade'){const order=g.player.hp<4?['armor','overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost']:['overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost','armor'];h.choose(order.find(id=>g.offers.includes(id)));}
   }
   assert.equal(h.game.phase,'won');assert(h.calls>100000);assert(!h.$('result-screen').hidden);
 });
