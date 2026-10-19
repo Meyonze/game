@@ -358,7 +358,7 @@
     $('health').classList.toggle('low',game.player.hp<=3);$('hp-number').textContent=`${game.player.hp} / ${game.player.maxHp}`;
     $('score').textContent=game.score.toLocaleString();$('turn').textContent=`TURN ${String(game.turn).padStart(2,'0')}`;
     $('sector').innerHTML=`${sectorLabel(game.sector)}/${STAGES.length} <b>${game.stage.name}</b>`;
-    $('turn').textContent=game.bossSpawned?'BOSS BATTLE':`WAVE ${String(game.sectorTurn).padStart(2,'0')}/${game.stage.turns}`;
+    $('turn').textContent=game.reinforcementsOver?`残り ${game.enemies.length}体`:game.bossSpawned?`ボス戦 ${game.enemies.length}体`:`増援あと ${Math.max(0,game.stage.turns-game.sectorTurn)}手`;
     $('level').textContent=`CORE ${String(game.level+1).padStart(2,'0')}`;
     const prev=game.thresholds[game.xpLevel-1]||0,next=game.thresholds[game.xpLevel]||game.experience;
     $('xp').style.width=`${next===prev?100:Math.max(0,Math.min(100,(game.experience-prev)/(next-prev)*100))}%`;
@@ -382,8 +382,9 @@
     }else if(animation)el.textContent='BURST IN PROGRESS';
     else if(game.turn===0)el.textContent='上の敵へ踏み込んでみよう。隣のマスをタップ';
     else if(game.turn<3)el.textContent='長押しで結果を確認。指を外へずらすとキャンセル';
+    else if(game.reinforcementsOver&&game.enemies.length)el.textContent=`増援終了。残り${game.enemies.length}体を倒せばクリア`;
     else if(game.player.hp<=3)el.textContent='HPが残りわずか。緑の救急箱で回復';
-    else if(game.bossSpawned)el.textContent='ボスの光る側へ回り込むと、与えるダメージ2倍';
+    else if(game.enemies.some(e=>e.type==='boss'))el.textContent='ボスの光る側へ回り込むと、与えるダメージ2倍';
     else el.textContent='隣へ移動して攻撃 · 自分をタップでその場撃ち';
   }
   function interactive(){return started&&!helpOpen&&!animation&&game.phase==='play';}
@@ -425,6 +426,8 @@
   function finishTurn(){
     updateHUD();updateHint();$('clock-state').classList.remove('running');$('clock-state').innerHTML='<i></i> TIME STOPPED';
     if(game.events.some(e=>e.type==='bossEnter'))banner('WARNING / '+BOSS_NAMES[game.stage.boss]);
+    const end=game.events.find(e=>e.type==='reinforcementsEnd');
+    if(end&&game.enemies.length)banner(`${end.bossDied?'ボス撃破':'増援終了'} / 残り${game.enemies.length}体`);
     if(game.phase==='rest')showRest();
     if(game.phase==='upgrade')showUpgrade();
     if(game.phase==='won'||game.phase==='lost')showResult();

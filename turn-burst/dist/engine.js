@@ -102,6 +102,7 @@
     }
     get sector() { return this.sectorIndex+1; }
     get stage() { return STAGES[this.sectorIndex]; }
+    get reinforcementsOver(){return this.stage.boss?this.bossDead:this.sectorTurn>=this.stage.turns;}
     get ownedWeapons(){return UPGRADES.filter(u=>!u.support&&this.weapons[u.id]>0);}
     get buildComplete(){return this.ownedWeapons.length>=this.slotLimit&&UPGRADES.every(u=>!u.support&&!this.weapons[u.id]||this.weapons[u.id]>=u.max);}
     canUpgrade(id){
@@ -218,13 +219,14 @@
         this.events.push({type:'death',id:e.id,x:e.x,y:e.y,kind:e.type,depth});
         this.lastKills++; this.kills++;
         if(!e.summoned)this.experience+=e.type==='boss'?5:['brute','warder'].includes(e.type)?2:1;
-        if(e.type==='boss')this.bossDead=true;
+        if(e.type==='boss'){this.bossDead=true;this.bossesDefeated++;}
         if(e.type==='splitter')this.splits.push({x:e.x,y:e.y});
         if(this.weapons.blast&&e.type!=='boss')this.explosions.push({x:e.x,y:e.y,depth:depth+1});
       }
     }
     step(x,y) {
       if(!this.canMove(x,y))return false;
+      const wasOver=this.reinforcementsOver;
       this.events=[];this.explosions=[];this.splits=[];this.boosted=[];this.lastKills=0;
       const attack=this.attackCells(x,y);
       this.player.x=x;this.player.y=y;this.player.dx=attack.dx;this.player.dy=attack.dy;
@@ -270,9 +272,10 @@
       this.enemies=this.enemies.filter(e=>e.hp>0);
       this.score+=Math.round(this.lastKills*100*(1+Math.max(0,this.lastKills-1)*.18));
       this.bestCombo=Math.max(this.bestCombo,this.lastKills);
-      if(this.bossDead){this.bossesDefeated++;this.clearSector();return true;}
+      const bossDied=this.events.some(e=>e.type==='death'&&e.kind==='boss');
       let damage=0;
       for(const e of this.enemies) {
+        if(bossDied)continue;
         const intent=e.intent;if(!intent)continue;
         if(e.frozen>0){e.frozen--;this.events.push({type:'freeze',id:e.id,x:e.x,y:e.y});continue;}
         if(intent.cells.some(p=>p.x===x&&p.y===y))damage+=['boss','brute','mortar','warder'].includes(e.type)?2:1;
@@ -290,8 +293,9 @@
           s.children=(s.children||0)+1;if(s.children===2)break;
         }
       }
-      if(this.sectorTurn>=this.stage.turns&&!this.stage.boss){this.clearSector();return true;}
-      if(this.sectorTurn===this.stage.turns&&this.stage.boss)this.spawnBoss();
+      if(!wasOver&&this.reinforcementsOver)this.events.push({type:'reinforcementsEnd',bossDied});
+      if(this.reinforcementsOver&&!this.enemies.length){this.clearSector();return true;}
+      if(this.sectorTurn>=this.stage.turns&&this.stage.boss&&!this.bossSpawned&&!this.bossDead)this.spawnBoss();
       this.spawnWave();
       if(this.sectorTurn%4===3)this.spawnMedkit();
       this.planEnemies();
@@ -299,6 +303,7 @@
       return true;
     }
     spawnWave() {
+      if(this.reinforcementsOver)return;
       const count=this.bossSpawned?this.sectorTurn%2:this.sector<3?2:[1,4,2,3][this.sectorTurn%4];
       const edges=[];
       for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(x===0||x===W-1||y===0||y===H-1)edges.push({x,y});
@@ -317,17 +322,26 @@
       this.bossSpawned=true;
       // The boss arrives at the opposite end of the arena, never on the player.
       const y=this.player.y<4?7:1;
-      this.enemies=this.enemies.filter(e=>Math.max(Math.abs(e.x-3),Math.abs(e.y-y))>1);
+      const displaced=this.enemies.filter(e=>Math.max(Math.abs(e.x-3),Math.abs(e.y-y))<=1);
+      for(const e of displaced){
+        const spaces=[];
+        for(let yy=0;yy<H;yy++)for(let xx=0;xx<W;xx++)if(Math.max(Math.abs(xx-3),Math.abs(yy-y))>1&&!this.occupied(xx,yy)&&!(xx===this.player.x&&yy===this.player.y))spaces.push({x:xx,y:yy});
+        spaces.sort((a,b)=>dist(a,e)-dist(b,e));
+        if(spaces.length){e.x=spaces[0].x;e.y=spaces[0].y;}
+      }
       this.pickups=this.pickups.filter(p=>Math.max(Math.abs(p.x-3),Math.abs(p.y-y))>1);
       const boss=this.addEnemy(3,y,'boss');
       boss.variant=this.stage.boss||'king';boss.maxHp=boss.hp={gate:60,storm:90,king:120,reaper:145,prism:175,core:200,bastion:230,hydra:265,oracle:290,forge:325,eclipse:375,origin:430}[boss.variant];boss.bornTurn=this.sectorTurn;
       this.events.push({type:'bossEnter',id:boss.id,x:3,y});
     }
     clearSector(){
+      if(this.enemies.some(e=>e.hp>0))return false;
+      this.enemies=[];
       this.clearedSectors=this.sector;this.score+=this.sector*2000+this.player.hp*100;
       this.events.push({type:'sectorClear',sector:this.sector});
-      if(this.sector===STAGES.length){this.phase='won';this.score+=15000+Math.max(0,520-this.turn)*100;return;}
+      if(this.sector===STAGES.length){this.phase='won';this.score+=15000+Math.max(0,520-this.turn)*100;return true;}
       this.phase='rest';this.offers=[];
+      return true;
     }
     nextSector(){
       if(this.phase!=='rest')return false;

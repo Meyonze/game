@@ -45,7 +45,7 @@ test('overclock stays locked before sector twelve and increases actual attack da
   assert.equal(damage[1]-damage[0],2,'bonus applies once to each enemy per action');
 });
 test('old five-sector saves keep their progress and can continue through the new campaign',()=>{
-  const g=new Game(42);g.sectorIndex=4;g.player.hp=5;g.score=12345;g.kills=300;g.weapons.blast=2;g.clearSector();
+  const g=new Game(42);g.sectorIndex=4;g.player.hp=5;g.score=12345;g.kills=300;g.weapons.blast=2;g.enemies=[];g.clearSector();
   const old=g.save();delete old.state.weapons.overclock;old.state.thresholds=old.state.thresholds.slice(0,26);
   const resumed=Game.restore(old);assert(resumed);assert.equal(resumed.player.hp,5);assert.equal(resumed.score,g.score);assert.equal(resumed.weapons.blast,2);assert.equal(resumed.weapons.overclock,0);assert.equal(resumed.thresholds.length,32);assert(resumed.nextSector());assert.equal(resumed.sector,6);
 });
