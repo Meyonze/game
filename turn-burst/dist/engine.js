@@ -150,7 +150,20 @@
       if(!this.canMove(x,y))return null;
       const clone=this.clone(), attack=this.attackCells(x,y), oldHp=this.player.hp;
       clone.step(x,y);
-      return {kills:clone.lastKills, damage:clone.events.filter(e=>e.type==='hurt').reduce((n,e)=>n+e.amount,0), heal:Math.max(0,clone.player.hp-oldHp), beams:attack.beams,pulse:attack.pulse, events:clone.events, bossDamage:clone.events.filter(e=>e.type==='hit'&&e.boss).reduce((n,e)=>n+e.amount,0)};
+      const killed=new Set(clone.events.filter(e=>e.type==='death').map(e=>e.id));
+      const frozen=new Set(clone.events.filter(e=>e.type==='freeze').map(e=>e.id));
+      const bossKilled=clone.events.some(e=>e.type==='death'&&e.kind==='boss');
+      const stopped=this.enemies.filter(e=>killed.has(e.id)||frozen.has(e.id)||e.frozen>0||bossKilled).map(e=>e.id);
+      const threats=this.enemies.filter(e=>!(e.frozen>0)&&e.intent?.cells.some(p=>p.x===x&&p.y===y)).map(e=>({
+        id:e.id,x:e.x,y:e.y,type:e.type,kind:e.intent.kind,
+        state:killed.has(e.id)?'killed':bossKilled?'bossStopped':frozen.has(e.id)?'frozen':'hit',
+        power:['boss','brute','mortar','warder'].includes(e.type)?2:1
+      }));
+      const rawDamage=threats.filter(e=>e.state==='hit').reduce((sum,e)=>sum+e.power,0);
+      const damage=clone.events.filter(e=>e.type==='hurt').reduce((n,e)=>n+e.amount,0);
+      return {kills:clone.lastKills,damage,rawDamage,armorBlocked:Math.max(0,Math.min(2,rawDamage)-damage),threats,stopped,
+        heal:Math.max(0,clone.player.hp-oldHp),beams:attack.beams,pulse:attack.pulse,events:clone.events,
+        bossDamage:clone.events.filter(e=>e.type==='hit'&&e.boss).reduce((n,e)=>n+e.amount,0)};
     }
     planEnemies() {
       const reserved=new Set();

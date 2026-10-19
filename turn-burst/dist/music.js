@@ -1,4 +1,4 @@
-/* Original score: IGNITION / IRON WILL. 32 bars, D minor, no sampled assets. */
+/* Original scores: IGNITION / IRON WILL / THE LAST ORIGIN / PIXEL AFTERNOON. */
 (() => {
   'use strict';
   const midi = name => {
@@ -47,10 +47,9 @@
     c:{bass:36,notes:[60,64,67]},f:{bass:29,notes:[60,65,69]}
   };
   const harmony='d b g a d c b a d b g a d g a d f g b c f g b a d b g a d b a a'.split(' ');
-  function compose(mode){
+  function compose(){
     const bars=Array.from({length:32},()=>Array.from({length:16},()=>[]));
     const put=(bar,step,instrument,note,duration,gain=1)=>bars[bar][step].push({instrument,note,duration,gain});
-    const boss=mode==='boss';
     melody.forEach((phrase,bar)=>{
       const chord=chords[harmony[bar]],section=Math.floor(bar/8);
       let pos=0;
@@ -66,17 +65,16 @@
       bass.forEach((interval,i)=>put(bar,i*2,'bass',interval===null?next+(next>=chord.bass?-1:1):chord.bass+interval,1.65));
       // Wide sustained strings let the melody breathe; power chords supply attack.
       chord.notes.forEach(note=>put(bar,0,'strings',note,15.3,section===2?1:.75));
-      for(const step of boss?[0,3,6,8,10,14]:[0,6,8,14]){
+      for(const step of [0,8]){
         put(bar,step,'guitar',chord.bass+12,step===0?2.8:1.3);
         put(bar,step,'guitar',chord.bass+19,step===0?2.8:1.3,.65);
       }
-      // B section adds a quieter answering ostinato. Bosses retain it throughout.
-      if(section===2||boss){
-        [0,2,1,2,0,2,1,2].forEach((n,i)=>put(bar,i*2+1,'spark',chord.notes[n]+12,.85,boss?.65:1));
+      // The normal theme adds a quieter answering ostinato in its B section.
+      if(section===2){
+        [0,2,1,2,0,2,1,2].forEach((n,i)=>put(bar,i*2+1,'spark',chord.notes[n]+12,.85,.75));
       }
-      const kicks=boss?[0,2,6,8,10,14]:[0,6,8,11];
-      kicks.forEach(step=>put(bar,step,'kick',36,1));
-      [4,12].forEach(step=>put(bar,step,'snare',38,1));
+      [0,6,8].forEach(step=>put(bar,step,'kick',36,1,.72));
+      [4,12].forEach(step=>put(bar,step,'snare',38,1,.7));
       for(let step=0;step<16;step+=2)put(bar,step,'hat',42,.5,step%4===0?.7:.45);
       if(bar%4===3){
         for(const step of [13,14,15])put(bar,step,'tom',45-(step-13)*2,1,.65);
@@ -84,7 +82,64 @@
       }
       if(bar%8===0)put(bar,0,'crash',49,5,.65);
     });
-    return {title:boss?'IRON WILL':'IGNITION',bpm:boss?168:160,bars,steps:512};
+    return {title:'IGNITION',bpm:144,bars,steps:512};
+  }
+  function composeBoss(final=false){
+    const phrases=final?[
+      'D5:6 A5:2 D6:4 C6:2 A5:2','Bb5:4 F5:2 A5:2 Bb5:6 D6:2',
+      'G5:4 Bb5:4 D6:4 F6:4','E6:4 Cs6:4 A5:4 G5:2 E5:2',
+      'F5:4 A5:2 D6:2 F6:6 E6:2','D6:6 Bb5:2 A5:4 F5:4',
+      'G5:2 Bb5:2 D6:4 C6:4 Bb5:4','A5:6 Cs6:2 E6:4 Cs6:4',
+      'D6:8 A5:2 F5:2 E5:2 D5:2','F5:4 Bb5:4 D6:6 C6:2',
+      'Bb5:4 G5:4 D6:4 Bb5:4','Cs6:6 E6:2 D6:2 Cs6:2 Bb5:2 A5:2',
+      'F6:6 E6:2 D6:4 A5:4','Bb5:4 D6:4 F6:4 E6:2 D6:2',
+      'E6:2 Cs6:2 A5:4 G5:2 E5:2 Cs5:2 E5:2','A5:4 Cs6:4 E6:4 Cs6:2 A5:2'
+    ]:[
+      'D5:1 _:1 D5:1 _:1 Eb5:2 D5:2 A5:2 G5:1 F5:1 E5:2 Cs5:2',
+      'Bb4:2 D5:1 F5:1 Bb5:2 A5:2 F5:2 D5:2 C5:2 Bb4:2',
+      'G5:1 _:1 G5:1 _:1 Bb5:2 A5:2 G5:2 F5:1 D5:1 F5:2 G5:2',
+      'Cs5:2 E5:2 A5:2 Bb5:2 A5:2 G5:2 E5:2 Cs5:2',
+      'D6:3 A5:1 F5:2 D5:2 F5:1 G5:1 A5:2 C6:2 D6:2',
+      'Bb5:2 A5:2 F5:2 D5:2 Bb4:2 D5:2 F5:2 A5:2',
+      'Bb5:2 D6:2 G6:2 F6:2 D6:2 Bb5:2 A5:2 G5:2',
+      'A5:2 Cs6:2 E6:2 G6:2 E6:2 Cs6:2 Bb5:2 A5:2',
+      'D5:1 _:1 D5:2 F5:2 G5:2 A5:4 D6:4',
+      'F5:2 Bb5:2 D6:2 C6:2 Bb5:2 A5:2 F5:2 D5:2',
+      'G5:2 Bb5:1 D6:1 F6:2 D6:2 Bb5:2 A5:2 G5:2 F5:2',
+      'E5:1 F5:1 G5:2 A5:2 Cs6:2 E6:4 Cs6:4',
+      'D6:4 A5:2 F5:2 D5:2 F5:2 A5:2 D6:2',
+      'Bb5:2 D6:2 F6:4 E6:2 D6:2 C6:2 Bb5:2',
+      'Cs6:2 E6:2 A6:2 G6:2 E6:2 Cs6:2 Bb5:2 G5:2',
+      'A5:2 G5:2 E5:2 Cs5:2 D5:1 E5:1 F5:1 E5:1 Cs5:2 A4:2'
+    ];
+    const count=final?32:16,bars=Array.from({length:count},()=>Array.from({length:16},()=>[]));
+    const progression='d b g a d b g a d b g a d b a a'.split(' '),shift=final?2:0;
+    const put=(b,s,instrument,note,duration,gain=1)=>bars[b][s].push({instrument,note:note+shift,duration,gain});
+    for(let b=0;b<count;b++){
+      const n=b%16,chord=chords[progression[n]];let pos=0;
+      for(const token of phrases[n].split(' ')){
+        const [name,d]=token.split(':'),duration=Number(d);
+        if(name!=='_')put(b,pos,'bossLead',midi(name),duration*.88,final?.9:1);
+        pos+=duration;
+      }
+      if(pos!==16)throw Error('Boss score length '+b+': '+pos);
+      for(const s of [0,2,4,6,8,10,12,14])put(b,s,'bass',chord.bass+([6,14].includes(s)?7:0),1.5);
+      for(const s of [0,2,3,6,8,10,11,14]){
+        put(b,s,'bossGuitar',chord.bass+12,s%4===0?1.7:.75);
+        put(b,s,'bossGuitar',chord.bass+19,s%4===0?1.7:.75,.65);
+      }
+      for(const s of [0,2,6,7,8,10,14])put(b,s,'kick',36,1);
+      [4,12].forEach(s=>put(b,s,'snare',38,1,1.2));
+      for(let s=0;s<16;s+=2)put(b,s,'hat',42,.5,.65);
+      if(b%4===0)put(b,0,'crash',49,5,.9);
+      if(b%4===3)[10,11,13,14,15].forEach((s,i)=>put(b,s,'tom',49-i*2,1,.8));
+      if(final){
+        chord.notes.forEach(note=>put(b,0,'choir',note,15,.8));
+        for(const s of [0,8])chord.notes.slice(0,2).forEach(note=>put(b,s,'bossBrass',note,3,.7));
+        if(b>=16)[1,5,9,13].forEach((s,i)=>put(b,s,'spark',chord.notes[i%3]+12,1,1));
+      }else for(const s of [0,8])chord.notes.slice(0,2).forEach(note=>put(b,s,'bossBrass',note,2,.7));
+    }
+    return {title:final?'THE LAST ORIGIN':'IRON WILL',bpm:final?176:184,bars,steps:count*16};
   }
   function composeRetro(){
     const bars=Array.from({length:16},()=>Array.from({length:16},()=>[]));
@@ -117,7 +172,26 @@
     });
     return {title:'PIXEL AFTERNOON',bpm:104,bars,steps:256};
   }
-  const scores={normal:compose('normal'),boss:compose('boss'),retro:composeRetro()};
+  const finalScore=composeBoss(true);
+  const scores={normal:compose(),boss:composeBoss(),final:finalScore,finale:{...finalScore,title:'THE LAST ORIGIN · CORE',bpm:196},retro:composeRetro()};
+  function softBoss(source,title,bpm){
+    const bars=source.bars.map(bar=>bar.map((events,s)=>{
+      const out=[];
+      for(const e of events){
+        if(e.instrument==='bossLead')out.push({...e,instrument:'chipLead',note:e.note-12,gain:.9});
+        if(e.instrument==='bass'&&s%4===0)out.push({...e,instrument:'chipBass',duration:3,gain:1});
+        if(e.instrument==='bossBrass')out.push({...e,instrument:'chipArp',duration:2,gain:.7});
+        if(e.instrument==='kick'&&[0,8,14].includes(s))out.push({...e,instrument:'softKick',gain:.8});
+        if(e.instrument==='snare')out.push({...e,instrument:'softSnare',gain:1});
+        if(e.instrument==='hat'&&s%4===0)out.push({...e,instrument:'softHat',gain:.7});
+      }
+      return out;
+    }));
+    return {title,bpm,bars,steps:source.steps};
+  }
+  scores.retroBoss=softBoss(scores.boss,'PIXEL / DANGER',120);
+  scores.retroFinal=softBoss(scores.final,'PIXEL / LAST ORIGIN',120);
+  scores.retroFinale={...scores.retroFinal,title:'PIXEL / LAST CORE',bpm:132};
   const frequency=note=>440*Math.pow(2,(note-69)/12);
 
   class BattleMusic {
@@ -135,7 +209,7 @@
       for(let i=0;i<data.length;i++){seed=(Math.imul(seed,1664525)+1013904223)|0;data[i]=seed/2147483648;}
       this.driveCurve=Float32Array.from({length:1024},(_,i)=>Math.tanh((i/1023*2-1)*3.5)/Math.tanh(3.5));
     }
-    get score(){return this.style==='retro'?scores.retro:scores[this.mode];}
+    get score(){return this.style==='retro'?scores[{normal:'retro',boss:'retroBoss',final:'retroFinal',finale:'retroFinale'}[this.mode]]:scores[this.mode];}
     setStyle(style){
       const next=style==='retro'?'retro':'battle';if(next===this.style)return;
       const playing=this.timer!==null;this.stop();this.style=next;this.step=0;
@@ -145,7 +219,12 @@
       this.echoGain.gain.linearRampToValueAtTime(.17,this.ctx.currentTime+.55);
       if(playing)this.start(this.pending);
     }
-    setMode(mode){this.pending=mode==='boss'?'boss':'normal';}
+    setMode(mode){this.pending=['boss','final','finale'].includes(mode)?mode:'normal';}
+    transition(mode){
+      const previous=this.pending;this.setMode(mode);if(previous===this.pending)return;
+      const playing=this.timer!==null;this.stop();this.step=0;this.mode=this.pending;
+      if(playing)this.start(this.pending);
+    }
     start(mode='normal',reset=false){
       this.setMode(mode);
       if(reset){this.stop();this.step=0;}
@@ -161,6 +240,7 @@
       while(this.next<current+.12){
         if(this.step%16===0){this.mode=this.pending;this.echo.delayTime.setValueAtTime(45/this.score.bpm,this.next);}
         const score=this.score,unit=60/score.bpm/4;
+        this.step%=score.steps;
         for(const event of score.bars[Math.floor(this.step/16)][this.step%16])this.play(event,this.next,unit);
         this.step=(this.step+1)%score.steps;this.next+=unit;
       }
@@ -202,7 +282,16 @@
         this.voice({freq:instrument==='kick'?145:frequency(note+12),end:instrument==='kick'?42:frequency(note),type:'sine',t,d:instrument==='kick'?.2:.17,attack:.002,volume:(instrument==='kick'?.35:.16)*gain});return;
       }
       const f=frequency(note);
-      if(instrument==='lead'){
+      if(instrument==='bossLead'){
+        for(const detune of [-7,7])this.voice({freq:f*Math.pow(2,detune/1200),type:detune<0?'square':'sawtooth',cutoff:4200,t,d,attack:.005,release:.035,volume:.062*gain,pan:detune/25,echo:true,vibrato:d>.2});
+      }else if(instrument==='bossGuitar'){
+        this.voice({freq:f,type:'sawtooth',drive:true,cutoff:2600,cutoffEnd:1100,t,d,attack:.002,release:.018,sustain:.35,volume:.055*gain,pan:note%2?.32:-.32});
+      }else if(instrument==='bossBrass'){
+        this.voice({freq:f,type:'square',cutoff:2200,t,d,attack:.016,release:.05,volume:.042*gain,pan:-.2});
+      }else if(instrument==='choir'){
+        this.voice({freq:f,type:'triangle',cutoff:1100,t,d,attack:.12,release:.14,volume:.052*gain,pan:note%2?.5:-.5});
+        this.voice({freq:f*2,type:'sine',t,d,attack:.15,release:.14,volume:.018*gain,pan:note%2?-.4:.4});
+      }else if(instrument==='lead'){
         for(const detune of [-5,5])this.voice({freq:f*Math.pow(2,detune/1200),type:'sawtooth',cutoff:3200,t,d,attack:.009,release:.055,volume:.058*gain,pan:detune/60,echo:true,vibrato:d>.2});
       }else if(instrument==='bass'){
         // A saturated midrange layer stays audible on phone speakers; clean low

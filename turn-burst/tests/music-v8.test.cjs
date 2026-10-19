@@ -2,34 +2,34 @@ const test=require('node:test'),assert=require('node:assert/strict'),vm=require(
 const boot=require('./harness.cjs');
 const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../dist/music.js'),'utf8'),sandbox);
 const {scores}=sandbox.window.TurnBurstMusic;
-test('both complete compositions loop within 32 bars with valid playable notes',()=>{
-  for(const score of [scores.normal,scores.boss]){
-    assert.equal(score.bars.length,32);assert.equal(score.steps,512);
-    const seconds=score.steps*60/score.bpm/4;assert(seconds>45&&seconds<=48);
+test('battle compositions have complete looping bars with valid playable notes',()=>{
+  for(const score of [scores.normal,scores.boss,scores.final,scores.finale]){
+    assert.equal(score.steps,score.bars.length*16);
+    const seconds=score.steps*60/score.bpm/4;assert(seconds>=20&&seconds<=60);
     const melodies=new Set();
     score.bars.forEach((bar,b)=>{
       assert.equal(bar.length,16);
       const line=[];
       bar.forEach((events,s)=>events.forEach(e=>{
-        assert(Number.isFinite(e.note)&&e.note>=24&&e.note<=89);
+        assert(Number.isFinite(e.note)&&e.note>=24&&e.note<=98);
         assert(e.duration>0&&e.gain>0&&s+e.duration<=16);
-        if(e.instrument==='lead')line.push([s,e.note,e.duration]);
+        if(['lead','bossLead'].includes(e.instrument))line.push([s,e.note,e.duration]);
       }));
-      assert(line.length>=5,'a written melody in each bar');melodies.add(JSON.stringify(line));
+      assert(line.length>=4,'a written melody in each bar');melodies.add(JSON.stringify(line));
     });
-    assert(melodies.size>=24,'the composition develops beyond a short repeating riff');
+    assert(melodies.size>=(score===scores.normal?24:16),'the composition develops beyond a short repeating riff');
   }
 });
-test('boss arrangement retains the theme and adds rhythm and counterpoint',()=>{
-  const notes=score=>score.bars.flat(2);
-  const normal=notes(scores.normal),boss=notes(scores.boss);
-  assert.deepEqual(boss.filter(e=>e.instrument==='lead'),normal.filter(e=>e.instrument==='lead'));
-  for(const instrument of ['kick','guitar','spark'])assert(boss.filter(e=>e.instrument===instrument).length>normal.filter(e=>e.instrument===instrument).length);
-  assert(scores.boss.bpm>scores.normal.bpm);
+test('boss battle has a separate melody, faster tempo and denser accompaniment',()=>{
+  const normal=scores.normal.bars.flat(2),boss=scores.boss.bars.flat(2);
+  assert.notDeepEqual(boss.filter(e=>e.instrument==='bossLead').map(e=>e.note),normal.filter(e=>e.instrument==='lead').map(e=>e.note));
+  assert(boss.some(e=>e.instrument==='bossGuitar'));assert(!normal.some(e=>e.instrument==='bossGuitar'));
+  assert(boss.filter(e=>e.instrument==='kick').length/scores.boss.bars.length>normal.filter(e=>e.instrument==='kick').length/scores.normal.bars.length);
+  assert(scores.boss.bpm>=scores.normal.bpm*1.25);
 });
 test('two full loops keep voices bounded, clean up nodes, and never advance gameplay',()=>{
   const h=boot();h.click('start');let peak=0;
-  for(let i=0;i<2450;i++){h.tick(40);peak=Math.max(peak,h.debug().music.voices);}
+  for(let i=0;i<2750;i++){h.tick(40);peak=Math.max(peak,h.debug().music.voices);}
   assert.equal(h.game.turn,0);assert(peak>10&&peak<70,`peak music voices: ${peak}`);
   assert(h.audio[0].oscillators.filter(o=>o.ended).every(o=>o.disconnected));
   assert.equal(h.intervals.size,1);

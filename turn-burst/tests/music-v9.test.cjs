@@ -40,10 +40,10 @@ test('settings block gameplay and upgrade shortcuts until closed',()=>{
   h.game.phase='upgrade';h.game.offers=['blast','arc','pulse'];h.key('1');assert.equal(h.game.weapons.blast,0);
   h.game.phase='play';h.key('Escape');assert(h.$('sound-screen').hidden);h.key('ArrowUp');assert.equal(h.game.turn,1);
 });
-test('retro remains calm in a boss encounter and switching back restores its battle arrangement',()=>{
+test('retro uses a soft boss theme and switching back restores its battle arrangement',()=>{
   const h=boot({initialStorage:[['turn-burst-music-style','retro']]});h.click('start');h.game.sectorIndex=1;h.game.bossSpawned=true;
   h.click('audio-settings');for(let i=0;i<65;i++)h.tick(40);
-  assert.equal(h.debug().music.title,'PIXEL AFTERNOON');h.click('music-battle');assert.equal(h.debug().music.title,'IRON WILL');
+  assert.equal(h.debug().music.title,'PIXEL / DANGER');h.click('music-battle');assert.equal(h.debug().music.title,'IRON WILL');
   h.click('music-retro');h.doc.hidden=true;h.docEvents.visibilitychange();h.tick(1000);
   assert.equal(h.intervals.size,0);h.doc.hidden=false;h.docEvents.visibilitychange();h.tick(40);
   assert.equal(h.debug().music.style,'retro');assert.equal(h.intervals.size,1);

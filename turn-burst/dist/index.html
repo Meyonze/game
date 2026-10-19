@@ -27,12 +27,14 @@
       <div id="combo" aria-hidden="true"></div>
       <div id="sector-banner" aria-hidden="true"></div>
       <div id="boss-health" class="boss-health" hidden><div><span id="boss-name">THE HOLLOW KING</span><b id="boss-hp"></b></div><div class="boss-track"><i id="boss-fill"></i></div></div>
+      <div id="boss-intro" aria-live="polite"><small>FINAL BOSS</small><strong>LAST ORIGIN</strong><span>終端の創主</span></div>
     </div>
   </section>
   <section class="bottom-panel">
     <div class="xp-row"><span id="level">CORE 01</span><div class="xp-track"><i id="xp"></i></div><span id="next-upgrade">あと6 XP</span></div>
     <div id="hint" class="hint" role="status">隣のマスをタップして、移動＋攻撃</div>
-    <div id="legend" class="legend"><span><i class="safe-dot"></i> 白枠＝移動先</span><span><i class="danger-dot"></i> 赤＝敵の次の攻撃</span></div>
+    <div id="threat-detail" class="threat-detail" aria-live="polite">移動先を長押しすると、攻撃してくる敵が分かります</div>
+    <div id="legend" class="legend"><span><i class="danger-dot"></i> 赤線＝被弾元</span><span><i class="safe-dot"></i> 緑の×＝倒して阻止</span></div>
     <div id="loadout" class="loadout" aria-label="装備一覧"></div>
   </section>
   <div id="start-screen" class="screen title-screen">
@@ -88,7 +90,7 @@
     <div class="modal-content help-content">
       <div class="eyebrow accent">FIELD MANUAL</div><h2>一手の読み方。</h2>
       <div class="manual-entry"><b>隣へ動く → 武器が全部発動 → 敵の番</b><p>上下左右・斜めの8方向へ移動できます。自分をタップすると、その場で向いている方向へ攻撃します。</p></div>
-      <div class="manual-entry"><b>長押しして、離す前に確認</b><p>移動先を押すと攻撃範囲・撃破数・受けるダメージが見えます。指を外へずらすとキャンセルできます。</p></div>
+      <div class="manual-entry"><b>長押しして、離す前に確認</b><p>赤線は被弾元。敵のA・B印と下の説明が対応し、緑の×はこの一手で倒して攻撃を阻止できる印、青は凍結で阻止できる印です。移動先を押すと攻撃範囲・撃破数・受けるダメージが見えます。指を外へずらすとキャンセルできます。</p></div>
       <div class="manual-entry"><b>赤い予告の敵を、先に倒してもOK</b><p>生き残った敵だけが予告どおりに攻撃します。緑の救急箱は踏むとHPが4回復。全20エリア、12体のボスを突破するとクリアです。ボスの光る側からの攻撃は2倍のダメージ。他の側からも通常ダメージを与えられます。</p></div>
       <div class="manual-entry"><b>4系統の武装で、自分の戦い方を作る</b><p>射撃・衝撃波の強化も含めて武装は4系統。装甲とオーバークロックは別枠です。6面から武装の覚醒、12面から最初の一撃だけを強めるオーバークロックが解禁。雷とドローンは2手ごと、隕石は3手ごとに発動します。</p></div>
       <div class="manual-entry"><b>敵に合わせて、狙う順番を変える</b><p>緑の突進兵は2マス移動。紫の増殖体は倒すと2体に分裂しますが、分裂した小型敵からXPは得られません。橙の砲台は十字砲撃。青緑の結界兵は凍らず、炎と誘爆に強いので射撃で狙いましょう。通常敵も解凍後2手は再凍結しません。</p></div>
@@ -103,7 +105,7 @@
       <div class="eyebrow accent">SOUND</div><h2 id="sound-title">音の気分を変える。</h2>
       <p class="modal-sub">選ぶと、その場で試聴できます。</p>
       <div class="music-options" role="group" aria-label="BGMの曲調">
-        <button id="music-battle" class="music-option" aria-pressed="true"><span class="music-symbol" aria-hidden="true">⚡</span><span><b>戦闘・ベース強め</b><small>ゴリッとした低音と、疾走するメロディ。</small></span><span class="music-selected" aria-hidden="true">✓</span></button>
+        <button id="music-battle" class="music-option" aria-pressed="true"><span class="music-symbol" aria-hidden="true">⚡</span><span><b>戦闘・ベース強め</b><small>重い低音。ボス戦では別曲に切り替わる。</small></span><span class="music-selected" aria-hidden="true">✓</span></button>
         <button id="music-retro" class="music-option" aria-pressed="false"><span class="music-symbol" aria-hidden="true">♫</span><span><b>レトロ・おだやか</b><small>やわらかな電子音で、ゆったりと。</small></span><span class="music-selected" aria-hidden="true">✓</span></button>
       </div>
       <button id="sound" class="sound-toggle" aria-pressed="true">サウンド ON</button>
