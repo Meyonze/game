@@ -12,13 +12,25 @@ from scipy.io.wavfile import write
 RATE = 32000
 output = Path(sys.argv[1])
 
-def biquad(signal, cutoff, highpass=False):
+def coefficients(cutoff, highpass=False):
     w = 2 * np.pi * cutoff / RATE
     alpha = np.sin(w) / (2 * .65)
     c = np.cos(w)
     b = np.array([(1+c)/2, -(1+c), (1+c)/2] if highpass else [(1-c)/2, 1-c, (1-c)/2])
     a = np.array([1+alpha, -2*c, 1-alpha])
-    return lfilter(b/a[0], a/a[0], signal)
+    return b/a[0], a/a[0]
+
+def biquad(signal, cutoff, highpass=False, end=None, duration=None):
+    if end is None:
+        b,a=coefficients(cutoff,highpass)
+        return lfilter(b,a,signal)
+    result=np.zeros(len(signal)); state=np.zeros(2)
+    for first in range(0,len(signal),64):
+        last=min(first+64,len(signal))
+        current=cutoff*(end/cutoff)**min((first+32)/RATE/duration,1)
+        b,a=coefficients(current,highpass)
+        result[first:last],state=lfilter(b,a,signal[first:last],zi=state)
+    return result
 
 reports = []
 for track in json.loads(Path(sys.argv[2]).read_text()):
@@ -54,14 +66,20 @@ for track in json.loads(Path(sys.argv[2]).read_text()):
                 wave = np.zeros(len(time))
                 for k in range(1, min(33, int(RATE/2/max(freq))), 2):
                     wave += (-1)**((k-1)//2)*np.sin(phase*k)/k**2*8/np.pi**2
+            elif kind == 'square':
+                wave = np.zeros(len(time))
+                for k in range(1, min(33, int(RATE/2/max(freq))), 2):
+                    wave += np.sin(phase*k)/k*4/np.pi
             else:
                 wave = np.zeros(len(time))
                 for k in range(1, min(33, int(RATE/2/max(freq)))):
                     wave += (-1)**(k+1)*np.sin(phase*k)/k*2/np.pi
+        if v.get('drive'):
+            wave = np.tanh(wave*3.5)/np.tanh(3.5)
         if 'cutoff' in v:
-            wave = biquad(wave, v['cutoff'], v.get('filter') == 'highpass')
+            wave = biquad(wave, v['cutoff'], v.get('filter') == 'highpass',v.get('cutoffEnd'),d)
         volume = v['volume']
-        sustain = max(.0001, volume*.65)
+        sustain = max(.0001, volume*v.get('sustain',.65))
         env = np.interp(time, [0, attack], [.0001, volume])
         decay = time > attack
         env[decay] = volume * (sustain/volume)**np.minimum((time[decay]-attack)/(d-attack), 1)

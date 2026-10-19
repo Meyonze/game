@@ -33,13 +33,14 @@ module.exports=function boot({width=362,height=480,reduced=false,realCanvas=fals
     elements.set(id,el);
   }
   class AudioMock{
-    constructor(){this.state='suspended';this.destination={};this.oscillators=[];audio.push(this);}
+    constructor(){this.state='suspended';this.destination={};this.oscillators=[];this.shapers=[];audio.push(this);}
     get currentTime(){return clock/1000;}
     resume(){this.state='running';return Promise.resolve();}suspend(){this.state='suspended';return Promise.resolve();}
     createBuffer(channels,length,rate){return {sampleRate:rate,length,getChannelData:()=>new Float32Array(length)};}
     get sampleRate(){return 22050;}
     createBufferSource(){return this.createOscillator();}
-    createBiquadFilter(){return {type:'lowpass',frequency:{value:0},Q:{value:0},connect(){},disconnect(){}};}
+    createWaveShaper(){const s={curve:null,connect(){},disconnect(){s.disconnected=true;}};this.shapers.push(s);return s;}
+    createBiquadFilter(){return {type:'lowpass',frequency:{value:0,setValueAtTime(v){assert(v>0);},exponentialRampToValueAtTime(v){assert(v>0);}},Q:{value:0},connect(){},disconnect(){}};}
     createStereoPanner(){return {pan:{value:0},connect(){},disconnect(){}};}
     createDelay(){return {delayTime:{value:0,setValueAtTime(v){assert(v>=0);}},connect(){},disconnect(){}};}
     createDynamicsCompressor(){return {threshold:{},knee:{},ratio:{},attack:{},release:{},connect(){},disconnect(){}};}

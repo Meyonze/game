@@ -6,8 +6,8 @@ const {scores,BattleMusic}=sandbox.window.TurnBurstMusic;
 const tracks=[];
 for(const [mode,score] of Object.entries(scores)){
   const voices=[],unit=60/score.bpm/4;
-  const synth={bus:{gain:{setValueAtTime(){}}},voice:voice=>voices.push(voice)};
-  score.bars.forEach((bar,b)=>bar.forEach((events,s)=>events.forEach(e=>BattleMusic.prototype.play.call(synth,e,(b*16+s)*unit,unit))));
+  const synth={bus:{gain:{setValueAtTime(){}}},voice:voice=>voices.push({...voice,instrument:synth.instrument})};
+  score.bars.forEach((bar,b)=>bar.forEach((events,s)=>events.forEach(e=>{synth.instrument=e.instrument;BattleMusic.prototype.play.call(synth,e,(b*16+s)*unit,unit);} )));
   tracks.push({mode,seconds:score.steps*unit,delay:45/score.bpm,voices});
 }
 const spec=path.join(root,'artifacts/music-voices.json');

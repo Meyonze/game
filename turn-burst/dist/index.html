@@ -13,7 +13,7 @@
   <header class="topbar">
     <a class="back" href="./index.html" aria-label="ゲーム一覧">‹</a>
     <div class="wordmark">TURN<span>BURST</span><i>01</i></div>
-    <button id="sound" class="icon-button" aria-label="サウンドを切り替え" aria-pressed="true">♪</button>
+    <button id="audio-settings" class="icon-button" aria-label="BGM・サウンド設定" aria-controls="sound-screen" aria-expanded="false">♪</button>
     <button id="help" class="icon-button" aria-label="遊び方と装備を見る">?</button>
   </header>
   <section class="hud" aria-label="プレイ状況">
@@ -96,6 +96,18 @@
       <div class="manual-entry"><b>敵を全滅させて、ステージクリア</b><p>「増援あと○手」が0になると新しい増援が止まります。残っている敵をすべて倒すとクリア。ボス戦はボス撃破で増援が止まり、残敵も全滅させてから次へ進みます。</p></div>
       <div id="equipment-help"></div>
       <button id="close-help" class="primary-button">戦場に戻る <span>↗</span></button>
+    </div>
+  </div>
+  <div id="sound-screen" class="screen modal-screen sound-screen" role="dialog" aria-modal="true" aria-labelledby="sound-title" hidden>
+    <div class="modal-content sound-content">
+      <div class="eyebrow accent">SOUND</div><h2 id="sound-title">音の気分を変える。</h2>
+      <p class="modal-sub">選ぶと、その場で試聴できます。</p>
+      <div class="music-options" role="group" aria-label="BGMの曲調">
+        <button id="music-battle" class="music-option" aria-pressed="true"><span class="music-symbol" aria-hidden="true">⚡</span><span><b>戦闘・ベース強め</b><small>ゴリッとした低音と、疾走するメロディ。</small></span><span class="music-selected" aria-hidden="true">✓</span></button>
+        <button id="music-retro" class="music-option" aria-pressed="false"><span class="music-symbol" aria-hidden="true">♫</span><span><b>レトロ・おだやか</b><small>やわらかな電子音で、ゆったりと。</small></span><span class="music-selected" aria-hidden="true">✓</span></button>
+      </div>
+      <button id="sound" class="sound-toggle" aria-pressed="true">サウンド ON</button>
+      <button id="close-sound" class="primary-button">閉じる <span>↗</span></button>
     </div>
   </div>
 </main>

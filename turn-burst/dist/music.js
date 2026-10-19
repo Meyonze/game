@@ -86,12 +86,44 @@
     });
     return {title:boss?'IRON WILL':'IGNITION',bpm:boss?168:160,bars,steps:512};
   }
-  const scores={normal:compose('normal'),boss:compose('boss')};
+  function composeRetro(){
+    const bars=Array.from({length:16},()=>Array.from({length:16},()=>[]));
+    const lines=[
+      'E5:4 G5:4 A5:2 G5:2 E5:4', 'C5:6 E5:2 G5:4 E5:4',
+      'F5:4 A5:4 G5:4 E5:4', 'D5:6 E5:2 G5:4 _:4',
+      'E5:4 B4:2 D5:2 G5:4 E5:4', 'C5:4 E5:4 A5:4 G5:4',
+      'F5:6 E5:2 D5:4 F5:4', 'G5:6 D5:2 B4:4 _:4',
+      'C6:6 B5:2 G5:4 E5:4', 'A5:4 G5:2 E5:2 C5:4 E5:4',
+      'A5:6 G5:2 F5:4 E5:4', 'D5:4 G5:4 B5:4 G5:4',
+      'E5:6 G5:2 B5:4 A5:4', 'G5:4 E5:4 C5:4 D5:4',
+      'F5:4 E5:2 D5:2 G5:4 B4:4', 'C5:8 E5:4 _:4'
+    ];
+    const roots=[36,33,29,31,28,33,26,31,36,33,29,31,28,33,31,36];
+    const triads=[[60,64,67],[60,64,69],[60,65,69],[59,62,67],[59,64,67],[60,64,69],[62,65,69],[59,62,67]];
+    const put=(b,s,instrument,note,duration,gain=1)=>bars[b][s].push({instrument,note,duration,gain});
+    lines.forEach((line,b)=>{
+      let pos=0;
+      for(const token of line.split(' ')){
+        const [name,d]=token.split(':'),duration=Number(d);
+        if(name!=='_')put(b,pos,'chipLead',midi(name),duration*.8);
+        pos+=duration;
+      }
+      if(pos!==16)throw Error('Retro bar length '+b);
+      const chord=b===14?triads[3]:b===15?triads[0]:triads[b%8];
+      [0,8].forEach((s,i)=>put(b,s,'chipBass',roots[b]+(i?7:0),5.5));
+      [2,6,10,14].forEach((s,i)=>put(b,s,'chipArp',chord[[0,1,2,1][i]],1.8));
+      put(b,0,'softKick',36,1);put(b,8,'softSnare',38,1);
+      [4,12].forEach(s=>put(b,s,'softHat',42,.5));
+    });
+    return {title:'PIXEL AFTERNOON',bpm:104,bars,steps:256};
+  }
+  const scores={normal:compose('normal'),boss:compose('boss'),retro:composeRetro()};
   const frequency=note=>440*Math.pow(2,(note-69)/12);
 
   class BattleMusic {
-    constructor(ctx,destination){
+    constructor(ctx,destination,style='battle'){
       this.ctx=ctx;this.sources=new Set();this.mode='normal';this.pending='normal';
+      this.style=style==='retro'?'retro':'battle';
       this.step=0;this.timer=null;this.next=0;
       this.bus=ctx.createGain();this.bus.gain.value=.85;this.bus.connect(destination);
       this.echo=ctx.createDelay(.5);this.echo.delayTime.value=.28125;
@@ -101,6 +133,17 @@
       this.noise=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);
       const data=this.noise.getChannelData(0);let seed=314159;
       for(let i=0;i<data.length;i++){seed=(Math.imul(seed,1664525)+1013904223)|0;data[i]=seed/2147483648;}
+      this.driveCurve=Float32Array.from({length:1024},(_,i)=>Math.tanh((i/1023*2-1)*3.5)/Math.tanh(3.5));
+    }
+    get score(){return this.style==='retro'?scores.retro:scores[this.mode];}
+    setStyle(style){
+      const next=style==='retro'?'retro':'battle';if(next===this.style)return;
+      const playing=this.timer!==null;this.stop();this.style=next;this.step=0;
+      // Silence the previous track's delay tail during the change.
+      this.echoGain.gain.cancelScheduledValues(this.ctx.currentTime);
+      this.echoGain.gain.setValueAtTime(0,this.ctx.currentTime);
+      this.echoGain.gain.linearRampToValueAtTime(.17,this.ctx.currentTime+.55);
+      if(playing)this.start(this.pending);
     }
     setMode(mode){this.pending=mode==='boss'?'boss':'normal';}
     start(mode='normal',reset=false){
@@ -116,22 +159,38 @@
       // Discard a stale lookahead after suspension instead of emitting a burst.
       if(this.next<current-.12)this.next=current+.025;
       while(this.next<current+.12){
-        if(this.step%16===0){this.mode=this.pending;this.echo.delayTime.setValueAtTime(45/scores[this.mode].bpm,this.next);}
-        const score=scores[this.mode],unit=60/score.bpm/4;
+        if(this.step%16===0){this.mode=this.pending;this.echo.delayTime.setValueAtTime(45/this.score.bpm,this.next);}
+        const score=this.score,unit=60/score.bpm/4;
         for(const event of score.bars[Math.floor(this.step/16)][this.step%16])this.play(event,this.next,unit);
         this.step=(this.step+1)%score.steps;this.next+=unit;
       }
     }
     stop(){
       if(this.timer!==null)clearInterval(this.timer);this.timer=null;
-      for(const source of [...this.sources]){try{source.stop(this.ctx.currentTime+.008);}catch{}}
+      for(const source of [...this.sources]){try{source.stop(this.ctx.currentTime+.025);}catch{}}
       // Muting the send also clears the audible echo when returning to a result.
       this.bus.gain.cancelScheduledValues(this.ctx.currentTime);
-      this.bus.gain.setValueAtTime(0,this.ctx.currentTime);
+      this.bus.gain.setValueAtTime(this.bus.gain.value,this.ctx.currentTime);
+      this.bus.gain.linearRampToValueAtTime(0,this.ctx.currentTime+.02);
     }
     play(event,t,unit){
       this.bus.gain.setValueAtTime(.85,t);
       const {instrument,note,duration,gain}=event,d=duration*unit;
+      if(instrument==='chipLead'){
+        this.voice({freq:frequency(note),type:'square',cutoff:1750,t,d,attack:.012,release:.065,volume:.052*gain,pan:-.06});return;
+      }
+      if(instrument==='chipBass'){
+        this.voice({freq:frequency(note),type:'triangle',cutoff:600,t,d,attack:.012,release:.08,volume:.115*gain});return;
+      }
+      if(instrument==='chipArp'){
+        this.voice({freq:frequency(note),type:'triangle',cutoff:1800,t,d,attack:.009,release:.07,volume:.032*gain,pan:.25});return;
+      }
+      if(instrument==='softKick'){
+        this.voice({freq:90,end:48,type:'sine',t,d:.12,attack:.005,volume:.105*gain});return;
+      }
+      if(instrument==='softSnare'||instrument==='softHat'){
+        this.voice({noise:true,filter:'highpass',cutoff:instrument==='softSnare'?2400:6500,t,d:instrument==='softSnare'?.07:.025,volume:(instrument==='softSnare'?.033:.02)*gain,pan:.08});return;
+      }
       if(['hat','snare','crash'].includes(instrument)){
         const snare=instrument==='snare',crash=instrument==='crash';
         this.voice({noise:true,filter:'highpass',cutoff:snare?1500:crash?6000:8500,t,
@@ -146,8 +205,11 @@
       if(instrument==='lead'){
         for(const detune of [-5,5])this.voice({freq:f*Math.pow(2,detune/1200),type:'sawtooth',cutoff:3200,t,d,attack:.009,release:.055,volume:.058*gain,pan:detune/60,echo:true,vibrato:d>.2});
       }else if(instrument==='bass'){
-        this.voice({freq:f,type:'sawtooth',cutoff:720,t,d,attack:.005,release:.035,volume:.115*gain});
-        this.voice({freq:f,type:'sine',t,d,attack:.004,volume:.07*gain});
+        // A saturated midrange layer stays audible on phone speakers; clean low
+        // fundamentals and a short octave transient add weight and pick attack.
+        this.voice({freq:f,type:'sawtooth',drive:true,cutoff:2400,cutoffEnd:650,t,d,attack:.002,release:.025,sustain:.42,volume:.23*gain});
+        this.voice({freq:f,type:'sine',t,d,attack:.003,volume:.105*gain});
+        this.voice({freq:f*2,type:'square',cutoff:2800,t,d:Math.min(.065,d),attack:.001,release:.018,sustain:.15,volume:.045*gain});
       }else if(instrument==='strings'){
         this.voice({freq:f,type:'sawtooth',cutoff:1500,t,d,attack:.16,release:.16,volume:.025*gain,pan:note%2?.4:-.4});
       }else if(instrument==='guitar'){
@@ -156,7 +218,7 @@
         this.voice({freq:f,type:'triangle',t,d,attack:.003,release:.03,volume:.045*gain,pan:.38,echo:true});
       }
     }
-    voice({freq=440,end,type='sine',noise=false,filter='lowpass',cutoff,t,d,attack=.004,release=.025,volume,pan=0,echo=false,vibrato=false}){
+    voice({freq=440,end,type='sine',noise=false,filter='lowpass',cutoff,cutoffEnd,drive=false,t,d,attack=.004,release=.025,sustain=.65,volume,pan=0,echo=false,vibrato=false}){
       const ctx=this.ctx,source=noise?ctx.createBufferSource():ctx.createOscillator(),env=ctx.createGain(),nodes=[env];
       if(noise)source.buffer=this.noise;
       else{
@@ -169,10 +231,11 @@
         }
       }
       let output=source;
-      if(cutoff){const f=ctx.createBiquadFilter();f.type=filter;f.frequency.value=cutoff;f.Q.value=.65;output.connect(f);output=f;nodes.push(f);}
+      if(drive){const shaper=ctx.createWaveShaper();shaper.curve=this.driveCurve;shaper.oversample='2x';output.connect(shaper);output=shaper;nodes.push(shaper);}
+      if(cutoff){const f=ctx.createBiquadFilter();f.type=filter;f.frequency.setValueAtTime(cutoff,t);if(cutoffEnd)f.frequency.exponentialRampToValueAtTime(cutoffEnd,t+d);f.Q.value=.65;output.connect(f);output=f;nodes.push(f);}
       output.connect(env);
       env.gain.setValueAtTime(.0001,t);env.gain.linearRampToValueAtTime(volume,t+Math.min(attack,d*.4));
-      env.gain.exponentialRampToValueAtTime(Math.max(.0001,volume*.65),t+d);
+      env.gain.exponentialRampToValueAtTime(Math.max(.0001,volume*sustain),t+d);
       env.gain.exponentialRampToValueAtTime(.0001,t+d+release);
       if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=pan;env.connect(p);p.connect(this.bus);nodes.push(p);}else env.connect(this.bus);
       if(echo)env.connect(this.echo);

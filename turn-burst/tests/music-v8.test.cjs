@@ -3,7 +3,7 @@ const boot=require('./harness.cjs');
 const sandbox={window:{}};vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../dist/music.js'),'utf8'),sandbox);
 const {scores}=sandbox.window.TurnBurstMusic;
 test('both complete compositions loop within 32 bars with valid playable notes',()=>{
-  for(const score of Object.values(scores)){
+  for(const score of [scores.normal,scores.boss]){
     assert.equal(score.bars.length,32);assert.equal(score.steps,512);
     const seconds=score.steps*60/score.bpm/4;assert(seconds>45&&seconds<=48);
     const melodies=new Set();
