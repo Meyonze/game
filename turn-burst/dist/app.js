@@ -8,7 +8,7 @@
   let game=new Game(3863),started=false,helpOpen=false,soundOpen=false,selection=null,pointer=null,animation=null;
   let tile=48,width=336,height=432,dpr=1,now=0,particles=[],floats=[],shake=0,announcedSector=1;
   const UPGRADE_SETTLE_MS=350;
-  let finalAwakened=false;
+  let finalAwakened=false,victoryScene=null;
   let upgradeReadyAt=Infinity,upgradePress=null,upgradeSawPointer=false;
   const sectorLabel=n=>String(n).padStart(2,'0');
   let soundEnabled=true,musicStyle='battle';
@@ -71,7 +71,7 @@
   function updateSound(){
     $('sound').setAttribute('aria-pressed',String(soundEnabled));$('sound').textContent=soundEnabled?'サウンド ON':'サウンド OFF';
     $('audio-settings').textContent=soundEnabled?'♪':'♩';
-    $('audio-settings').setAttribute('aria-label','BGM・サウンド設定（'+(soundEnabled?'音あり':'音なし')+'）');
+    $('audio-settings').setAttribute('aria-label',victoryScene?'演出の音を'+(soundEnabled?'消す':'出す'):'BGM・サウンド設定（'+(soundEnabled?'音あり':'音なし')+'）');
     $('audio-settings').setAttribute('aria-expanded',String(soundOpen));
     $('music-battle').setAttribute('aria-pressed',String(musicStyle==='battle'));
     $('music-retro').setAttribute('aria-pressed',String(musicStyle==='retro'));
@@ -95,16 +95,17 @@
     updateSound();
   }
   updateSound();
-  $('audio-settings').addEventListener('click',()=>soundOpen?closeSound():openSound());
+  $('audio-settings').addEventListener('click',()=>victoryScene?toggleSound():soundOpen?closeSound():openSound());
   $('close-sound').addEventListener('click',closeSound);
   $('music-battle').addEventListener('click',()=>chooseMusic('battle'));
   $('music-retro').addEventListener('click',()=>chooseMusic('retro'));
-  $('sound').addEventListener('click',()=>{
+  function toggleSound(){
     soundEnabled=!soundEnabled;try{localStorage.setItem('turn-burst-sound',soundEnabled?'on':'off');}catch{}
     if(soundEnabled){sound.init();if(musicWanted())sound.start();}
     else{sound.stop();if(sound.ctx)sound.ctx.suspend().catch(()=>{});}
     updateSound();
-  });
+  }
+  $('sound').addEventListener('click',toggleSound);
 
   function resize(){
     const r=$('arena').getBoundingClientRect();
@@ -334,6 +335,7 @@
     const live=new Map(game.enemies.map(e=>[e.id,e]));
     const enemies=a?[...before.enemies,...game.enemies.filter(e=>!before.enemies.some(b=>b.id===e.id))]:game.enemies;
     for(const e of enemies){
+      if(victoryScene&&(e.id===victoryScene.boss.id||victoryScene.disabledIds.has(e.id)))continue;
       let x=e.x,y=e.y,alpha=1;
       if(a){
         const after=live.get(e.id),old=before.enemies.find(b=>b.id===e.id),death=a.events.find(ev=>ev.type==='death'&&ev.id===e.id),disabled=a.events.find(ev=>ev.type==='disabled'&&ev.id===e.id);
@@ -402,6 +404,7 @@
       const elapsed=t-a.start;
       for(let i=0;i<a.events.length;i++){
         const e=a.events[i],at=eventTime(e),age=elapsed-at;
+        if(finaleOwns(e))continue;
         if(age>=0&&!a.fired.has(i)){a.fired.add(i);emitEvent(e);}
         if(age<0||age>350)continue;
         const life=1-age/350;ctx.save();ctx.globalAlpha=life;
@@ -459,15 +462,139 @@
     for(const f of floats){const age=t-f.born;ctx.globalAlpha=1-age/800;ctx.font=`800 ${tile*.4}px sans-serif`;ctx.textAlign='center';ctx.fillStyle=f.color;ctx.fillText(f.text,f.x,f.y-age*.035);ctx.globalAlpha=1;}
   }
 
+  const FINALE_MS=8000;
+  const clamp=n=>Math.max(0,Math.min(1,n));
+  function rememberBest(){
+    let best=game.score;try{best=Math.max(best,Number(localStorage.getItem('turn-burst-best-v5'))||0);localStorage.setItem('turn-burst-best-v5',String(best));}catch{}return best;
+  }
+  function beginFinale(before){
+    const boss=before.enemies.find(e=>e.type==='boss'),death=animation.events.find(e=>e.type==='death'&&e.id===boss?.id);
+    if(game.phase!=='won'||game.sector!==20||!boss||!death)return;
+    const ids=new Set(animation.events.filter(e=>e.type==='disabled').map(e=>e.id));
+    victoryScene={boss:{...boss,variant:'origin'},survivors:before.enemies.filter(e=>ids.has(e.id)),disabledIds:ids,start:animation.start+eventTime(death),pausedAt:null,cues:new Set(),stage:-1};
+    rememberBest();sound.stop();selection=null;pointer=null;
+    $('finale-kicker').textContent='FINAL BLOW';$('finale-title').textContent='臨界点、突破。';
+    $('finale-overlay').hidden=false;$('game').classList.add('victory-finale');
+    $('combo').classList.remove('show');$('sector-banner').classList.remove('show');
+    updateSound();
+  }
+  function finaleOwns(e){return victoryScene&&(e.id===victoryScene.boss.id||victoryScene.disabledIds.has(e.id)||e.type==='networkDown');}
+  function finaleSound(kind){
+    if(kind==='impact'){sound.tone(72,1.1,'sine',.65,0,26);sound.tone(280,.5,'triangle',.24,0,70);}
+    if(kind==='collapse'){sound.fx('boom');sound.tone(370,.22,'triangle',.16,0,80);}
+    if(kind==='charge'){sound.tone(100,.9,'sawtooth',.12,0,900);sound.tone(55,1,'sine',.5,0,125);}
+    if(kind==='blast'){sound.tone(95,1.6,'sine',.85,0,22);sound.tone(540,.7,'sawtooth',.16,0,38);sound.tone(1600,.9,'triangle',.18,0,130);}
+    if(kind==='silence'){
+      [164.81,246.94,329.63,415.30,493.88,659.25].forEach((f,i)=>sound.tone(f,1.45,'triangle',.17,i*.09));
+      sound.tone(82.41,1.7,'sine',.42);
+    }
+  }
+  function drawFinale(t){
+    const scene=victoryScene;if(!scene)return;
+    const ms=t-scene.start;if(ms<0)return;
+    const sec=ms/1000,cx=width*.5,cy=height*.37,diag=Math.hypot(width,height);
+    const stage=sec<1.1?0:sec<4.8?1:sec<6.2?2:3;
+    if(stage!==scene.stage){
+      scene.stage=stage;
+      const captions=[['FINAL BLOW','臨界点、突破。'],['CORE COLLAPSE','核心崩壊'],['SYSTEM SHUTDOWN','防衛群、停止。'],['ORIGIN SILENCED','街に、静けさが戻る。']][stage];
+      $('finale-kicker').textContent=captions[0];$('finale-title').textContent=captions[1];
+    }
+    function cue(id,at,fn){if(ms>=at&&!scene.cues.has(id)){scene.cues.add(id);if(ms-at<400)fn();}}
+    cue('impact',0,()=>{finaleSound('impact');shake=reduced?0:11;});
+    for(let i=0;i<12;i++)cue('burst'+i,1100+i*220,()=>{finaleSound('collapse');shake=reduced?0:5+i*.4;});
+    cue('charge',3900,()=>finaleSound('charge'));
+    cue('blast',4800,()=>{finaleSound('blast');shake=reduced?0:22;emit(cx,cy,'#ffe5a1',100,4);});
+    cue('silence',6300,()=>finaleSound('silence'));
+    // Keep the battle visible under the cinematic; no layout changes or simulation steps.
+    ctx.save();ctx.fillStyle='#030611';ctx.globalAlpha=.55*clamp(sec/.28);ctx.fillRect(0,0,width,height);ctx.globalAlpha=1;
+    for(const e of scene.survivors){
+      const p=center(e.x,e.y),off=5+Math.hypot(p.x-cx,p.y-cy)/diag*.9;
+      const fade=clamp((sec-off)/.6);enemySprite(e,p.x,p.y,t,(1-fade)*.65);
+      if(sec>=off&&sec<off+.6){ctx.globalAlpha=(1-fade)*.8;ring(p.x,p.y,tile*(.2+fade*.6),C.cyan,2);ctx.globalAlpha=1;}
+    }
+    const from=center(scene.boss.x,scene.boss.y),travel=reduced?1:clamp(sec/.65),ease=1-Math.pow(1-travel,3);
+    const bx=from.x+(cx-from.x)*ease,by=from.y+(cy-from.y)*ease;
+    if(sec<4.8){
+      const contraction=sec>3.9?1-.4*clamp((sec-3.9)/.9):1;
+      const scale=(1+ease*.24)*contraction;
+      ctx.save();ctx.translate(bx,by);ctx.scale(scale,scale);
+      enemySprite(scene.boss,0,0,reduced?0:t,1);
+      ctx.globalCompositeOperation='lighter';
+      // Bright fractures branch across the boss instead of only showing a text banner.
+      const crack=clamp(sec/1.4);ctx.globalAlpha=crack*.9;
+      for(let i=0;i<7;i++){
+        const a=i*Math.PI*2/7+.2,r=tile*(.45+i%3*.28)*crack;
+        line(0,0,Math.cos(a)*r*.48,Math.sin(a)*r*.48,'#fff7d8',2);
+        line(Math.cos(a)*r*.48,Math.sin(a)*r*.48,Math.cos(a+.28)*r,Math.sin(a+.28)*r,'#ffc86b',1.5);
+      }
+      ctx.restore();
+      for(let i=0;i<12;i++){
+        const age=sec-(1.1+i*.22);if(age<0||age>.55)continue;
+        const a=i*2.399,r=tile*(.3+(i%4)*.23),x=bx+Math.cos(a)*r,y=by+Math.sin(a)*r;
+        ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=1-age/.55;
+        ring(x,y,tile*(.08+age*1.35),'#ffd894',4*(1-age/.55));
+        ctx.fillStyle='#fff3ce';ctx.beginPath();ctx.arc(x,y,tile*.22*(1-age/.55),0,Math.PI*2);ctx.fill();
+        for(let j=0;j<7;j++){const b=j*Math.PI*2/7;line(x+Math.cos(b)*age*tile,y+Math.sin(b)*age*tile,x+Math.cos(b)*age*tile*2,y+Math.sin(b)*age*tile*2,'#ffb45c',2);}
+        ctx.restore();
+      }
+      if(sec>=3.9){
+        const charge=clamp((sec-3.9)/.9);ctx.save();ctx.globalCompositeOperation='lighter';
+        for(let i=0;i<(reduced?8:28);i++){
+          const a=i*2.399,r=tile*(.3+((i*.137+1-charge)%1)*3.8);
+          ctx.globalAlpha=charge*.7;line(cx+Math.cos(a)*r,cy+Math.sin(a)*r,cx+Math.cos(a)*(r+tile*.5),cy+Math.sin(a)*(r+tile*.5),'#ffe6af',1.4);
+        }
+        ring(cx,cy,tile*(2.1-charge*1.7),'#ffedbd',2+charge*3);ctx.restore();
+      }
+    }
+    if(sec>=4.8){
+      const age=sec-4.8;ctx.save();ctx.globalCompositeOperation='lighter';
+      for(let i=0;i<3;i++){
+        const p=clamp((age-i*.15)/1.8);if(age<i*.15||p>=1)continue;
+        ctx.globalAlpha=(1-p)*.85;ring(cx,cy,diag*p,'#ffe9b4',(reduced?2:8)*(1-p)+1);
+        ring(cx,cy,diag*p*.94,'#ff9c88',2*(1-p));
+      }
+      for(let i=0;i<(reduced?12:64);i++){
+        const a=i*2.399,speed=tile*(.45+(i%9)*.18),r=tile*.2+age*speed;
+        ctx.globalAlpha=clamp(1-age/(1.8+(i%5)*.45));
+        const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r+age*age*tile*.1;
+        ctx.save();ctx.translate(x,y);if(!reduced)ctx.rotate(a+age*(i%2?1:-1));
+        polygon([[-3,-7],[3,-3],[2,7],[-2,4]],i%3?'#ffdf97':'#c9adff');ctx.restore();
+      }
+      const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,tile*(.8+age*.4));
+      glow.addColorStop(0,'#fff1b988');glow.addColorStop(1,'#ffc97700');ctx.globalAlpha=clamp(1-age/2.1);ctx.fillStyle=glow;ctx.fillRect(0,0,width,height);
+      ctx.restore();
+      if(age<.38){ctx.globalAlpha=(reduced?.12:.8)*(1-age/.38);ctx.fillStyle='#fff4d6';ctx.fillRect(0,0,width,height);ctx.globalAlpha=1;}
+      if(sec>=6.2){
+        const fade=clamp((sec-6.2)/.7);ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=fade*.65;
+        for(let i=0;i<(reduced?12:40);i++){
+          const x=((i*73+29)%337)/337*width,y=height-((i*137+sec*25)%height);
+          ctx.fillStyle=i%3?'#ffe7a2':'#b4e6ff';ctx.fillRect(x,y,i%4?1.4:2.5,i%4?1.4:2.5);
+        }
+        ring(cx,cy,tile*(.7+.05*Math.sin(sec*2)),'#ffe1a166',1);
+        ctx.restore();
+      }
+    }
+    ctx.fillStyle='#02040b';ctx.globalAlpha=.8;const band=height*.055*clamp(sec/.4);
+    ctx.fillRect(0,0,width,band);ctx.fillRect(0,height-band,width,band);ctx.restore();
+  }
+  function finishFinale(){
+    victoryScene=null;animation=null;particles=[];floats=[];shake=0;
+    $('finale-overlay').hidden=true;$('game').classList.remove('victory-finale');
+    $('clock-state').classList.remove('running');$('clock-state').innerHTML='<i></i> OPERATION COMPLETE';
+    updateSound();updateHUD();showResult(true);
+  }
+
   function render(t){
+    if(document.hidden){requestAnimationFrame(render);return;}
     now=t;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.save();
     if(shake>.1&&!reduced){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.88;}
-    drawGrid(t);drawThreatLinks();drawActors(t);drawThreatMarkers();drawEffects(t);ctx.restore();
+    drawGrid(t);drawThreatLinks();drawActors(t);drawThreatMarkers();drawEffects(t);drawFinale(t);ctx.restore();
     if(animation){
       const elapsed=t-animation.start;
-      if(elapsed>170&&!animation.comboShown){animation.comboShown=true;updateHUD();if(game.lastKills>=3)showCombo(game.lastKills);}
-      if(elapsed>animation.duration){animation=null;finishTurn();}
+      if(elapsed>170&&!animation.comboShown){animation.comboShown=true;updateHUD();if(game.lastKills>=3&&!victoryScene)showCombo(game.lastKills);}
+      if(elapsed>animation.duration&&!victoryScene){animation=null;finishTurn();}
     }
+    if(victoryScene&&t-victoryScene.start>=FINALE_MS)finishFinale();
     if(game.phase==='upgrade'&&t>=upgradeReadyAt&&!$('upgrade-screen').hidden){$('choices').classList.remove('choices-locked');$('choices').setAttribute('aria-disabled','false');}
     requestAnimationFrame(render);
   }
@@ -556,6 +683,7 @@
     const before=game.clone();forecast??=game.preview(x,y);sound.init();sound.fx('step');game.step(x,y);
     saveRun();
     animation={before,forecast,events:game.events.slice(),start:performance.now(),duration:reduced?700:800,fired:new Set(),comboShown:false,soundedKills:0,soundedBooms:0};
+    beginFinale(before);
     $('clock-state').classList.add('running');$('clock-state').innerHTML='<i></i> BURST';updateHint();
   }
   function finishTurn(){
@@ -617,17 +745,18 @@
     saveRun();
     updateHUD();updateHint();banner(game.sector===20?'FINAL SECTOR / 終端宙域':`SECTOR ${sectorLabel(game.sector)} / ${game.stage.name}`);if(game.phase==='upgrade')showUpgrade();
   });
-  function showResult(){
-    sound.stop();const win=game.phase==='won';sound.fx(win?'win':'lose');$('result-screen').hidden=false;
+  function showResult(celebrated=false){
+    sound.stop();const win=game.phase==='won';if(!celebrated)sound.fx(win?'win':'lose');$('result-screen').hidden=false;
     $('result-tag').textContent=win?'OPERATION COMPLETE':'SIGNAL LOST';
     $('result-title').innerHTML=win?'ノアは、<br>街を取り戻した。':'まだ、直せる。';
     $('result-copy').textContent=win?`ORIGIN停止。全${STAGES.length}区域の防衛群が沈黙した。廃棄寸前の整備機が、もう一度この街を直し始める。`:`ノアの修復記録：区域${game.sector} / ${game.stage.name}。回収する武装を変えて、もう一度。`;
     $('result-score').textContent=game.score.toLocaleString();$('result-turn').textContent=game.turn;$('result-kills').textContent=game.kills;$('result-combo').textContent=game.bestCombo;
     $('result-build').innerHTML=UPGRADES.filter(u=>game.weapons[u.id]).map(u=>`<span>${u.icon} ${u.name} ${game.weapons[u.id]}</span>`).join('');
-    let best=game.score;try{best=Math.max(game.score,Number(localStorage.getItem('turn-burst-best-v5'))||0);localStorage.setItem('turn-burst-best-v5',String(best));}catch{}
+    const best=rememberBest();
     $('best').textContent=`BEST SCORE ${best.toLocaleString()}`;
   }
   function start(){
+    if(victoryScene)return;
     game=new Game(Date.now());started=true;selection=null;pointer=null;animation=null;particles=[];floats=[];announcedSector=1;
     for(const id of ['start-screen','upgrade-screen','result-screen','help-screen','rest-screen','sound-screen'])$(id).hidden=true;
     helpOpen=false;soundOpen=false;finalAwakened=false;updateSound();$('combo').classList.remove('show');$('sector-banner').classList.remove('show');$('boss-intro').classList.remove('show');
@@ -648,11 +777,18 @@
   function closeHelp(){helpOpen=false;$('help-screen').hidden=true;updateHint();}
   $('help').addEventListener('click',openHelp);$('close-help').addEventListener('click',closeHelp);$('loadout').addEventListener('click',openHelp);
   document.addEventListener('visibilitychange',()=>{
-    if(document.hidden){sound.stop();if(sound.ctx)sound.ctx.suspend().catch(()=>{});pointer=null;selection=null;upgradePress=null;}
-    else if(musicWanted())sound.start();
+    if(document.hidden){
+      if(victoryScene&&victoryScene.pausedAt===null)victoryScene.pausedAt=performance.now();
+      sound.stop();if(sound.ctx)sound.ctx.suspend().catch(()=>{});pointer=null;selection=null;upgradePress=null;
+    }else{
+      if(victoryScene){
+        if(victoryScene.pausedAt!==null){const delay=performance.now()-victoryScene.pausedAt;victoryScene.start+=delay;if(animation)animation.start+=delay;for(const p of particles)p.born+=delay;for(const f of floats)f.born+=delay;victoryScene.pausedAt=null;}
+        if(soundEnabled)sound.init();
+      }else if(musicWanted())sound.start();
+    }
   });
   window.addEventListener('pagehide',()=>{saveRun();sound.stop();});
   updateHUD();resize();requestAnimationFrame(render);
   // Read-only diagnostics help check viewport fit and turn progression without an autoplay mode.
-  window.turnBurstDebug=()=>({turn:game.turn,sector:game.sector,sectorTurn:game.sectorTurn,bossesDefeated:game.bossesDefeated,phase:game.phase,started,busy:!!animation,player:{...game.player},enemies:game.enemies.map(e=>({...e})),weapons:{...game.weapons},kills:game.kills,score:game.score,canvas:{width,height},offers:[...game.offers],threats:threatContext().map(e=>({id:e.id,state:e.state,label:e.label})),music:sound.music?{style:sound.music.style,title:sound.music.score.title,mode:sound.music.mode,pending:sound.music.pending,step:sound.music.step,playing:sound.music.timer!==null,voices:sound.music.sources.size}:null});
+  window.turnBurstDebug=()=>({turn:game.turn,sector:game.sector,sectorTurn:game.sectorTurn,bossesDefeated:game.bossesDefeated,phase:game.phase,started,busy:!!animation,finale:victoryScene?{duration:FINALE_MS,elapsed:Math.max(0,(victoryScene.pausedAt??performance.now())-victoryScene.start),stage:victoryScene.stage,cues:victoryScene.cues.size,paused:victoryScene.pausedAt!==null}:null,player:{...game.player},enemies:game.enemies.map(e=>({...e})),weapons:{...game.weapons},kills:game.kills,score:game.score,canvas:{width,height},offers:[...game.offers],threats:threatContext().map(e=>({id:e.id,state:e.state,label:e.label})),music:sound.music?{style:sound.music.style,title:sound.music.score.title,mode:sound.music.mode,pending:sound.music.pending,step:sound.music.step,playing:sound.music.timer!==null,voices:sound.music.sources.size}:null});
 })();
