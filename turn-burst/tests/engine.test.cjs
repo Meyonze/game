@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const {Game,W,H,UPGRADES,STAGES}=require('../dist/engine.js');
 
 function empty(){const g=new Game(100);g.enemies=[];g.player={x:3,y:5,hp:8,maxHp:8,dx:0,dy:-1};g.spawnWave=()=>{};g.spawnMedkit=()=>{};return g;}
-function choose(g){if(g.phase==='rest')g.nextSector();const order=g.player.hp<=4?['armor','overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost']:['overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost','armor'];while(g.phase==='upgrade')g.choose(order.find(id=>g.offers.includes(id)));}
+function choose(g){if(g.phase==='rest')g.nextSector();const order=g.player.hp<=4?['armor','overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost']:['overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost','armor'];while(g.phase==='upgrade')g.choose(order.find(id=>g.offers.includes(id))||g.offers[0]);}
 function moves(g){const out=[];for(let y=g.player.y-1;y<=g.player.y+1;y++)for(let x=g.player.x-1;x<=g.player.x+1;x++)if(g.canMove(x,y))out.push({x,y,p:g.preview(x,y)});return out;}
 
 test('first action visibly clears a group and only adjacent cells are legal',()=>{
@@ -83,6 +83,6 @@ test('different seeded builds can complete all twenty sectors',()=>{
   const {play,builds}=require('./balance-simulation.cjs');
   for(const build of Object.keys(builds))for(let seed=1;seed<=4;seed++){
     const result=play(seed,build);assert.equal(result.phase,'won',`${build}, seed ${seed}`);
-    assert(result.turn>=STAGES.reduce((n,s)=>n+s.turns,0)&&result.turn<650);assert.equal(result.sector,20);assert.equal(result.bosses,12);assert.equal(result.owned.length,4);
+    assert(result.turn>=STAGES.reduce((n,s)=>n+s.turns,0)&&result.turn<650);assert.equal(result.sector,20);assert.equal(result.bosses,12);assert.equal(result.owned.length,4);assert(['coreburst','coreguard','coresalvage'].some(id=>result.weapons[id]>0),'growth continues after armament cap');
   }
 });

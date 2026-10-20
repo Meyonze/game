@@ -42,7 +42,7 @@
     <button id="help" class="icon-button" aria-label="遊び方と装備を見る">?</button>
   </header>
   <section class="hud" aria-label="プレイ状況">
-    <div class="health-group"><div class="eyebrow">ARMOR <span id="hp-number">8 / 8</span></div><div id="health" class="health"></div></div>
+    <div class="health-group"><div class="eyebrow">NOA / ARMOR <span id="hp-number">8 / 8</span></div><div id="health" class="health"></div></div>
     <div class="score-group"><div class="eyebrow">SCORE</div><div id="score">0</div></div>
   </section>
   <section class="arena-shell">
@@ -66,12 +66,12 @@
     <div class="title-copy">
       <div class="pill">時間制限なし / 一手ずつ進むサバイバー</div>
       <h1>止めて、狙って。<br>一手で、<em>殲滅。</em></h1>
-      <p class="lead">移動が、攻撃になる。<br>群れに飛び込み、自分だけの連鎖を育てよう。</p>
+      <p class="lead">廃棄寸前の整備ロボ〈ノア〉。<br>暴走した再生装置ORIGINを止め、軌道都市を取り戻せ。</p>
     </div>
     <div class="title-bottom">
       <div class="instructions">
         <div><span>01</span><p><b>隣のマスをタップ</b><small>移動した方向へ貫通射撃。周りにも衝撃波。</small></p></div>
-        <div><span>02</span><p><b>4系統の武装を選び、育てる</b><small>連鎖爆発・貫通射撃・雷。補助装備は別枠。</small></p></div>
+        <div><span>02</span><p><b>4系統の武装を選び、育てる</b><small>連鎖爆発・貫通射撃・雷。MAX後はコア改造。</small></p></div>
         <div><span>03</span><p><b>赤い攻撃予告をかわす</b><small>考えている間は、敵も弾も動かない。</small></p></div>
       </div>
       <button id="continue" class="primary-button" hidden>続きから出撃 <span>↗</span></button>
@@ -104,6 +104,7 @@
     <div class="modal-content">
       <div class="eyebrow accent">SECTOR COMPLETE <span id="clear-number"></span></div>
       <h2 id="clear-title"></h2>
+      <p id="clear-reason" class="modal-sub"></p>
       <div id="journey" class="journey"></div>
       <p id="supply-note" class="supply-note">HPを全回復</p>
       <div class="next-area"><div class="eyebrow">NEXT SECTOR</div><h3 id="next-name"></h3><p id="next-description"></p></div>
@@ -113,14 +114,17 @@
   </div>
   <div id="help-screen" class="screen modal-screen" hidden>
     <div class="modal-content help-content">
-      <div class="eyebrow accent">FIELD MANUAL</div><h2>一手の読み方。</h2>
+      <div class="eyebrow accent">NOA / FIELD MANUAL</div><h2>この街は、まだ直せる。</h2>
+      <div class="manual-entry"><b>主人公：整備ロボ〈ノア〉</b><p>廃棄寸前の旧式整備機。回収した部品で武装を組み直し、自分を捨てた軌道都市を救いに戻ってきました。</p></div>
+      <div class="manual-entry"><b>敵：ORIGINに支配された修復体</b><p>都市再生装置ORIGINは、街のすべてを部品に戻そうと暴走。修復体を増殖させています。各区域のボスは敵群を動かす制御核。ボスを倒すと、残った敵も停止します。</p></div>
       <div class="manual-entry"><b>隣へ動く → 武器が全部発動 → 敵の番</b><p>上下左右・斜めの8方向へ移動できます。自分をタップすると、その場で向いている方向へ攻撃します。</p></div>
       <div class="manual-entry"><b>長押しして、離す前に確認</b><p>赤線は被弾元。敵のA・B印と下の説明が対応し、緑の×はこの一手で倒して攻撃を阻止できる印、青は凍結で阻止できる印です。移動先を押すと攻撃範囲・撃破数・受けるダメージが見えます。指を外へずらすとキャンセルできます。</p></div>
       <div class="manual-entry"><b>赤い予告の敵を、先に倒してもOK</b><p>生き残った敵だけが予告どおりに攻撃します。緑の救急箱は踏むとHPが4回復。全20エリア、12体のボスを突破するとクリアです。ボスの光る側からの攻撃は2倍のダメージ。他の側からも通常ダメージを与えられます。</p></div>
       <div class="manual-entry"><b>4系統の武装で、自分の戦い方を作る</b><p>射撃・衝撃波の強化も含めて武装は4系統。装甲とオーバークロックは別枠です。6面から武装の覚醒、12面から最初の一撃だけを強めるオーバークロックが解禁。雷とドローンは2手ごと、隕石は3手ごとに発動します。</p></div>
       <div class="manual-entry"><b>敵に合わせて、狙う順番を変える</b><p>緑の突進兵は2マス移動。紫の増殖体は倒すと2体に分裂しますが、分裂した小型敵からXPは得られません。橙の砲台は十字砲撃。青緑の結界兵は凍らず、炎と誘爆に強いので射撃で狙いましょう。通常敵も解凍後2手は再凍結しません。</p></div>
       <div class="manual-entry"><b>次のエリアへ補給する</b><p>エリア突破でHPを全回復。ボスを倒すと、追加の強化権を1回獲得します。未解禁の強化しか残っていないときは、権利を保持したまま先へ進めます。</p></div>
-      <div class="manual-entry"><b>敵を全滅させて、ステージクリア</b><p>「増援あと○手」が0になると新しい増援が止まります。残っている敵をすべて倒すとクリア。ボス戦はボス撃破で増援が止まり、残敵も全滅させてから次へ進みます。</p></div>
+      <div class="manual-entry"><b>通常面は全滅、ボス面はボス撃破でクリア</b><p>通常面は「増援あと○手」が0になってから、残った敵を全滅させます。ボス面はボスを倒した瞬間にクリア。残った修復体も停止するので、掃討は不要です。20面もORIGINを倒せば終了します。</p></div>
+<div class="manual-entry"><b>装備MAX後は、コア改造へ</b><p>選んだ4系統の武装と補助装備がMAXになると、極点射撃・予備装甲・部品解析を選べます。各20ランク。武装枠を使わず、4手ごとの射撃、最大HP、XP・スコア回収を育てます。</p></div>
       <div id="equipment-help"></div>
       <button id="close-help" class="primary-button">戦場に戻る <span>↗</span></button>
     </div>
@@ -184,6 +188,14 @@
   ];
   const AWAKEN={blast:'死亡爆発が周囲2マス・2ダメージに。大きな群れを丸ごと連鎖。',cross:'3手ごとに8方向へ貫通射撃。他の手は4方向射撃。',pulse:'周囲2マスの衝撃波が4ダメージに。密集地を吹き飛ばす。',arc:'2手ごとに最大7体へ、各3ダメージの雷が連鎖。',lance:'貫通射撃が8ダメージ・射程9に。戦場の端まで撃ち抜く。',drone:'2手ごとに4体へ各3ダメージ。遠くの敵まで同時に追撃。'};
   for(const u of UPGRADES)if(AWAKEN[u.id]){u.desc.push(AWAKEN[u.id]);u.max=3;}
+  UPGRADES.push(
+    {id:'coreburst',name:'極点射撃',icon:'✹',color:'#ffe29b',short:'4手ごとに貫通射撃を増幅',max:20,support:true,core:true,minSector:12,
+      desc:Array.from({length:20},(_,i)=>`4手ごとの貫通射撃を＋${i+1}ダメージ。育てた武装と併用できるコア改造。`)},
+    {id:'coreguard',name:'予備装甲',icon:'⬡',color:'#8df2be',short:'最大HP＋1・HPを1回復',max:20,support:true,core:true,minSector:12,
+      desc:Array.from({length:20},(_,i)=>`最大HPをさらに＋1、HPを1回復。改造による最大HP増加は合計＋${i+1}。`)},
+    {id:'coresalvage',name:'部品解析',icon:'⚙',color:'#a7d9ff',short:'部品を集めて、さらに成長',max:20,support:true,core:true,minSector:12,
+      desc:Array.from({length:20},(_,i)=>`撃破で得るXPを＋${(i+1)*5}％、撃破スコアを＋${(i+1)*12}％。少数の部品も蓄積する。`)}
+  );
 
   class Game {
     constructor(seed = Date.now()) {
@@ -192,7 +204,7 @@
       this.player = { x:3, y:5, hp:8, maxHp:8, dx:0, dy:-1 };
       this.enemies = []; this.pickups = []; this.events = [];
       this.weapons = Object.fromEntries(UPGRADES.map(u=>[u.id,0]));
-      this.slotLimit=4;this.experience=0;this.boosted=[];
+      this.slotLimit=4;this.experience=0;this.xpRemainder=0;this.boosted=[];
       this.balanceVersion=6;
       this.kills = 0; this.score = 0; this.bestCombo = 0; this.lastKills = 0;
       this.level = 0; this.xpLevel=0; this.bonusUpgrades=0; this.pendingBonus=false;
@@ -205,19 +217,22 @@
     }
     random() { this.seed = (Math.imul(this.seed,1664525) + 1013904223) >>> 0; return this.seed / 4294967296; }
     clone() { return Object.assign(Object.create(Game.prototype), JSON.parse(JSON.stringify(this))); }
-    save(){const state=JSON.parse(JSON.stringify(this));state.events=[];state.explosions=[];state.splits=[];state.boosted=[];if(this.phase==='rest'){state.enemies=[];state.fires=[];}return{version:3,state};}
+    save(){const state=JSON.parse(JSON.stringify(this));state.events=[];state.explosions=[];state.splits=[];state.boosted=[];if(this.phase==='rest'){state.enemies=[];state.fires=[];}return{version:4,state};}
     static restore(value){
       try{
-        if(![2,3].includes(value?.version)||!value.state)return null;
+        if(![2,3,4].includes(value?.version)||!value.state)return null;
         const s=JSON.parse(JSON.stringify(value.state)),legacy=value.version===2,g=new Game(s.seed),integer=n=>Number.isSafeInteger(n)&&n>=0;
         if(!integer(s.seed)||s.seed>4294967295||!['play','upgrade','rest'].includes(s.phase)||!integer(s.turn)||!integer(s.sectorIndex)||s.sectorIndex>=STAGES.length||!integer(s.sectorTurn))return null;
         for(const k of ['kills','score','level','xpLevel','bonusUpgrades','nextId','bossesDefeated','clearedSectors'])if(!integer(s[k]))return null;
-        if(s.xpLevel>g.thresholds.length||s.level>40||s.bonusUpgrades>STAGES.length)return null;
-        const p=s.player;if(!p||!inside(p.x,p.y)||!integer(p.x)||!integer(p.y)||!integer(p.hp)||p.hp<1||!integer(p.maxHp)||p.hp>p.maxHp||p.maxHp>12||![-1,0,1].includes(p.dx)||![-1,0,1].includes(p.dy)||(!p.dx&&!p.dy))return null;
+        if(s.xpLevel>g.thresholds.length||s.level>128||s.bonusUpgrades>STAGES.length)return null;
+        const p=s.player;if(!p||!inside(p.x,p.y)||!integer(p.x)||!integer(p.y)||!integer(p.hp)||p.hp<1||!integer(p.maxHp)||p.hp>p.maxHp||p.maxHp>32||![-1,0,1].includes(p.dx)||![-1,0,1].includes(p.dy)||(!p.dx&&!p.dy))return null;
         if(!s.weapons)return null;
         if(!Object.hasOwn(s.weapons,'overclock'))s.weapons={...s.weapons,overclock:0};
+        for(const u of UPGRADES)if(u.core&&!Object.hasOwn(s.weapons,u.id))s.weapons[u.id]=0;
         if(legacy&&integer(s.weapons.overclock)&&s.weapons.overclock<=6)s.weapons.overclock=Math.min(3,s.weapons.overclock);
         if(UPGRADES.some(u=>!integer(s.weapons[u.id])||s.weapons[u.id]>u.max))return null;
+        if(p.maxHp>12+s.weapons.coreguard)return null;
+        if(s.xpRemainder!==undefined&&(!integer(s.xpRemainder)||s.xpRemainder>=100))return null;
         const cell=p=>p&&integer(p.x)&&integer(p.y)&&inside(p.x,p.y);
         if(!Array.isArray(s.enemies)||s.enemies.length>70||s.enemies.some(e=>!cell(e)||!['mite','brute','gunner','runner','splitter','mortar','warder','boss'].includes(e.type)||!integer(e.hp)||e.hp<1||!integer(e.maxHp)||e.hp>e.maxHp||!integer(e.id)||e.id>=s.nextId||!e.intent||!Array.isArray(e.intent.cells)||e.intent.cells.some(p=>!cell(p))))return null;
         if(new Set(s.enemies.map(e=>e.id)).size!==s.enemies.length)return null;
@@ -238,6 +253,10 @@
           g.phase='play';g.offers=[];g.pendingBonus=false;g.checkUpgrade();
         }
         if(g.phase==='upgrade'&&g.offers.some(id=>!g.canUpgrade(id)))return null;
+        // Older saves can be in the cleanup portion of a defeated boss fight.
+        // Migrate directly to the break/result without a second boss reward.
+        if(g.stage.boss&&g.bossDead&&g.phase!=='rest')g.clearSector();
+        else if(g.phase==='play')g.checkUpgrade();
         return g;
       }catch{return null;}
     }
@@ -245,13 +264,15 @@
     get stage() { return STAGES[this.sectorIndex]; }
     get reinforcementsOver(){return this.stage.boss?this.bossDead:this.sectorTurn>=this.stage.turns;}
     get ownedWeapons(){return UPGRADES.filter(u=>!u.support&&this.weapons[u.id]>0);}
-    get buildComplete(){return this.ownedWeapons.length>=this.slotLimit&&UPGRADES.every(u=>!u.support&&!this.weapons[u.id]||this.weapons[u.id]>=u.max);}
+    get armamentComplete(){return this.ownedWeapons.length>=this.slotLimit&&UPGRADES.filter(u=>!u.core).every(u=>!u.support&&!this.weapons[u.id]||this.weapons[u.id]>=u.max);}
+    get buildComplete(){return this.armamentComplete&&UPGRADES.filter(u=>u.core).every(u=>this.weapons[u.id]>=u.max);}
     canUpgrade(id){
       const u=UPGRADES.find(u=>u.id===id);if(!u||this.weapons[id]>=u.max||this.sector<(u.minSector||1))return false;
+      if(u.core)return this.armamentComplete;
       if(!u.support&&this.weapons[id]>=2&&this.sector<6)return false;
       return u.support||this.weapons[id]>0||this.ownedWeapons.length<this.slotLimit;
     }
-    weaponPeriod(id){return ['arc','drone'].includes(id)?2:id==='meteor'?3:1;}
+    weaponPeriod(id){return id==='coreburst'?4:['arc','drone'].includes(id)?2:id==='meteor'?3:1;}
     weaponReady(id,turn=this.turn+1){return turn%this.weaponPeriod(id)===0;}
     onWeakSide(boss,p=this.player){return boss.weakSide==='N'?p.y<boss.y-1:boss.weakSide==='S'?p.y>boss.y+1:boss.weakSide==='E'?p.x>boss.x+1:boss.weakSide==='W'?p.x<boss.x-1:false;}
     enemyAt(e,x,y) { return e.type === 'boss' ? Math.max(Math.abs(e.x-x),Math.abs(e.y-y)) <= 1 : e.x===x && e.y===y; }
@@ -372,7 +393,11 @@
       if(e.hp<=0) {
         this.events.push({type:'death',id:e.id,x:e.x,y:e.y,kind:e.type,depth});
         this.lastKills++; this.kills++;
-        if(!e.summoned)this.experience+=e.type==='boss'?5:['brute','warder'].includes(e.type)?2:1;
+        if(!e.summoned){
+          const base=e.type==='boss'?5:['brute','warder'].includes(e.type)?2:1;
+          const points=base*(100+this.weapons.coresalvage*5)+this.xpRemainder;
+          this.experience+=Math.floor(points/100);this.xpRemainder=points%100;
+        }
         if(e.type==='boss'){this.bossDead=true;this.bossesDefeated++;}
         if(e.type==='splitter')this.splits.push({x:e.x,y:e.y});
         if(this.weapons.blast&&e.type!=='boss')this.explosions.push({x:e.x,y:e.y,depth:depth+1});
@@ -389,8 +414,8 @@
       const heal=this.pickups.find(p=>p.x===x&&p.y===y);
       if(heal){const amount=Math.min(4,this.player.maxHp-this.player.hp);this.player.hp+=amount;this.pickups=this.pickups.filter(p=>p!==heal);this.events.push({type:'heal',x,y,amount});}
       for(const cells of attack.beams) {
-        this.events.push({type:'beam',x,y,cells});
-        this.hitCells(cells,[2,3,5,8][this.weapons.lance]);
+        this.events.push({type:'beam',x,y,cells,charged:this.weapons.coreburst>0&&this.turn%4===0});
+        this.hitCells(cells,[2,3,5,8][this.weapons.lance]+(this.turn%4===0?this.weapons.coreburst:0));
       }
       this.events.push({type:'pulse',x,y,r:this.weapons.pulse>1?2:1});
       this.hitCells(attack.pulse,this.weapons.pulse===3?4:this.weapons.pulse?2:1);
@@ -424,9 +449,12 @@
         this.hitCells(this.area(ex.x,ex.y,this.weapons.blast===3?2:1),Math.min(2,this.weapons.blast),ex.depth,'blast');
       }
       this.enemies=this.enemies.filter(e=>e.hp>0);
-      this.score+=Math.round(this.lastKills*100*(1+Math.max(0,this.lastKills-1)*.18));
+      this.score+=Math.round(this.lastKills*100*(1+Math.max(0,this.lastKills-1)*.18)*(1+this.weapons.coresalvage*.12));
       this.bestCombo=Math.max(this.bestCombo,this.lastKills);
       const bossDied=this.events.some(e=>e.type==='death'&&e.kind==='boss');
+      if(this.stage.boss&&bossDied){
+        this.events.push({type:'reinforcementsEnd',bossDied:true});this.clearSector();return true;
+      }
       let damage=0;
       for(const e of this.enemies) {
         if(bossDied)continue;
@@ -489,7 +517,14 @@
       this.events.push({type:'bossEnter',id:boss.id,x:3,y});
     }
     clearSector(){
-      if(this.enemies.some(e=>e.hp>0))return false;
+      if(this.clearedSectors>=this.sector)return false;
+      const bossClear=this.stage.boss&&this.bossDead;
+      if(this.enemies.some(e=>e.hp>0)&&!bossClear)return false;
+      if(bossClear){
+        const survivors=this.enemies.filter(e=>e.hp>0);
+        for(const e of survivors)this.events.push({type:'disabled',id:e.id,x:e.x,y:e.y,kind:e.type});
+        if(survivors.length){const boss=this.events.find(e=>e.type==='death'&&e.kind==='boss');this.events.push({type:'networkDown',x:boss?.x??this.player.x,y:boss?.y??this.player.y,count:survivors.length});}
+      }
       this.enemies=[];
       this.clearedSectors=this.sector;this.score+=this.sector*2000+this.player.hp*100;
       this.events.push({type:'sectorClear',sector:this.sector});
@@ -538,6 +573,7 @@
       this.weapons[id]++;this.level++;if(this.pendingBonus)this.bonusUpgrades--;else this.xpLevel++;
       this.pendingBonus=false;this.offers=[];this.phase='play';
       if(id==='armor'){this.player.maxHp+=2;this.player.hp=this.player.maxHp;}
+      if(id==='coreguard'){this.player.maxHp++;this.player.hp=Math.min(this.player.maxHp,this.player.hp+1);}
       // A large chain can earn multiple choices; don't silently lose earned levels.
       this.checkUpgrade();return true;
     }
@@ -1236,8 +1272,8 @@
     for(const e of enemies){
       let x=e.x,y=e.y,alpha=1;
       if(a){
-        const after=live.get(e.id),old=before.enemies.find(b=>b.id===e.id),death=a.events.find(ev=>ev.type==='death'&&ev.id===e.id);
-        if(old&&!after){const dt=death?eventTime(death):220;if(elapsed>=dt)continue;}
+        const after=live.get(e.id),old=before.enemies.find(b=>b.id===e.id),death=a.events.find(ev=>ev.type==='death'&&ev.id===e.id),disabled=a.events.find(ev=>ev.type==='disabled'&&ev.id===e.id);
+        if(old&&!after){const dt=death?eventTime(death):disabled?eventTime(disabled)+160:220;if(elapsed>=dt)continue;if(disabled)alpha*=Math.min(1,Math.max(0,(dt-elapsed)/160));}
         if(!old){alpha=Math.max(0,Math.min(1,(elapsed-540)/180));if(alpha===0)continue;}
         else if(after){const p=Math.max(0,Math.min(1,(elapsed-440)/190));x=old.x+(after.x-old.x)*p;y=old.y+(after.y-old.y)*p;}
         const hit=a.events.find(ev=>ev.type==='hit'&&ev.id===e.id&&Math.abs(elapsed-eventTime(ev))<60);
@@ -1259,7 +1295,7 @@
     heroSprite(p.x,p.y,t,game.player.dx,game.player.dy);
   }
 
-  const eventTime=e=>e.type==='hurt'||e.type==='enemyAttack'?460:e.type==='heal'?90:e.type==='bossEnter'?650:130+Math.min(8,e.depth||0)*38;
+  const eventTime=e=>e.type==='hurt'||e.type==='enemyAttack'?460:e.type==='disabled'?300:e.type==='networkDown'?260:e.type==='heal'?90:e.type==='bossEnter'?650:130+Math.min(8,e.depth||0)*38;
   function emit(x,y,color,n=15,power=1){
     if(reduced)n=Math.min(4,n);
     for(let i=0;i<n;i++){
@@ -1270,6 +1306,7 @@
   }
   function emitEvent(e){
     const p=center(e.x||0,e.y||0);
+    if(e.type==='disabled')emit(p.x,p.y,C.cyan,7,.6);
     if(e.type==='bossEnter'){
       sound.sync();sound.fx('boss');
       if(game.enemies.some(b=>b.id===e.id&&b.variant==='origin')){
@@ -1306,10 +1343,14 @@
         const life=1-age/350;ctx.save();ctx.globalAlpha=life;
         if(e.type==='beam'&&e.cells.length){
           const from=center(e.x,e.y),to=center(e.cells[e.cells.length-1].x,e.cells[e.cells.length-1].y);
-          ctx.globalCompositeOperation='lighter';ctx.shadowColor=C.cyan;ctx.shadowBlur=15;
-          line(from.x,from.y,to.x,to.y,'#239ca588',tile*.29*life);line(from.x,from.y,to.x,to.y,C.cyan,tile*.12*life);line(from.x,from.y,to.x,to.y,'#f3fff2',tile*.04*life);
+          ctx.globalCompositeOperation='lighter';ctx.shadowColor=e.charged?'#ffc65f':C.cyan;ctx.shadowBlur=15;
+          line(from.x,from.y,to.x,to.y,e.charged?'#ffcf7688':'#239ca588',tile*(e.charged?.38:.29)*life);line(from.x,from.y,to.x,to.y,e.charged?'#ffe2a1':C.cyan,tile*.12*life);line(from.x,from.y,to.x,to.y,'#f3fff2',tile*.04*life);
           ctx.shadowBlur=0;
         }
+        if(e.type==='networkDown'){
+          const p=center(e.x,e.y);ring(p.x,p.y,Math.hypot(width,height)*Math.min(1,age/250),C.cyan,3*life);
+        }
+        if(e.type==='disabled'){const p=center(e.x,e.y);ring(p.x,p.y,tile*.33,C.cyan,2*life);}
         if(e.type==='pulse'||e.type==='boom'){
           const p=center(e.x,e.y),r=tile*(e.type==='pulse'?e.r+.45:game.weapons.blast===3?2.2:1.2)*Math.min(1,age/220);
           ctx.globalCompositeOperation='lighter';const color=e.type==='boom'?C.orange:C.purple;
@@ -1382,7 +1423,7 @@
     const prev=game.thresholds[game.xpLevel-1]||0,next=game.thresholds[game.xpLevel]||game.experience;
     $('xp').style.width=`${next===prev?100:Math.max(0,Math.min(100,(game.experience-prev)/(next-prev)*100))}%`;
     const maxed=game.buildComplete,eligible=UPGRADES.some(u=>game.canUpgrade(u.id));
-    $('next-upgrade').textContent=maxed?'MAX CORE':!eligible?`次の強化：${game.sector<6?6:12}面`:`あと${Math.max(0,next-game.experience)} XP`;
+    $('next-upgrade').textContent=maxed?'MAX CORE':!eligible?`次の強化：${game.sector<6?6:12}面`:game.armamentComplete?`コア改造 · あと${Math.max(0,next-game.experience)} XP`:`あと${Math.max(0,next-game.experience)} XP`;
     if(maxed)$('xp').style.width='100%';
     const boss=game.enemies.find(e=>e.type==='boss');$('boss-health').hidden=!boss;
     const final=boss?.variant==='origin',rage=final&&boss.hp<=boss.maxHp*.5;
@@ -1391,7 +1432,7 @@
     $('loadout').innerHTML=`<button class="weapon-chip base" aria-label="武装と基本装備を見る">武装 ${game.ownedWeapons.length}/${game.slotLimit}</button>`+UPGRADES.filter(u=>game.weapons[u.id]).map(u=>{
       const period=game.weaponPeriod(u.id),wait=(period-(game.turn+1)%period)%period;
       const status=period>1?wait?`あと${wait}手`:'準備OK':'';
-      return `<button class="weapon-chip${period>1&&!wait?' charged':''}" style="color:${u.color}" aria-label="${u.name} レベル${game.weapons[u.id]} ${status}">${u.icon}<small>${game.weapons[u.id]}${status?' · '+status:''}</small></button>`;
+      return `<button class="weapon-chip${period>1&&!wait?' charged':''}" style="color:${u.color}" aria-label="${u.name} ${u.core?'改造ランク':'レベル'}${game.weapons[u.id]} ${status}">${u.icon}<small>${u.core?'R':''}${game.weapons[u.id]}${status?' · '+status:''}</small></button>`;
     }).join('');
   }
   function updateHint(){
@@ -1468,8 +1509,8 @@
     upgradeReadyAt=performance.now()+UPGRADE_SETTLE_MS;upgradePress=null;upgradeSawPointer=false;
     $('choices').classList.add('choices-locked');$('choices').setAttribute('aria-disabled','true');
     sound.fx('upgrade');$('upgrade-screen').hidden=false;$('upgrade-level').textContent=`${String(game.level+1).padStart(2,'0')} → ${String(game.level+2).padStart(2,'0')}`;
-    $('upgrade-rule').textContent=`武装 ${game.ownedWeapons.length}/${game.slotLimit}系統。${game.ownedWeapons.length<game.slotLimit?'新しい武装は1枠使用。補助装備は別枠。':'選んだ武装と補助装備を強化します。'}`;
-    $('choices').innerHTML=game.offers.map(id=>{const u=UPGRADES.find(u=>u.id===id),level=game.weapons[id],awaken=!u.support&&level===2&&u.max===3;return `<button class="upgrade-card${awaken?' awaken':''}" data-upgrade="${id}" style="--card:${u.color}"><span class="upgrade-icon">${u.icon}</span><span class="upgrade-copy"><span class="upgrade-top"><b>${u.name}</b><small>${awaken?'覚醒 LV.3':level?'LV.'+(level+1):u.support?'補助':'NEW / 武装枠'}</small></span><span class="upgrade-short">${awaken?'AWAKENING':level?'さらに強化':u.short}</span><p>${u.desc[level]}</p></span></button>`;}).join('');
+    $('upgrade-rule').textContent=game.armamentComplete?'装備MAX。回収した部品で、ノアのコアを改造します。武装枠は使いません。':`武装 ${game.ownedWeapons.length}/${game.slotLimit}系統。${game.ownedWeapons.length<game.slotLimit?'新しい武装は1枠使用。補助装備は別枠。':'選んだ武装と補助装備を強化します。'}`;
+    $('choices').innerHTML=game.offers.map(id=>{const u=UPGRADES.find(u=>u.id===id),level=game.weapons[id],awaken=!u.support&&level===2&&u.max===3;return `<button class="upgrade-card${awaken||u.core?' awaken':''}" data-upgrade="${id}" style="--card:${u.color}"><span class="upgrade-icon">${u.icon}</span><span class="upgrade-copy"><span class="upgrade-top"><b>${u.name}</b><small>${u.core?'改造 RANK '+(level+1):awaken?'覚醒 LV.3':level?'LV.'+(level+1):u.support?'補助':'NEW / 武装枠'}</small></span><span class="upgrade-short">${u.core?u.short:awaken?'AWAKENING':level?'さらに強化':u.short}</span><p>${u.desc[level]}</p></span></button>`;}).join('');
   }
   function chooseUpgrade(id){
     if(animation||helpOpen||soundOpen||$('upgrade-screen').hidden||performance.now()<upgradeReadyAt||!game.choose(id))return;sound.init();sound.fx('select');updateHUD();selection=null;
@@ -1503,7 +1544,7 @@
   });
   function showRest(){
     $('rest-screen').hidden=false;sound.fx('upgrade');$('clear-number').textContent=`${sectorLabel(game.sector)} / ${STAGES.length}`;
-    $('clear-title').textContent=game.stage.name+'、突破。';$('journey').innerHTML=STAGES.map((_,i)=>`<span class="${i<game.sector?'done':''}"></span>`).join('');
+    $('clear-title').textContent=game.stage.boss?'制御核、停止。':game.stage.name+'、突破。';$('clear-reason').textContent=game.stage.boss?'ボスとの接続が切れ、防衛群も停止しました。':'回収した部品と武装を、次の区域へ。';$('journey').innerHTML=STAGES.map((_,i)=>`<span class="${i<game.sector?'done':''}"></span>`).join('');
     const next=STAGES[game.sector];$('next-name').textContent=`${sectorLabel(game.sector+1)} / ${next.name}`;$('next-description').textContent=next.subtitle+(game.sector+1===6?'。主力武器の覚醒が解禁。':'');
     $('supply-note').textContent=game.stage.boss&&!game.buildComplete?'HPを全回復 ＋ ボス撃破の強化権1回':'HPを全回復。武装を引き継いで次の戦場へ';
   }
@@ -1515,8 +1556,8 @@
   function showResult(){
     sound.stop();const win=game.phase==='won';sound.fx(win?'win':'lose');$('result-screen').hidden=false;
     $('result-tag').textContent=win?'OPERATION COMPLETE':'SIGNAL LOST';
-    $('result-title').innerHTML=win?'終端の主を、撃ち抜いた。':'次の一手が、ある。';
-    $('result-copy').textContent=win?`全${STAGES.length}エリアと${STAGES.filter(s=>s.boss).length}体のボスを突破。その組み合わせが、群れを砕いた。`:`エリア${game.sector} / ${game.stage.name}。長押しで被ダメージを確認して、次の突破へ。`;
+    $('result-title').innerHTML=win?'ノアは、<br>街を取り戻した。':'まだ、直せる。';
+    $('result-copy').textContent=win?`ORIGIN停止。全${STAGES.length}区域の防衛群が沈黙した。廃棄寸前の整備機が、もう一度この街を直し始める。`:`ノアの修復記録：区域${game.sector} / ${game.stage.name}。回収する武装を変えて、もう一度。`;
     $('result-score').textContent=game.score.toLocaleString();$('result-turn').textContent=game.turn;$('result-kills').textContent=game.kills;$('result-combo').textContent=game.bestCombo;
     $('result-build').innerHTML=UPGRADES.filter(u=>game.weapons[u.id]).map(u=>`<span>${u.icon} ${u.name} ${game.weapons[u.id]}</span>`).join('');
     let best=game.score;try{best=Math.max(game.score,Number(localStorage.getItem('turn-burst-best-v5'))||0);localStorage.setItem('turn-burst-best-v5',String(best));}catch{}
@@ -1533,8 +1574,8 @@
     if(!savedRun)return;game=savedRun;savedRun=null;started=true;helpOpen=false;soundOpen=false;updateSound();selection=null;pointer=null;animation=null;
     finalAwakened=game.enemies.some(e=>e.variant==='origin'&&e.hp<=e.maxHp*.5);
     for(const id of ['start-screen','upgrade-screen','result-screen','help-screen','rest-screen','sound-screen'])$(id).hidden=true;
-    sound.start();updateHUD();updateHint();resize();
-    if(game.phase==='upgrade')showUpgrade();else if(game.phase==='rest')showRest();else banner(`RESUME / ${game.stage.name}`);
+    saveRun();sound.start();updateHUD();updateHint();resize();
+    if(game.phase==='won')showResult();else if(game.phase==='upgrade')showUpgrade();else if(game.phase==='rest')showRest();else banner(`RESUME / ${game.stage.name}`);
   });
   function openHelp(){
     if(animation||soundOpen)return;helpOpen=true;selection=null;pointer=null;$('help-screen').hidden=false;

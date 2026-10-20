@@ -60,8 +60,7 @@ test('final themes and restored retro stay bounded, with no extra turn or audio 
     let peak=0;for(let i=0;i<1150;i++){h.tick(40);peak=Math.max(peak,h.debug().music.voices);}
     assert(peak<75);assert.equal(h.intervals.size,1);assert.equal(h.game.turn,1);assert.equal(h.debug().music.style,style);
     const boss=h.game.enemies.find(e=>e.type==='boss');boss.hp=1;h.game.enemies=[boss];aim(h.game,0,0,'warder');
-    h.tap(3,4);h.tick(850);assert(h.game.bossDead);assert.equal(h.game.phase,'play');assert.equal(h.debug().music.mode,'normal');assert.equal(h.intervals.size,1);
-    assert.equal(h.debug().music.title,style==='retro'?'PIXEL AFTERNOON':'IGNITION');
-    h.click('sound');h.tick(40);assert.equal(h.debug().music.voices,0);
+    h.tap(3,4);h.tick(850);assert(h.game.bossDead);assert.equal(h.game.phase,'won');assert.equal(h.intervals.size,0);assert.equal(h.game.enemies.length,0);
+    h.tick(40);assert.equal(h.debug().music.voices,0);
   }
 });

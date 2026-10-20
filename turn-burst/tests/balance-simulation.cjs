@@ -4,7 +4,7 @@ function play(seed,build,policy='tactical',initialState=null){
  const g=initialState||new Game(seed),row={seed,build,policy},stageData=[];let bound=0,blocked=0;
  while(!['won','lost'].includes(g.phase)&&g.turn<650&&bound++<1400){
   if(g.phase==='rest'){stageData.push({sector:g.sector,turn:g.turn,hp:g.player.hp,level:g.level});g.nextSector();continue;}
-  if(g.phase==='upgrade'){const p=g.player.hp<=4?['armor','overclock',...builds[build]]:['overclock',...builds[build],'armor'];const id=p.find(id=>g.offers.includes(id));if(!id||!g.choose(id)){throw Error('stuck upgrade');}continue;}
+  if(g.phase==='upgrade'){const p=g.player.hp<=4?['armor','overclock',...builds[build]]:['overclock',...builds[build],'armor'];const id=p.find(id=>g.offers.includes(id))||g.offers[0];if(!id||!g.choose(id)){throw Error('stuck upgrade');}continue;}
   const options=[];const boss=g.enemies.find(e=>e.type==='boss');
   for(let y=g.player.y-1;y<=g.player.y+1;y++)for(let x=g.player.x-1;x<=g.player.x+1;x++)if(g.canMove(x,y)){
    const p=g.preview(x,y);let v=p.kills*3+p.bossDamage*2-p.damage*(g.player.hp<=3?40:16)+p.heal*10;

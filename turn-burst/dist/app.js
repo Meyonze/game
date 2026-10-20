@@ -336,8 +336,8 @@
     for(const e of enemies){
       let x=e.x,y=e.y,alpha=1;
       if(a){
-        const after=live.get(e.id),old=before.enemies.find(b=>b.id===e.id),death=a.events.find(ev=>ev.type==='death'&&ev.id===e.id);
-        if(old&&!after){const dt=death?eventTime(death):220;if(elapsed>=dt)continue;}
+        const after=live.get(e.id),old=before.enemies.find(b=>b.id===e.id),death=a.events.find(ev=>ev.type==='death'&&ev.id===e.id),disabled=a.events.find(ev=>ev.type==='disabled'&&ev.id===e.id);
+        if(old&&!after){const dt=death?eventTime(death):disabled?eventTime(disabled)+160:220;if(elapsed>=dt)continue;if(disabled)alpha*=Math.min(1,Math.max(0,(dt-elapsed)/160));}
         if(!old){alpha=Math.max(0,Math.min(1,(elapsed-540)/180));if(alpha===0)continue;}
         else if(after){const p=Math.max(0,Math.min(1,(elapsed-440)/190));x=old.x+(after.x-old.x)*p;y=old.y+(after.y-old.y)*p;}
         const hit=a.events.find(ev=>ev.type==='hit'&&ev.id===e.id&&Math.abs(elapsed-eventTime(ev))<60);
@@ -359,7 +359,7 @@
     heroSprite(p.x,p.y,t,game.player.dx,game.player.dy);
   }
 
-  const eventTime=e=>e.type==='hurt'||e.type==='enemyAttack'?460:e.type==='heal'?90:e.type==='bossEnter'?650:130+Math.min(8,e.depth||0)*38;
+  const eventTime=e=>e.type==='hurt'||e.type==='enemyAttack'?460:e.type==='disabled'?300:e.type==='networkDown'?260:e.type==='heal'?90:e.type==='bossEnter'?650:130+Math.min(8,e.depth||0)*38;
   function emit(x,y,color,n=15,power=1){
     if(reduced)n=Math.min(4,n);
     for(let i=0;i<n;i++){
@@ -370,6 +370,7 @@
   }
   function emitEvent(e){
     const p=center(e.x||0,e.y||0);
+    if(e.type==='disabled')emit(p.x,p.y,C.cyan,7,.6);
     if(e.type==='bossEnter'){
       sound.sync();sound.fx('boss');
       if(game.enemies.some(b=>b.id===e.id&&b.variant==='origin')){
@@ -406,10 +407,14 @@
         const life=1-age/350;ctx.save();ctx.globalAlpha=life;
         if(e.type==='beam'&&e.cells.length){
           const from=center(e.x,e.y),to=center(e.cells[e.cells.length-1].x,e.cells[e.cells.length-1].y);
-          ctx.globalCompositeOperation='lighter';ctx.shadowColor=C.cyan;ctx.shadowBlur=15;
-          line(from.x,from.y,to.x,to.y,'#239ca588',tile*.29*life);line(from.x,from.y,to.x,to.y,C.cyan,tile*.12*life);line(from.x,from.y,to.x,to.y,'#f3fff2',tile*.04*life);
+          ctx.globalCompositeOperation='lighter';ctx.shadowColor=e.charged?'#ffc65f':C.cyan;ctx.shadowBlur=15;
+          line(from.x,from.y,to.x,to.y,e.charged?'#ffcf7688':'#239ca588',tile*(e.charged?.38:.29)*life);line(from.x,from.y,to.x,to.y,e.charged?'#ffe2a1':C.cyan,tile*.12*life);line(from.x,from.y,to.x,to.y,'#f3fff2',tile*.04*life);
           ctx.shadowBlur=0;
         }
+        if(e.type==='networkDown'){
+          const p=center(e.x,e.y);ring(p.x,p.y,Math.hypot(width,height)*Math.min(1,age/250),C.cyan,3*life);
+        }
+        if(e.type==='disabled'){const p=center(e.x,e.y);ring(p.x,p.y,tile*.33,C.cyan,2*life);}
         if(e.type==='pulse'||e.type==='boom'){
           const p=center(e.x,e.y),r=tile*(e.type==='pulse'?e.r+.45:game.weapons.blast===3?2.2:1.2)*Math.min(1,age/220);
           ctx.globalCompositeOperation='lighter';const color=e.type==='boom'?C.orange:C.purple;
@@ -482,7 +487,7 @@
     const prev=game.thresholds[game.xpLevel-1]||0,next=game.thresholds[game.xpLevel]||game.experience;
     $('xp').style.width=`${next===prev?100:Math.max(0,Math.min(100,(game.experience-prev)/(next-prev)*100))}%`;
     const maxed=game.buildComplete,eligible=UPGRADES.some(u=>game.canUpgrade(u.id));
-    $('next-upgrade').textContent=maxed?'MAX CORE':!eligible?`次の強化：${game.sector<6?6:12}面`:`あと${Math.max(0,next-game.experience)} XP`;
+    $('next-upgrade').textContent=maxed?'MAX CORE':!eligible?`次の強化：${game.sector<6?6:12}面`:game.armamentComplete?`コア改造 · あと${Math.max(0,next-game.experience)} XP`:`あと${Math.max(0,next-game.experience)} XP`;
     if(maxed)$('xp').style.width='100%';
     const boss=game.enemies.find(e=>e.type==='boss');$('boss-health').hidden=!boss;
     const final=boss?.variant==='origin',rage=final&&boss.hp<=boss.maxHp*.5;
@@ -491,7 +496,7 @@
     $('loadout').innerHTML=`<button class="weapon-chip base" aria-label="武装と基本装備を見る">武装 ${game.ownedWeapons.length}/${game.slotLimit}</button>`+UPGRADES.filter(u=>game.weapons[u.id]).map(u=>{
       const period=game.weaponPeriod(u.id),wait=(period-(game.turn+1)%period)%period;
       const status=period>1?wait?`あと${wait}手`:'準備OK':'';
-      return `<button class="weapon-chip${period>1&&!wait?' charged':''}" style="color:${u.color}" aria-label="${u.name} レベル${game.weapons[u.id]} ${status}">${u.icon}<small>${game.weapons[u.id]}${status?' · '+status:''}</small></button>`;
+      return `<button class="weapon-chip${period>1&&!wait?' charged':''}" style="color:${u.color}" aria-label="${u.name} ${u.core?'改造ランク':'レベル'}${game.weapons[u.id]} ${status}">${u.icon}<small>${u.core?'R':''}${game.weapons[u.id]}${status?' · '+status:''}</small></button>`;
     }).join('');
   }
   function updateHint(){
@@ -568,8 +573,8 @@
     upgradeReadyAt=performance.now()+UPGRADE_SETTLE_MS;upgradePress=null;upgradeSawPointer=false;
     $('choices').classList.add('choices-locked');$('choices').setAttribute('aria-disabled','true');
     sound.fx('upgrade');$('upgrade-screen').hidden=false;$('upgrade-level').textContent=`${String(game.level+1).padStart(2,'0')} → ${String(game.level+2).padStart(2,'0')}`;
-    $('upgrade-rule').textContent=`武装 ${game.ownedWeapons.length}/${game.slotLimit}系統。${game.ownedWeapons.length<game.slotLimit?'新しい武装は1枠使用。補助装備は別枠。':'選んだ武装と補助装備を強化します。'}`;
-    $('choices').innerHTML=game.offers.map(id=>{const u=UPGRADES.find(u=>u.id===id),level=game.weapons[id],awaken=!u.support&&level===2&&u.max===3;return `<button class="upgrade-card${awaken?' awaken':''}" data-upgrade="${id}" style="--card:${u.color}"><span class="upgrade-icon">${u.icon}</span><span class="upgrade-copy"><span class="upgrade-top"><b>${u.name}</b><small>${awaken?'覚醒 LV.3':level?'LV.'+(level+1):u.support?'補助':'NEW / 武装枠'}</small></span><span class="upgrade-short">${awaken?'AWAKENING':level?'さらに強化':u.short}</span><p>${u.desc[level]}</p></span></button>`;}).join('');
+    $('upgrade-rule').textContent=game.armamentComplete?'装備MAX。回収した部品で、ノアのコアを改造します。武装枠は使いません。':`武装 ${game.ownedWeapons.length}/${game.slotLimit}系統。${game.ownedWeapons.length<game.slotLimit?'新しい武装は1枠使用。補助装備は別枠。':'選んだ武装と補助装備を強化します。'}`;
+    $('choices').innerHTML=game.offers.map(id=>{const u=UPGRADES.find(u=>u.id===id),level=game.weapons[id],awaken=!u.support&&level===2&&u.max===3;return `<button class="upgrade-card${awaken||u.core?' awaken':''}" data-upgrade="${id}" style="--card:${u.color}"><span class="upgrade-icon">${u.icon}</span><span class="upgrade-copy"><span class="upgrade-top"><b>${u.name}</b><small>${u.core?'改造 RANK '+(level+1):awaken?'覚醒 LV.3':level?'LV.'+(level+1):u.support?'補助':'NEW / 武装枠'}</small></span><span class="upgrade-short">${u.core?u.short:awaken?'AWAKENING':level?'さらに強化':u.short}</span><p>${u.desc[level]}</p></span></button>`;}).join('');
   }
   function chooseUpgrade(id){
     if(animation||helpOpen||soundOpen||$('upgrade-screen').hidden||performance.now()<upgradeReadyAt||!game.choose(id))return;sound.init();sound.fx('select');updateHUD();selection=null;
@@ -603,7 +608,7 @@
   });
   function showRest(){
     $('rest-screen').hidden=false;sound.fx('upgrade');$('clear-number').textContent=`${sectorLabel(game.sector)} / ${STAGES.length}`;
-    $('clear-title').textContent=game.stage.name+'、突破。';$('journey').innerHTML=STAGES.map((_,i)=>`<span class="${i<game.sector?'done':''}"></span>`).join('');
+    $('clear-title').textContent=game.stage.boss?'制御核、停止。':game.stage.name+'、突破。';$('clear-reason').textContent=game.stage.boss?'ボスとの接続が切れ、防衛群も停止しました。':'回収した部品と武装を、次の区域へ。';$('journey').innerHTML=STAGES.map((_,i)=>`<span class="${i<game.sector?'done':''}"></span>`).join('');
     const next=STAGES[game.sector];$('next-name').textContent=`${sectorLabel(game.sector+1)} / ${next.name}`;$('next-description').textContent=next.subtitle+(game.sector+1===6?'。主力武器の覚醒が解禁。':'');
     $('supply-note').textContent=game.stage.boss&&!game.buildComplete?'HPを全回復 ＋ ボス撃破の強化権1回':'HPを全回復。武装を引き継いで次の戦場へ';
   }
@@ -615,8 +620,8 @@
   function showResult(){
     sound.stop();const win=game.phase==='won';sound.fx(win?'win':'lose');$('result-screen').hidden=false;
     $('result-tag').textContent=win?'OPERATION COMPLETE':'SIGNAL LOST';
-    $('result-title').innerHTML=win?'終端の主を、撃ち抜いた。':'次の一手が、ある。';
-    $('result-copy').textContent=win?`全${STAGES.length}エリアと${STAGES.filter(s=>s.boss).length}体のボスを突破。その組み合わせが、群れを砕いた。`:`エリア${game.sector} / ${game.stage.name}。長押しで被ダメージを確認して、次の突破へ。`;
+    $('result-title').innerHTML=win?'ノアは、<br>街を取り戻した。':'まだ、直せる。';
+    $('result-copy').textContent=win?`ORIGIN停止。全${STAGES.length}区域の防衛群が沈黙した。廃棄寸前の整備機が、もう一度この街を直し始める。`:`ノアの修復記録：区域${game.sector} / ${game.stage.name}。回収する武装を変えて、もう一度。`;
     $('result-score').textContent=game.score.toLocaleString();$('result-turn').textContent=game.turn;$('result-kills').textContent=game.kills;$('result-combo').textContent=game.bestCombo;
     $('result-build').innerHTML=UPGRADES.filter(u=>game.weapons[u.id]).map(u=>`<span>${u.icon} ${u.name} ${game.weapons[u.id]}</span>`).join('');
     let best=game.score;try{best=Math.max(game.score,Number(localStorage.getItem('turn-burst-best-v5'))||0);localStorage.setItem('turn-burst-best-v5',String(best));}catch{}
@@ -633,8 +638,8 @@
     if(!savedRun)return;game=savedRun;savedRun=null;started=true;helpOpen=false;soundOpen=false;updateSound();selection=null;pointer=null;animation=null;
     finalAwakened=game.enemies.some(e=>e.variant==='origin'&&e.hp<=e.maxHp*.5);
     for(const id of ['start-screen','upgrade-screen','result-screen','help-screen','rest-screen','sound-screen'])$(id).hidden=true;
-    sound.start();updateHUD();updateHint();resize();
-    if(game.phase==='upgrade')showUpgrade();else if(game.phase==='rest')showRest();else banner(`RESUME / ${game.stage.name}`);
+    saveRun();sound.start();updateHUD();updateHint();resize();
+    if(game.phase==='won')showResult();else if(game.phase==='upgrade')showUpgrade();else if(game.phase==='rest')showRest();else banner(`RESUME / ${game.stage.name}`);
   });
   function openHelp(){
     if(animation||soundOpen)return;helpOpen=true;selection=null;pointer=null;$('help-screen').hidden=false;

@@ -12,23 +12,26 @@ test('reinforcement deadline stops spawns but does not clear live enemies',()=>{
   g.step(3,5);assert.equal(g.nextId,nextId);assert.equal(g.phase,'play');
   e.x=3;e.y=4;e.hp=1;e.intent={kind:'shot',cells:[]};g.step(3,5);assert.equal(g.phase,'rest');assert.equal(g.enemies.length,0);
 });
-test('boss defeat stops reinforcements and counts once while stragglers remain',()=>{
+test('boss defeat immediately clears its sector and disables stragglers without a second kill reward',()=>{
   const {g,e}=bossAndStraggler();g.player.hp=1;const nextId=g.nextId;
-  g.step(3,4);assert.equal(g.phase,'play');assert(g.reinforcementsOver);assert.equal(g.enemies.length,1);assert.equal(g.bossesDefeated,1);assert.equal(g.nextId,nextId);assert.equal(g.player.hp,1,'boss kill still cancels attacks on that turn');
-  g.step(3,4);assert.equal(g.bossesDefeated,1);assert.equal(g.nextId,nextId);
-  e.x=3;e.y=4;e.intent={kind:'shot',cells:[]};g.step(3,4);assert.equal(g.phase,'rest');assert.equal(g.bossesDefeated,1);
+  g.step(3,4);assert.equal(g.phase,'rest');assert(g.reinforcementsOver);assert.equal(g.enemies.length,0);assert.equal(g.bossesDefeated,1);assert.equal(g.nextId,nextId);assert.equal(g.player.hp,1);
+  assert(g.events.some(v=>v.type==='disabled'&&v.id===e.id));assert.equal(g.lastKills,1);assert.equal(g.experience,5);
+  const score=g.score;assert.equal(g.step(3,4),false);assert.equal(g.clearSector(),false);assert.equal(g.score,score);assert.equal(g.bossesDefeated,1);
 });
 test('a final splitter leaves its children to be cleared',()=>{
   const g=empty();g.sectorTurn=9;const e=g.addEnemy(3,4,'splitter');e.hp=1;e.intent={kind:'shot',cells:[]};g.step(3,5);
   assert(g.reinforcementsOver);assert.equal(g.phase,'play');assert.equal(g.enemies.length,2);assert(g.enemies.every(e=>e.summoned));
 });
-test('victory requires defeating the final boss and every remaining enemy',()=>{
-  const {g,e}=bossAndStraggler(true);g.bossesDefeated=11;g.step(3,4);assert.equal(g.phase,'play');assert.equal(g.bossesDefeated,12);
-  e.x=3;e.y=4;e.intent={kind:'shot',cells:[]};g.step(3,4);assert.equal(g.phase,'won');assert.equal(g.enemies.length,0);assert.equal(g.bossesDefeated,12);
+test('victory follows the final boss defeat even with live remaining enemies',()=>{
+  const {g}=bossAndStraggler(true);g.bossesDefeated=11;g.step(3,4);
+  assert.equal(g.phase,'won');assert.equal(g.enemies.length,0);assert.equal(g.bossesDefeated,12);assert.equal(g.lastKills,1);
 });
-test('cleanup resumes from a save without re-spawning or re-counting the boss',()=>{
-  const {g}=bossAndStraggler();g.step(3,4);const r=Game.restore(g.save());assert(r);assert(r.reinforcementsOver);const nextId=r.nextId;
-  r.step(3,4);assert.equal(r.nextId,nextId);assert.equal(r.bossesDefeated,1);assert.equal(r.phase,'play');
+test('an old boss cleanup save migrates to a cleared sector without counting the boss again',()=>{
+  const {g,e}=bossAndStraggler();g.step(3,4);const record=g.save();record.version=3;
+  record.state.phase='play';record.state.enemies=[e];record.state.clearedSectors=0;record.state.score=1234;
+  for(const id of ['coreburst','coreguard','coresalvage'])delete record.state.weapons[id];
+  const r=Game.restore(record);assert(r);assert.equal(r.phase,'rest');assert.equal(r.bossesDefeated,1);assert.equal(r.enemies.length,0);
+  const score=r.score;const again=Game.restore(r.save());assert(again);assert.equal(again.score,score);assert.equal(again.bossesDefeated,1);
 });
 test('clearSector cannot discard live enemies',()=>{
   const g=new Game(6);assert.equal(g.clearSector(),false);assert.equal(g.phase,'play');assert(g.enemies.length>0);assert.equal(g.clearedSectors,0);

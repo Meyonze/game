@@ -42,7 +42,7 @@ test('rendering a complete campaign uses finite canvas coordinates and balanced 
     const g=h.game,options=[];for(let y=g.player.y-1;y<=g.player.y+1;y++)for(let x=g.player.x-1;x<=g.player.x+1;x++)if(g.canMove(x,y)){const p=g.preview(x,y);options.push({x,y,s:p.kills*3+p.bossDamage*2-p.damage*14+p.heal*9-(g.enemies.find(e=>e.type==='boss')?Math.max(Math.abs(x-g.enemies.find(e=>e.type==='boss').x),Math.abs(y-g.enemies.find(e=>e.type==='boss').y))*.5:0)});}
     options.sort((a,b)=>b.s-a.s);h.tap(options[0].x,options[0].y);for(let i=0;i<9;i++)h.tick(100);
     if(g.phase==='rest')h.click('next-sector');
-    while(g.phase==='upgrade'){const order=g.player.hp<4?['armor','overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost']:['overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost','armor'];h.choose(order.find(id=>g.offers.includes(id)));}
+    while(g.phase==='upgrade'){const order=g.player.hp<4?['armor','overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost']:['overclock','blast','pulse','lance','cross','arc','meteor','drone','flame','frost','armor'];h.choose(order.find(id=>g.offers.includes(id))||g.offers[0]);}
   }
   assert.equal(h.game.phase,'won');assert(h.calls>100000);assert(!h.$('result-screen').hidden);
 });
