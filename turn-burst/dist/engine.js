@@ -58,6 +58,7 @@
       this.turn = 0; this.nextId = 1; this.phase = 'play';
       this.player = { x:3, y:5, hp:8, maxHp:8, dx:0, dy:-1 };
       this.enemies = []; this.pickups = []; this.events = [];
+      this.upgradeHistory=[];
       this.weapons = Object.fromEntries(UPGRADES.map(u=>[u.id,0]));
       this.slotLimit=4;this.experience=0;this.xpRemainder=0;this.boosted=[];
       this.balanceVersion=6;
@@ -88,6 +89,16 @@
         if(UPGRADES.some(u=>!integer(s.weapons[u.id])||s.weapons[u.id]>u.max))return null;
         if(p.maxHp>12+s.weapons.coreguard)return null;
         if(s.xpRemainder!==undefined&&(!integer(s.xpRemainder)||s.xpRemainder>=100))return null;
+        if(s.upgradeHistory!==undefined){
+          if(!Array.isArray(s.upgradeHistory)||s.upgradeHistory.length>128||s.upgradeHistory.length>s.level)return null;
+          const ranks={};let lastTurn=0,lastSector=1;
+          for(const entry of s.upgradeHistory){
+            const u=UPGRADES.find(u=>u.id===entry?.id);
+            if(!u||!integer(entry.level)||entry.level<1||entry.level>s.weapons[u.id]||!integer(entry.sector)||entry.sector<lastSector||entry.sector>s.sectorIndex+1||!integer(entry.turn)||entry.turn<lastTurn||entry.turn>s.turn||!['xp','bonus'].includes(entry.source))return null;
+            if(ranks[u.id]!==undefined&&entry.level!==ranks[u.id]+1)return null;
+            ranks[u.id]=entry.level;lastTurn=entry.turn;lastSector=entry.sector;
+          }
+        }
         const cell=p=>p&&integer(p.x)&&integer(p.y)&&inside(p.x,p.y);
         if(!Array.isArray(s.enemies)||s.enemies.length>70||s.enemies.some(e=>!cell(e)||!['mite','brute','gunner','runner','splitter','mortar','warder','boss'].includes(e.type)||!integer(e.hp)||e.hp<1||!integer(e.maxHp)||e.hp>e.maxHp||!integer(e.id)||e.id>=s.nextId||!e.intent||!Array.isArray(e.intent.cells)||e.intent.cells.some(p=>!cell(p))))return null;
         if(new Set(s.enemies.map(e=>e.id)).size!==s.enemies.length)return null;
@@ -426,6 +437,7 @@
       const upgrade=UPGRADES.find(u=>u.id===id);
       if(!upgrade||!this.canUpgrade(id))return false;
       this.weapons[id]++;this.level++;if(this.pendingBonus)this.bonusUpgrades--;else this.xpLevel++;
+      this.upgradeHistory.push({id,level:this.weapons[id],sector:this.sector,turn:this.turn,source:this.pendingBonus?'bonus':'xp'});
       this.pendingBonus=false;this.offers=[];this.phase='play';
       if(id==='armor'){this.player.maxHp+=2;this.player.hp=this.player.maxHp;}
       if(id==='coreguard'){this.player.maxHp++;this.player.hp=Math.min(this.player.maxHp,this.player.hp+1);}

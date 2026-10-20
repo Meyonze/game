@@ -33,6 +33,8 @@
 
 .finale-overlay{position:absolute;inset:0;z-index:6;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;padding:0 8px 12%;text-align:center}.finale-caption{color:#fff0cb;text-shadow:0 2px 8px #000,0 0 32px #ffd37b66}.finale-caption small{display:block;font-size:10px;letter-spacing:4px;color:#e8c68d;margin-bottom:10px}.finale-caption strong{display:block;font-size:clamp(19px,6vw,28px);font-weight:900;letter-spacing:2px}.victory-finale .hud,.victory-finale .stagebar,.victory-finale .bottom-panel{opacity:.25;transition:opacity .4s}.victory-finale #help{visibility:hidden}.victory-finale #boss-health{visibility:hidden}.victory-finale canvas{border-color:#ba955b;box-shadow:0 0 50px #eabf5422}
 
+.result-build-label{font-size:10px;color:#93a8bf;letter-spacing:2px;margin-bottom:10px}.result-history{text-align:left;border:1px solid #35475c;border-radius:10px;background:#111d2d;margin:0 0 22px;overflow:hidden}.result-history summary{padding:14px;font-size:13px;font-weight:800;cursor:pointer;color:#e8f3e8}.result-history summary>span{float:right;font-size:11px;color:var(--lime)}.history-entries{max-height:290px;overflow-y:auto;overscroll-behavior:contain;padding:0 14px 12px;scrollbar-width:thin;scrollbar-color:#4c604f transparent}.history-sector h4,.history-inherited h4{font-size:12px;color:var(--lime);margin:15px 0 7px;letter-spacing:1px}.history-sector:first-child h4{margin-top:0}.history-sector h4>span{font-size:10px;color:#99adc0;font-weight:500;letter-spacing:0;margin-left:6px}.history-sector ol{list-style:none;padding:0;margin:0}.history-sector li{display:flex;align-items:center;gap:10px;border-left:1px solid #4d6652;margin-left:9px;padding:10px 0 10px 12px;border-bottom:1px solid #243346}.history-icon{color:var(--card);font-size:21px;width:24px;text-align:center;flex-shrink:0}.history-sector li>div{flex:1;min-width:0}.history-sector li b{display:block;font-size:12px;color:#e4ecf4}.history-sector li div>span{display:block;font-size:10px;margin-top:4px;color:var(--card)}.history-sector li small{font-size:9px;color:#8d9fb3;line-height:1.7;text-align:right;white-space:nowrap}.history-inherited{border-bottom:1px solid #35475c;padding-bottom:14px;margin-bottom:12px}.history-inherited p,.history-empty{font-size:11px;color:#a6b8cb;line-height:1.8}.history-inherited>div{display:flex;flex-wrap:wrap;gap:6px}.history-inherited>div span{font-size:10px;border:1px solid #35475c;padding:5px;border-radius:4px;color:#b9c9d8}
+
 </style>
 </head>
 <body>
@@ -98,7 +100,9 @@
       <p id="result-copy" class="modal-sub"></p>
       <div class="result-score" id="result-score"></div><div class="eyebrow">TOTAL SCORE</div>
       <div class="result-stats"><div><b id="result-turn"></b><span>手数</span></div><div><b id="result-kills"></b><span>総撃破</span></div><div><b id="result-combo"></b><span>最大同時撃破</span></div></div>
+      <div class="result-build-label">最終装備</div>
       <div id="result-build" class="result-build"></div>
+      <details id="result-history" class="result-history" open><summary>今回の強化履歴 <span id="history-count"></span></summary><div id="history-entries" class="history-entries"></div></details>
       <button id="retry" class="primary-button">別のビルドでもう一度 <span>↗</span></button>
       <div id="best" class="modal-foot"></div>
     </div>
@@ -206,6 +210,7 @@
       this.turn = 0; this.nextId = 1; this.phase = 'play';
       this.player = { x:3, y:5, hp:8, maxHp:8, dx:0, dy:-1 };
       this.enemies = []; this.pickups = []; this.events = [];
+      this.upgradeHistory=[];
       this.weapons = Object.fromEntries(UPGRADES.map(u=>[u.id,0]));
       this.slotLimit=4;this.experience=0;this.xpRemainder=0;this.boosted=[];
       this.balanceVersion=6;
@@ -236,6 +241,16 @@
         if(UPGRADES.some(u=>!integer(s.weapons[u.id])||s.weapons[u.id]>u.max))return null;
         if(p.maxHp>12+s.weapons.coreguard)return null;
         if(s.xpRemainder!==undefined&&(!integer(s.xpRemainder)||s.xpRemainder>=100))return null;
+        if(s.upgradeHistory!==undefined){
+          if(!Array.isArray(s.upgradeHistory)||s.upgradeHistory.length>128||s.upgradeHistory.length>s.level)return null;
+          const ranks={};let lastTurn=0,lastSector=1;
+          for(const entry of s.upgradeHistory){
+            const u=UPGRADES.find(u=>u.id===entry?.id);
+            if(!u||!integer(entry.level)||entry.level<1||entry.level>s.weapons[u.id]||!integer(entry.sector)||entry.sector<lastSector||entry.sector>s.sectorIndex+1||!integer(entry.turn)||entry.turn<lastTurn||entry.turn>s.turn||!['xp','bonus'].includes(entry.source))return null;
+            if(ranks[u.id]!==undefined&&entry.level!==ranks[u.id]+1)return null;
+            ranks[u.id]=entry.level;lastTurn=entry.turn;lastSector=entry.sector;
+          }
+        }
         const cell=p=>p&&integer(p.x)&&integer(p.y)&&inside(p.x,p.y);
         if(!Array.isArray(s.enemies)||s.enemies.length>70||s.enemies.some(e=>!cell(e)||!['mite','brute','gunner','runner','splitter','mortar','warder','boss'].includes(e.type)||!integer(e.hp)||e.hp<1||!integer(e.maxHp)||e.hp>e.maxHp||!integer(e.id)||e.id>=s.nextId||!e.intent||!Array.isArray(e.intent.cells)||e.intent.cells.some(p=>!cell(p))))return null;
         if(new Set(s.enemies.map(e=>e.id)).size!==s.enemies.length)return null;
@@ -574,6 +589,7 @@
       const upgrade=UPGRADES.find(u=>u.id===id);
       if(!upgrade||!this.canUpgrade(id))return false;
       this.weapons[id]++;this.level++;if(this.pendingBonus)this.bonusUpgrades--;else this.xpLevel++;
+      this.upgradeHistory.push({id,level:this.weapons[id],sector:this.sector,turn:this.turn,source:this.pendingBonus?'bonus':'xp'});
       this.pendingBonus=false;this.offers=[];this.phase='play';
       if(id==='armor'){this.player.maxHp+=2;this.player.hp=this.player.maxHp;}
       if(id==='coreguard'){this.player.maxHp++;this.player.hp=Math.min(this.player.maxHp,this.player.hp+1);}
@@ -1684,6 +1700,22 @@
     saveRun();
     updateHUD();updateHint();banner(game.sector===20?'FINAL SECTOR / 終端宙域':`SECTOR ${sectorLabel(game.sector)} / ${game.stage.name}`);if(game.phase==='upgrade')showUpgrade();
   });
+  function showHistory(){
+    const history=game.upgradeHistory,counts={};for(const e of history)counts[e.id]=(counts[e.id]||0)+1;
+    const inherited=UPGRADES.filter(u=>game.weapons[u.id]>(counts[u.id]||0));
+    const rank=(u,n)=>u.core?'改造 R'+n:'LV.'+n;
+    let html=inherited.length?'<section class="history-inherited"><h4>再開時の装備</h4><p>旧版での取得順・面数は記録されていません。</p><div>'+inherited.map(u=>'<span>'+u.icon+' '+u.name+' '+rank(u,game.weapons[u.id]-(counts[u.id]||0))+'</span>').join('')+'</div></section>':'';
+    let sector=0;
+    for(const entry of history){
+      const u=UPGRADES.find(u=>u.id===entry.id);
+      if(entry.sector!==sector){if(sector)html+='</ol></section>';sector=entry.sector;html+='<section class="history-sector"><h4>'+sectorLabel(sector)+'面 <span>'+STAGES[sector-1].name+'</span></h4><ol>';}
+      const gained=u.core?(entry.level===1?'コア改造開始 · R1':'改造 R'+(entry.level-1)+' → R'+entry.level):entry.level===1?'新規取得 · LV.1':entry.level===3&&u.max===3&&!u.support?'LV.2 → 覚醒 LV.3':'LV.'+(entry.level-1)+' → LV.'+entry.level;
+      html+='<li style="--card:'+u.color+'"><span class="history-icon">'+u.icon+'</span><div><b>'+u.name+'</b><span>'+gained+'</span></div><small>'+entry.turn+'手目'+(entry.source==='bonus'?'<br>補給':'')+'</small></li>';
+    }
+    if(sector)html+='</ol></section>';
+    $('history-count').textContent=history.length+'回';$('history-entries').innerHTML=html||'<p class="history-empty">強化を選ぶ前に終了しました。</p>';
+    $('result-history').open=true;$('history-entries').scrollTop=0;
+  }
   function showResult(celebrated=false){
     sound.stop();const win=game.phase==='won';if(!celebrated)sound.fx(win?'win':'lose');$('result-screen').hidden=false;
     $('result-tag').textContent=win?'OPERATION COMPLETE':'SIGNAL LOST';
@@ -1691,6 +1723,7 @@
     $('result-copy').textContent=win?`ORIGIN停止。全${STAGES.length}区域の防衛群が沈黙した。廃棄寸前の整備機が、もう一度この街を直し始める。`:`ノアの修復記録：区域${game.sector} / ${game.stage.name}。回収する武装を変えて、もう一度。`;
     $('result-score').textContent=game.score.toLocaleString();$('result-turn').textContent=game.turn;$('result-kills').textContent=game.kills;$('result-combo').textContent=game.bestCombo;
     $('result-build').innerHTML=UPGRADES.filter(u=>game.weapons[u.id]).map(u=>`<span>${u.icon} ${u.name} ${game.weapons[u.id]}</span>`).join('');
+    showHistory();
     const best=rememberBest();
     $('best').textContent=`BEST SCORE ${best.toLocaleString()}`;
   }
@@ -1729,7 +1762,7 @@
   window.addEventListener('pagehide',()=>{saveRun();sound.stop();});
   updateHUD();resize();requestAnimationFrame(render);
   // Read-only diagnostics help check viewport fit and turn progression without an autoplay mode.
-  window.turnBurstDebug=()=>({turn:game.turn,sector:game.sector,sectorTurn:game.sectorTurn,bossesDefeated:game.bossesDefeated,phase:game.phase,started,busy:!!animation,finale:victoryScene?{duration:FINALE_MS,elapsed:Math.max(0,(victoryScene.pausedAt??performance.now())-victoryScene.start),stage:victoryScene.stage,cues:victoryScene.cues.size,paused:victoryScene.pausedAt!==null}:null,player:{...game.player},enemies:game.enemies.map(e=>({...e})),weapons:{...game.weapons},kills:game.kills,score:game.score,canvas:{width,height},offers:[...game.offers],threats:threatContext().map(e=>({id:e.id,state:e.state,label:e.label})),music:sound.music?{style:sound.music.style,title:sound.music.score.title,mode:sound.music.mode,pending:sound.music.pending,step:sound.music.step,playing:sound.music.timer!==null,voices:sound.music.sources.size}:null});
+  window.turnBurstDebug=()=>({turn:game.turn,sector:game.sector,sectorTurn:game.sectorTurn,bossesDefeated:game.bossesDefeated,phase:game.phase,started,busy:!!animation,finale:victoryScene?{duration:FINALE_MS,elapsed:Math.max(0,(victoryScene.pausedAt??performance.now())-victoryScene.start),stage:victoryScene.stage,cues:victoryScene.cues.size,paused:victoryScene.pausedAt!==null}:null,player:{...game.player},enemies:game.enemies.map(e=>({...e})),weapons:{...game.weapons},upgradeHistory:game.upgradeHistory.map(e=>({...e})),kills:game.kills,score:game.score,canvas:{width,height},offers:[...game.offers],threats:threatContext().map(e=>({id:e.id,state:e.state,label:e.label})),music:sound.music?{style:sound.music.style,title:sound.music.score.title,mode:sound.music.mode,pending:sound.music.pending,step:sound.music.step,playing:sound.music.timer!==null,voices:sound.music.sources.size}:null});
 })();
 
 </script>

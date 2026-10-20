@@ -745,6 +745,22 @@
     saveRun();
     updateHUD();updateHint();banner(game.sector===20?'FINAL SECTOR / 終端宙域':`SECTOR ${sectorLabel(game.sector)} / ${game.stage.name}`);if(game.phase==='upgrade')showUpgrade();
   });
+  function showHistory(){
+    const history=game.upgradeHistory,counts={};for(const e of history)counts[e.id]=(counts[e.id]||0)+1;
+    const inherited=UPGRADES.filter(u=>game.weapons[u.id]>(counts[u.id]||0));
+    const rank=(u,n)=>u.core?'改造 R'+n:'LV.'+n;
+    let html=inherited.length?'<section class="history-inherited"><h4>再開時の装備</h4><p>旧版での取得順・面数は記録されていません。</p><div>'+inherited.map(u=>'<span>'+u.icon+' '+u.name+' '+rank(u,game.weapons[u.id]-(counts[u.id]||0))+'</span>').join('')+'</div></section>':'';
+    let sector=0;
+    for(const entry of history){
+      const u=UPGRADES.find(u=>u.id===entry.id);
+      if(entry.sector!==sector){if(sector)html+='</ol></section>';sector=entry.sector;html+='<section class="history-sector"><h4>'+sectorLabel(sector)+'面 <span>'+STAGES[sector-1].name+'</span></h4><ol>';}
+      const gained=u.core?(entry.level===1?'コア改造開始 · R1':'改造 R'+(entry.level-1)+' → R'+entry.level):entry.level===1?'新規取得 · LV.1':entry.level===3&&u.max===3&&!u.support?'LV.2 → 覚醒 LV.3':'LV.'+(entry.level-1)+' → LV.'+entry.level;
+      html+='<li style="--card:'+u.color+'"><span class="history-icon">'+u.icon+'</span><div><b>'+u.name+'</b><span>'+gained+'</span></div><small>'+entry.turn+'手目'+(entry.source==='bonus'?'<br>補給':'')+'</small></li>';
+    }
+    if(sector)html+='</ol></section>';
+    $('history-count').textContent=history.length+'回';$('history-entries').innerHTML=html||'<p class="history-empty">強化を選ぶ前に終了しました。</p>';
+    $('result-history').open=true;$('history-entries').scrollTop=0;
+  }
   function showResult(celebrated=false){
     sound.stop();const win=game.phase==='won';if(!celebrated)sound.fx(win?'win':'lose');$('result-screen').hidden=false;
     $('result-tag').textContent=win?'OPERATION COMPLETE':'SIGNAL LOST';
@@ -752,6 +768,7 @@
     $('result-copy').textContent=win?`ORIGIN停止。全${STAGES.length}区域の防衛群が沈黙した。廃棄寸前の整備機が、もう一度この街を直し始める。`:`ノアの修復記録：区域${game.sector} / ${game.stage.name}。回収する武装を変えて、もう一度。`;
     $('result-score').textContent=game.score.toLocaleString();$('result-turn').textContent=game.turn;$('result-kills').textContent=game.kills;$('result-combo').textContent=game.bestCombo;
     $('result-build').innerHTML=UPGRADES.filter(u=>game.weapons[u.id]).map(u=>`<span>${u.icon} ${u.name} ${game.weapons[u.id]}</span>`).join('');
+    showHistory();
     const best=rememberBest();
     $('best').textContent=`BEST SCORE ${best.toLocaleString()}`;
   }
@@ -790,5 +807,5 @@
   window.addEventListener('pagehide',()=>{saveRun();sound.stop();});
   updateHUD();resize();requestAnimationFrame(render);
   // Read-only diagnostics help check viewport fit and turn progression without an autoplay mode.
-  window.turnBurstDebug=()=>({turn:game.turn,sector:game.sector,sectorTurn:game.sectorTurn,bossesDefeated:game.bossesDefeated,phase:game.phase,started,busy:!!animation,finale:victoryScene?{duration:FINALE_MS,elapsed:Math.max(0,(victoryScene.pausedAt??performance.now())-victoryScene.start),stage:victoryScene.stage,cues:victoryScene.cues.size,paused:victoryScene.pausedAt!==null}:null,player:{...game.player},enemies:game.enemies.map(e=>({...e})),weapons:{...game.weapons},kills:game.kills,score:game.score,canvas:{width,height},offers:[...game.offers],threats:threatContext().map(e=>({id:e.id,state:e.state,label:e.label})),music:sound.music?{style:sound.music.style,title:sound.music.score.title,mode:sound.music.mode,pending:sound.music.pending,step:sound.music.step,playing:sound.music.timer!==null,voices:sound.music.sources.size}:null});
+  window.turnBurstDebug=()=>({turn:game.turn,sector:game.sector,sectorTurn:game.sectorTurn,bossesDefeated:game.bossesDefeated,phase:game.phase,started,busy:!!animation,finale:victoryScene?{duration:FINALE_MS,elapsed:Math.max(0,(victoryScene.pausedAt??performance.now())-victoryScene.start),stage:victoryScene.stage,cues:victoryScene.cues.size,paused:victoryScene.pausedAt!==null}:null,player:{...game.player},enemies:game.enemies.map(e=>({...e})),weapons:{...game.weapons},upgradeHistory:game.upgradeHistory.map(e=>({...e})),kills:game.kills,score:game.score,canvas:{width,height},offers:[...game.offers],threats:threatContext().map(e=>({id:e.id,state:e.state,label:e.label})),music:sound.music?{style:sound.music.style,title:sound.music.score.title,mode:sound.music.mode,pending:sound.music.pending,step:sound.music.step,playing:sound.music.timer!==null,voices:sound.music.sources.size}:null});
 })();
