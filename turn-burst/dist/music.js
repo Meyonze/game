@@ -294,11 +294,13 @@
       }else if(instrument==='lead'){
         for(const detune of [-5,5])this.voice({freq:f*Math.pow(2,detune/1200),type:'sawtooth',cutoff:3200,t,d,attack:.009,release:.055,volume:.058*gain,pan:detune/60,echo:true,vibrato:d>.2});
       }else if(instrument==='bass'){
-        // A saturated midrange layer stays audible on phone speakers; clean low
-        // fundamentals and a short octave transient add weight and pick attack.
-        this.voice({freq:f,type:'sawtooth',drive:true,cutoff:2400,cutoffEnd:650,t,d,attack:.002,release:.025,sustain:.42,volume:.23*gain});
-        this.voice({freq:f,type:'sine',t,d,attack:.003,volume:.105*gain});
-        this.voice({freq:f*2,type:'square',cutoff:2800,t,d:Math.min(.065,d),attack:.001,release:.018,sustain:.15,volume:.045*gain});
+        // FM bite, sustained saturation and octave presence bring the bass to
+        // the front even on phone speakers. The clean fundamental anchors it.
+        const bassGain=gain*1.4;
+        this.voice({freq:f,type:'sawtooth',drive:true,cutoff:3400,cutoffEnd:1500,t,d,attack:.0015,release:.025,sustain:.68,volume:.32*bassGain});
+        this.voice({freq:f,type:'sine',fm:{ratio:2,index:4,tail:1.15},cutoff:3300,cutoffEnd:1500,t,d,attack:.002,release:.022,sustain:.65,volume:.26*bassGain});
+        this.voice({freq:f,type:'sine',t,d,attack:.002,release:.025,volume:.14*bassGain});
+        this.voice({freq:f*2,type:'square',cutoff:2900,cutoffEnd:1600,t,d:d*.92,attack:.001,release:.018,sustain:.55,volume:.16*bassGain});
       }else if(instrument==='strings'){
         this.voice({freq:f,type:'sawtooth',cutoff:1500,t,d,attack:.16,release:.16,volume:.025*gain,pan:note%2?.4:-.4});
       }else if(instrument==='guitar'){
@@ -307,7 +309,7 @@
         this.voice({freq:f,type:'triangle',t,d,attack:.003,release:.03,volume:.045*gain,pan:.38,echo:true});
       }
     }
-    voice({freq=440,end,type='sine',noise=false,filter='lowpass',cutoff,cutoffEnd,drive=false,t,d,attack=.004,release=.025,sustain=.65,volume,pan=0,echo=false,vibrato=false}){
+    voice({freq=440,end,type='sine',noise=false,filter='lowpass',cutoff,cutoffEnd,drive=false,fm=null,t,d,attack=.004,release=.025,sustain=.65,volume,pan=0,echo=false,vibrato=false}){
       const ctx=this.ctx,source=noise?ctx.createBufferSource():ctx.createOscillator(),env=ctx.createGain(),nodes=[env];
       if(noise)source.buffer=this.noise;
       else{
@@ -328,6 +330,13 @@
       env.gain.exponentialRampToValueAtTime(.0001,t+d+release);
       if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=pan;env.connect(p);p.connect(this.bus);nodes.push(p);}else env.connect(this.bus);
       if(echo)env.connect(this.echo);
+      if(fm){
+        const mod=ctx.createOscillator(),amount=ctx.createGain();mod.type='sine';mod.frequency.setValueAtTime(freq*fm.ratio,t);
+        amount.gain.setValueAtTime(freq*fm.index,t);amount.gain.exponentialRampToValueAtTime(freq*fm.tail,t+Math.min(.075,d));
+        mod.connect(amount);amount.connect(source.frequency);this.sources.add(mod);
+        mod.onended=()=>{this.sources.delete(mod);mod.disconnect();amount.disconnect();};
+        mod.start(t);mod.stop(t+d+release+.01);
+      }
       this.sources.add(source);
       source.onended=()=>{this.sources.delete(source);source.disconnect();nodes.forEach(n=>n.disconnect());};
       source.start(t);source.stop(t+d+release+.01);

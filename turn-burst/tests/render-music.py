@@ -58,6 +58,10 @@ for track in json.loads(Path(sys.argv[2]).read_text()):
                 values = np.ones(len(points)); values[2:-1] += np.sin(points[2:-1]*38)*.0028
                 values[-1] = values[-2]
                 freq *= np.interp(time, points, values)
+            if v.get('fm'):
+                fm=v['fm']
+                amplitude=v['freq']*fm['index']*(fm['tail']/fm['index'])**np.minimum(time/min(.075,d),1)
+                freq += amplitude*np.sin(2*np.pi*v['freq']*fm['ratio']*time)
             phase = 2*np.pi*np.cumsum(freq)/RATE
             kind = v.get('type', 'sine')
             if kind == 'sine':
