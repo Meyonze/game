@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "url": "https://meyonze.github.io/game/aether-pair.html?v=1",
+  "tests_passed": 36,
+  "test_counts": {
+    "engine.test.cjs": 16,
+    "campaign.test.cjs": 7,
+    "ui.test.cjs": 13
+  },
+  "grid": [
+    9,
+    11
+  ],
+  "units": 2,
+  "missions": 6,
+  "deterministic_forecasts": true,
+  "all_missions_have_legal_clears": true,
+  "full_campaign_tap_test": true,
+  "clear_rounds": [
+    4,
+    6,
+    6,
+    8,
+    7,
+    7
+  ],
+  "external_runtime_assets": false,
+  "real_browser_tested": false,
+  "real_device_audio_tested": false,
+  "canvas_images": [
+    "opening.png",
+    "combo-ready.png",
+    "cross-burst.png"
+  ]
+}

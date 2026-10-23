@@ -1,0 +1,680 @@
+[
+  {
+    "mission": 0,
+    "policy": 0,
+    "phase": "won",
+    "round": 4,
+    "beacon": 6,
+    "units": [
+      10,
+      9
+    ],
+    "combos": 0,
+    "friendlyKills": 1,
+    "trace": [
+      [
+        {
+          "unitId": "lumiere",
+          "x": 5,
+          "y": 5,
+          "skill": "attack",
+          "targetId": "e2"
+        },
+        {
+          "unitId": "aster",
+          "x": 3,
+          "y": 9,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 8,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 5,
+          "y": 3,
+          "skill": "attack",
+          "targetId": "e1"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e1"
+        },
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 5,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 4,
+          "skill": "attack",
+          "targetId": "e2"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 2,
+          "skill": "guard"
+        }
+      ]
+    ],
+    "value": 100000
+  },
+  {
+    "mission": 1,
+    "policy": 0,
+    "phase": "won",
+    "round": 6,
+    "beacon": 8,
+    "units": [
+      12,
+      9
+    ],
+    "combos": 0,
+    "friendlyKills": 1,
+    "trace": [
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 8,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 5,
+          "y": 6,
+          "skill": "attack",
+          "targetId": "e2"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 8,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 4,
+          "y": 4,
+          "skill": "attack",
+          "targetId": "e4"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 3,
+          "y": 5,
+          "skill": "special",
+          "targetId": "e2"
+        },
+        {
+          "unitId": "aster",
+          "x": 5,
+          "y": 6,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 3,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e4"
+        },
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 4,
+          "skill": "attack",
+          "targetId": "e3"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 2,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "aster",
+          "x": 3,
+          "y": 4,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 1,
+          "y": 3,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 2,
+          "y": 2,
+          "skill": "guard"
+        }
+      ]
+    ],
+    "value": 100000
+  },
+  {
+    "mission": 2,
+    "policy": 0,
+    "phase": "won",
+    "round": 6,
+    "beacon": 8,
+    "units": [
+      9,
+      8
+    ],
+    "combos": 0,
+    "friendlyKills": 1,
+    "trace": [
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 8,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 7,
+          "y": 6,
+          "skill": "special",
+          "targetId": "e2"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 7,
+          "y": 7,
+          "skill": "special",
+          "targetId": "e2"
+        },
+        {
+          "unitId": "aster",
+          "x": 5,
+          "y": 7,
+          "skill": "special",
+          "targetId": "e4"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 7,
+          "y": 5,
+          "skill": "attack",
+          "targetId": "e1"
+        },
+        {
+          "unitId": "aster",
+          "x": 5,
+          "y": 4,
+          "skill": "attack",
+          "targetId": "e1"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 3,
+          "skill": "special",
+          "targetId": "e1"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 3,
+          "skill": "attack",
+          "targetId": "e3"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 3,
+          "y": 3,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "aster",
+          "x": 2,
+          "y": 3,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 1,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 4,
+          "y": 3,
+          "skill": "attack",
+          "targetId": "e4"
+        }
+      ]
+    ],
+    "value": 100000
+  },
+  {
+    "mission": 3,
+    "policy": 0,
+    "phase": "won",
+    "round": 8,
+    "beacon": 8,
+    "units": [
+      10,
+      9
+    ],
+    "combos": 1,
+    "friendlyKills": 0,
+    "trace": [
+      [
+        {
+          "unitId": "aster",
+          "x": 3,
+          "y": 8,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 7,
+          "y": 8,
+          "skill": "special",
+          "targetId": "e1"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 7,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 6,
+          "skill": "special",
+          "targetId": "e2"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 7,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 5,
+          "y": 5,
+          "skill": "attack",
+          "targetId": "e2"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 7,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 5,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e0"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 1,
+          "skill": "attack",
+          "targetId": "e5"
+        },
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 7,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 5,
+          "y": 8,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 8,
+          "y": 0,
+          "skill": "attack",
+          "targetId": "e5"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 7,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 1,
+          "skill": "attack",
+          "targetId": "e1"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 4,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 7,
+          "skill": "attack",
+          "targetId": "e4"
+        }
+      ]
+    ],
+    "value": 100000
+  },
+  {
+    "mission": 4,
+    "policy": 0,
+    "phase": "won",
+    "round": 7,
+    "beacon": 2,
+    "units": [
+      12,
+      9
+    ],
+    "combos": 1,
+    "friendlyKills": 2,
+    "trace": [
+      [
+        {
+          "unitId": "aster",
+          "x": 1,
+          "y": 5,
+          "skill": "special",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 6,
+          "skill": "attack",
+          "targetId": "e1"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 2,
+          "y": 4,
+          "skill": "attack",
+          "targetId": "e2"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 4,
+          "skill": "attack",
+          "targetId": "e2"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 5,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e4"
+        },
+        {
+          "unitId": "aster",
+          "x": 1,
+          "y": 5,
+          "skill": "attack",
+          "targetId": "e0"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 5,
+          "y": 0,
+          "skill": "attack",
+          "targetId": "e6"
+        },
+        {
+          "unitId": "aster",
+          "x": 1,
+          "y": 4,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 1,
+          "skill": "attack",
+          "targetId": "e4"
+        },
+        {
+          "unitId": "aster",
+          "x": 0,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e5"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 0,
+          "skill": "attack",
+          "targetId": "e3"
+        },
+        {
+          "unitId": "aster",
+          "x": 0,
+          "y": 2,
+          "skill": "attack",
+          "targetId": "e5"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 6,
+          "y": 0,
+          "skill": "attack",
+          "targetId": "e3"
+        },
+        {
+          "unitId": "aster",
+          "x": 0,
+          "y": 2,
+          "skill": "guard"
+        }
+      ]
+    ],
+    "value": 100000
+  },
+  {
+    "mission": 5,
+    "policy": 0,
+    "phase": "won",
+    "round": 7,
+    "beacon": 1,
+    "units": [
+      9,
+      7
+    ],
+    "combos": 1,
+    "friendlyKills": 1,
+    "trace": [
+      [
+        {
+          "unitId": "lumiere",
+          "x": 4,
+          "y": 7,
+          "skill": "special",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 8,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 4,
+          "y": 4,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "aster",
+          "x": 4,
+          "y": 8,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 5,
+          "y": 3,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "aster",
+          "x": 5,
+          "y": 9,
+          "skill": "guard"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 3,
+          "y": 8,
+          "skill": "attack",
+          "targetId": "e3"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 3,
+          "y": 3,
+          "skill": "attack",
+          "targetId": "e3"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 2,
+          "y": 1,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "aster",
+          "x": 5,
+          "y": 7,
+          "skill": "attack",
+          "targetId": "e4"
+        }
+      ],
+      [
+        {
+          "unitId": "aster",
+          "x": 5,
+          "y": 9,
+          "skill": "guard"
+        },
+        {
+          "unitId": "lumiere",
+          "x": 2,
+          "y": 0,
+          "skill": "attack",
+          "targetId": "e0"
+        }
+      ],
+      [
+        {
+          "unitId": "lumiere",
+          "x": 2,
+          "y": 0,
+          "skill": "attack",
+          "targetId": "e0"
+        },
+        {
+          "unitId": "aster",
+          "x": 5,
+          "y": 9,
+          "skill": "guard"
+        }
+      ]
+    ]
+  }
+]
