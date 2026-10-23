@@ -1,42 +1,87 @@
 {
-  "version": 2,
-  "url": "https://meyonze.github.io/game/aether-pair.html?v=2",
-  "tests_passed": 36,
-  "test_counts": {
-    "engine": 15,
-    "ui": 14,
-    "campaign": 7
-  },
+  "version": 3,
+  "title": "ネコと鉄の灯台",
+  "test_cases": 34,
+  "test_files": 3,
   "grid": [
     7,
-    8
+    7
   ],
-  "units": 2,
-  "missions": 6,
-  "input": "move_only",
-  "auto_attack": "all_orthogonal_neighbors",
-  "combo": "both_units_adjacent_to_same_enemy",
-  "enemy_turn": "automatic_after_two_units_move",
-  "tutorial_destination_taps": 2,
-  "undo": true,
-  "save_version": 2,
-  "first_move_save_preserves_enemy_aim": true,
-  "all_missions_have_legal_clears": true,
-  "clear_rounds": [
-    1,
-    3,
-    3,
-    5,
-    8,
-    8
+  "scenarios": 2,
+  "forecast_matches_enemy_resolution": true,
+  "input_campaigns_completed": true,
+  "native_canvas_reviewed": [
+    "v3-opening.png",
+    "v3-preview.png",
+    "v3-title-art.png"
   ],
-  "full_campaign_destination_tap_test": true,
-  "real_browser_tested": false,
-  "real_device_audio_tested": false,
-  "canvas_images": [
-    "v2-first-tap.png",
-    "v2-second-tap.png",
-    "v2-combo-preview.png",
-    "v2-combo.png"
+  "real_browser_verified": false,
+  "phone_verified": false,
+  "winning_lines": [
+    {
+      "style": "careful",
+      "mission": 0,
+      "explored": 6582,
+      "rounds": 5,
+      "hp": [
+        9,
+        6
+      ],
+      "combos": 2,
+      "spent": 10,
+      "guards": 2
+    },
+    {
+      "style": "rush",
+      "mission": 0,
+      "explored": 4088,
+      "rounds": 3,
+      "hp": [
+        7,
+        5
+      ],
+      "combos": 1,
+      "spent": 7,
+      "guards": 1
+    },
+    {
+      "style": "combo",
+      "mission": 0,
+      "explored": 4978,
+      "rounds": 4,
+      "hp": [
+        7,
+        6
+      ],
+      "combos": 2,
+      "spent": 8,
+      "guards": 1
+    },
+    {
+      "style": "no-power",
+      "mission": 0,
+      "explored": 8525,
+      "rounds": 6,
+      "hp": [
+        9,
+        6
+      ],
+      "combos": 0,
+      "spent": 0,
+      "guards": 2
+    },
+    {
+      "style": "balanced",
+      "mission": 1,
+      "explored": 1140,
+      "rounds": 2,
+      "hp": [
+        9,
+        6
+      ],
+      "combos": 0,
+      "spent": 2,
+      "guards": 0
+    }
   ]
 }

@@ -1,0 +1,308 @@
+[
+  {
+    "style": "careful",
+    "mission": 0,
+    "explored": 6582,
+    "rounds": 5,
+    "hp": [
+      9,
+      6
+    ],
+    "combos": 2,
+    "spent": 10,
+    "guards": 2,
+    "actions": [
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 4,
+        "kind": "attack",
+        "target": "e1"
+      },
+      {
+        "id": "lumiere",
+        "x": 2,
+        "y": 5,
+        "kind": "attack",
+        "target": "e1"
+      },
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 3,
+        "kind": "combo",
+        "target": "e0"
+      },
+      {
+        "id": "aster",
+        "x": 1,
+        "y": 2,
+        "kind": "guard",
+        "target": null
+      },
+      {
+        "id": "lumiere",
+        "x": 2,
+        "y": 3,
+        "kind": "power",
+        "target": "e3"
+      },
+      {
+        "id": "lumiere",
+        "x": 2,
+        "y": 3,
+        "kind": "power",
+        "target": "e3"
+      },
+      {
+        "id": "aster",
+        "x": 1,
+        "y": 0,
+        "kind": "guard",
+        "target": null
+      },
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 0,
+        "kind": "combo",
+        "target": "e3"
+      }
+    ]
+  },
+  {
+    "style": "rush",
+    "mission": 0,
+    "explored": 4088,
+    "rounds": 3,
+    "hp": [
+      7,
+      5
+    ],
+    "combos": 1,
+    "spent": 7,
+    "guards": 1,
+    "actions": [
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 4,
+        "kind": "power",
+        "target": "e1"
+      },
+      {
+        "id": "lumiere",
+        "x": 3,
+        "y": 5,
+        "kind": "attack",
+        "target": "e0"
+      },
+      {
+        "id": "lumiere",
+        "x": 3,
+        "y": 4,
+        "kind": "power",
+        "target": "e3"
+      },
+      {
+        "id": "aster",
+        "x": 3,
+        "y": 3,
+        "kind": "guard",
+        "target": null
+      },
+      {
+        "id": "aster",
+        "x": 3,
+        "y": 1,
+        "kind": "combo",
+        "target": "e3"
+      }
+    ]
+  },
+  {
+    "style": "combo",
+    "mission": 0,
+    "explored": 4978,
+    "rounds": 4,
+    "hp": [
+      7,
+      6
+    ],
+    "combos": 2,
+    "spent": 8,
+    "guards": 1,
+    "actions": [
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 4,
+        "kind": "attack",
+        "target": "e1"
+      },
+      {
+        "id": "lumiere",
+        "x": 2,
+        "y": 5,
+        "kind": "attack",
+        "target": "e1"
+      },
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 3,
+        "kind": "combo",
+        "target": "e0"
+      },
+      {
+        "id": "lumiere",
+        "x": 3,
+        "y": 4,
+        "kind": "power",
+        "target": "e3"
+      },
+      {
+        "id": "aster",
+        "x": 3,
+        "y": 2,
+        "kind": "guard",
+        "target": null
+      },
+      {
+        "id": "aster",
+        "x": 3,
+        "y": 1,
+        "kind": "combo",
+        "target": "e3"
+      }
+    ]
+  },
+  {
+    "style": "no-power",
+    "mission": 0,
+    "explored": 8525,
+    "rounds": 6,
+    "hp": [
+      9,
+      6
+    ],
+    "combos": 0,
+    "spent": 0,
+    "guards": 2,
+    "actions": [
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 4,
+        "kind": "attack",
+        "target": "e1"
+      },
+      {
+        "id": "lumiere",
+        "x": 3,
+        "y": 5,
+        "kind": "attack",
+        "target": "e1"
+      },
+      {
+        "id": "lumiere",
+        "x": 4,
+        "y": 5,
+        "kind": "attack",
+        "target": "e0"
+      },
+      {
+        "id": "aster",
+        "x": 1,
+        "y": 3,
+        "kind": "guard",
+        "target": null
+      },
+      {
+        "id": "lumiere",
+        "x": 4,
+        "y": 3,
+        "kind": "attack",
+        "target": "e3"
+      },
+      {
+        "id": "aster",
+        "x": 1,
+        "y": 1,
+        "kind": "guard",
+        "target": null
+      },
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 0,
+        "kind": "attack",
+        "target": "e3"
+      },
+      {
+        "id": "lumiere",
+        "x": 4,
+        "y": 3,
+        "kind": "attack",
+        "target": "e3"
+      },
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 0,
+        "kind": "attack",
+        "target": "e3"
+      },
+      {
+        "id": "lumiere",
+        "x": 4,
+        "y": 3,
+        "kind": "attack",
+        "target": "e3"
+      },
+      {
+        "id": "aster",
+        "x": 2,
+        "y": 0,
+        "kind": "attack",
+        "target": "e3"
+      }
+    ]
+  },
+  {
+    "style": "balanced",
+    "mission": 1,
+    "explored": 1140,
+    "rounds": 2,
+    "hp": [
+      9,
+      6
+    ],
+    "combos": 0,
+    "spent": 2,
+    "guards": 0,
+    "actions": [
+      {
+        "id": "aster",
+        "x": 5,
+        "y": 4,
+        "kind": "power",
+        "target": "e1"
+      },
+      {
+        "id": "lumiere",
+        "x": 3,
+        "y": 5,
+        "kind": "attack",
+        "target": "e0"
+      },
+      {
+        "id": "aster",
+        "x": 4,
+        "y": 3,
+        "kind": "attack",
+        "target": "e0"
+      }
+    ]
+  }
+]
