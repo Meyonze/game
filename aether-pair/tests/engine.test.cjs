@@ -1,58 +1,18 @@
 const test=require('node:test'),assert=require('node:assert/strict'),E=require('../dist/engine.js');
-function blank(){const s=E.create();s.tiles=[];s.enemies=[];s.units[0].x=3;s.units[0].y=5;s.units[1].x=6;s.units[1].y=5;return s;}
-function enemy(s,type,x,y,hp){const e={id:'e'+s.enemies.length,type,x,y,hp:hp||E.TYPES[type].hp,maxHp:hp||E.TYPES[type].hp,intent:null};s.enemies.push(e);E.planEnemies(s);return e;}
-const guard=(u,x=u.x,y=u.y)=>({unitId:u.id,x,y,skill:'guard'});
-test('all six deployments use legal distinct cells and deterministic intentions',()=>{
-  for(let i=0;i<6;i++){const s=E.create(i),all=[...s.units,...s.enemies,s.objective];assert.equal(new Set(all.map(e=>E.key(e.x,e.y))).size,all.length);assert(all.every(e=>E.inside(e.x,e.y)&&E.tileAt(s,e.x,e.y)!=='wall'));assert.deepEqual(s,E.create(i));assert(E.restore(E.save(s)));}
-});
-test('movement is a three-step path around walls and enemies, without sharing an ending cell',()=>{
-  const s=blank();s.tiles=[{x:3,y:4,kind:'wall'}];enemy(s,'talon',2,5);const moves=E.reachable(s,'aster');assert(!moves.some(p=>p.x===3&&p.y===4));assert(!moves.some(p=>p.x===2&&p.y===5));assert(!moves.some(p=>p.x===6&&p.y===5));assert(moves.every(p=>p.path.length<=3));assert(moves.some(p=>p.x===4&&p.y===3));
-});
-test('each unit acts once and a single reservation never advances the real round',()=>{
-  const s=E.create(),before=JSON.stringify(s);E.playerPlan(s,[guard(s.units[0])]);assert.equal(JSON.stringify(s),before);assert.throws(()=>E.resolve(s,[guard(s.units[0])]));assert.throws(()=>E.resolve(s,[guard(s.units[0]),guard(s.units[0])]));assert.equal(s.round,1);
-});
-test('an ally can move into the first ally’s vacated cell in the reserved order',()=>{
-  const s=blank();s.units[1].x=4;s.units[1].y=5;enemy(s,'talon',0,0);const orders=[guard(s.units[0],3,4),guard(s.units[1],3,5)];const r=E.playerPlan(s,orders);assert.equal(r.state.units[1].x,3);assert.equal(r.state.units[1].y,5);assert.throws(()=>E.playerPlan(s,[orders[1],orders[0]]));
-});
-test('opposite-side crossfire deals seven, ignores armor and records the combo',()=>{
-  const s=blank(),e=enemy(s,'bulwark',4,5);const order={unitId:'lumiere',x:6,y:5,skill:'attack',targetId:e.id};assert(E.comboReady(s,s.units[1],e));const r=E.playerPlan(s,[order]);assert.equal(r.state.enemies[0].hp,2);assert.equal(r.state.combos,1);assert(r.events.some(e=>e.kind==='combo'));
-  s.units[0].x=5;assert(!E.comboReady(s,s.units[1],e));const normal=E.playerPlan(s,[order]);assert.equal(normal.state.enemies[0].hp,7);
-});
-test('push changes the enemy origin while a blocked push adds two collision damage',()=>{
-  const s=blank(),e=enemy(s,'bulwark',3,4);const order={unitId:'aster',x:3,y:5,skill:'special',targetId:e.id};let r=E.playerPlan(s,[order]);assert.equal(r.state.enemies[0].y,3);assert.equal(r.state.enemies[0].hp,8);
-  s.tiles=[{x:3,y:3,kind:'wall'}];r=E.playerPlan(s,[order]);assert.equal(r.state.enemies[0].y,4);assert.equal(r.state.enemies[0].hp,6);assert(r.events.some(e=>e.kind==='collision'));
-});
-test('enemy fire can kill another enemy before its action, cancelling that action',()=>{
-  const s=blank();s.units[0].x=0;s.units[0].y=8;s.units[1].x=8;s.units[1].y=9;const gun=enemy(s,'lancer',0,2),victim=enemy(s,'talon',0,5,3);gun.intent={kind:'ray',dx:0,dy:1,targetName:'アステル'};
-  const r=E.simulate(s,s.units.map(u=>guard(u)));assert.equal(r.state.enemies[1].hp,0);assert(!r.events.some(e=>e.kind==='enemyAttack'&&e.id===victim.id));assert.equal(r.state.friendlyKills,1);
-});
-test('killing a shooter cancels its incoming attack',()=>{
-  const s=blank();const gun=enemy(s,'lancer',3,4,3);gun.intent={kind:'ray',dx:0,dy:1,targetName:'アステル'};const r=E.simulate(s,[{unitId:'aster',x:3,y:5,skill:'attack',targetId:gun.id},guard(s.units[1])]);assert.equal(r.damage.aster,0);assert.equal(r.state.phase,'won');
-});
-test('guard and cover protect both pilot and adjacent beacon without granting invulnerability',()=>{
-  const s=blank();s.objective.x=4;s.objective.y=5;const gun=enemy(s,'lancer',4,1);gun.intent={kind:'ray',dx:0,dy:1,targetName:'風見灯'};const r=E.simulate(s,s.units.map(u=>guard(u)));assert.equal(r.damage.beacon,1);
-  s.units[0].x=2;const unprotected=E.simulate(s,s.units.map(u=>guard(u)));assert.equal(unprotected.damage.beacon,3);
-});
-test('piercing shots damage a friendly unit in the ray and the forecast includes it',()=>{
-  const s=blank();s.units[1].x=1;s.units[0].x=3;const e=enemy(s,'bulwark',4,5);const r=E.playerPlan(s,[{unitId:'lumiere',x:1,y:5,skill:'special',targetId:e.id}]);assert.equal(r.state.units[0].hp,9);assert.equal(r.state.enemies[0].hp,7);
-});
-test('the locked enemy aim remains fixed after a player moves away',()=>{
-  const s=blank(),e=enemy(s,'cannon',3,0);e.intent={kind:'shell',target:{x:3,y:5},targetName:'アステル'};const r=E.simulate(s,[guard(s.units[0],1,5),guard(s.units[1])]);assert.equal(r.damage.aster,0);assert(r.telegraphs[0].cells.some(p=>p.x===3&&p.y===5));
-});
-test('forecast and execution agree, including sequential friendly fire, on every initial mission',()=>{
-  for(let i=0;i<6;i++){const s=E.create(i),orders=s.units.map(u=>guard(u));const f=E.forecast(s,orders),r=E.resolve(s,orders);assert.deepEqual(f.damage,r.damage);assert.equal(f.state.objective.hp,r.state.objective.hp);assert.deepEqual(f.state.units.map(u=>u.hp),r.state.units.map(u=>u.hp));assert.equal(f.kills,r.kills);assert.equal(f.state.phase,r.state.phase);}
-});
-test('a draft preview changes neither reservations nor the actual battle',()=>{
-  const s=E.create(),before=JSON.stringify(s),orders=[];const f=E.forecast(s,orders,{unitId:'aster',x:3,y:6});assert.equal(f.display.units[0].y,6);assert.equal(JSON.stringify(s),before);assert.deepEqual(orders,[]);
-});
-test('either pilot loss or beacon loss is defeat, and boss defeat clears surviving enemies',()=>{
-  const s=blank();s.units[0].hp=0;enemy(s,'talon',0,0);assert.equal(E.simulate(s,[]).state.phase,'lost');s.units[0].hp=12;s.objective.hp=0;assert.equal(E.simulate(s,[]).state.phase,'lost');
-  const b=blank(),boss=enemy(b,'boss',3,4,3);enemy(b,'talon',0,0);const r=E.simulate(b,[{unitId:'aster',x:3,y:5,skill:'attack',targetId:boss.id}]);assert.equal(r.state.phase,'won');assert(r.state.enemies[1].hp>0);
-});
-test('storm cells resolve after enemy actions and can decide the battle',()=>{
-  const s=blank();s.tiles=[{x:3,y:5,kind:'storm'}];enemy(s,'talon',0,0);const r=E.simulate(s,[]);assert.equal(r.damage.aster,2);assert(r.events.some(e=>e.source==='storm'));
-});
-test('saved rounds restore safely and malformed saves are rejected',()=>{
-  const s=E.resolve(E.create(),E.create().units.map(u=>guard(u))).state,restored=E.restore(E.save(s));assert(restored);assert.equal(restored.round,s.round);assert.deepEqual(restored.units,s.units);
-  for(const change of [r=>r.state.round=-1,r=>r.state.units[0].x=100,r=>r.state.units[0].hp=999,r=>r.state.tiles=[],r=>r.state.enemies[0].type='script']){const record=E.save(s);change(record);assert.equal(E.restore(record),null);}
-});
+function blank(){const s=E.create(1);s.tiles=[];s.enemies=[];s.units[0].x=2;s.units[0].y=5;s.units[1].x=4;s.units[1].y=5;return s;}
+function enemy(s,type,x,y,hp){const e={id:'e'+s.enemies.length,type,x,y,hp:hp||E.TYPES[type].hp,maxHp:E.TYPES[type].hp,dx:0,dy:1};s.enemies.push(e);return e;}
+test('all six maps begin with legal distinct positions and valid saves',()=>{for(let i=0;i<6;i++){const s=E.create(i),all=[...s.units,...s.enemies];assert.equal(new Set(all.map(e=>E.key(e.x,e.y))).size,all.length);assert(all.every(e=>!E.wall(s,e.x,e.y)));assert.deepEqual(E.restore(E.save(s)),s);}});
+test('the opening needs exactly two destination taps to demonstrate automatic combo',()=>{let s=E.create();assert.deepEqual(E.moves(s,'aster').map(({x,y})=>({x,y})),[{x:2,y:3}]);assert.equal(E.moves(s,'lumiere').length,0);s=E.move(s,'aster',2,3).state;assert.equal(s.enemies[0].hp,2);assert.deepEqual(s.acted,['aster']);assert.equal(s.round,1);s=E.move(s,'lumiere',4,3).state;assert.equal(s.phase,'won');assert.equal(s.combos,1);assert.deepEqual(s.units.map(u=>u.hp),[4,4]);});
+test('movement is two orthogonal steps and never enters a wall, enemy or ally',()=>{const s=blank();s.tiles=[{x:2,y:4,kind:'wall'}];enemy(s,'talon',1,5);const moves=E.moves(s,'aster');assert(moves.every(p=>p.path.length<=2));for(const [x,y] of [[2,4],[1,5],[4,5],[2,2]])assert(!moves.some(p=>p.x===x&&p.y===y));assert(moves.some(p=>p.x===3&&p.y===4));});
+test('moving attacks every orthogonally adjacent enemy without a target command',()=>{const s=blank();enemy(s,'talon',1,4);enemy(s,'talon',2,3);enemy(s,'talon',3,4);enemy(s,'talon',3,3);const r=E.move(s,'aster',2,4);assert.deepEqual(r.state.enemies.map(e=>e.hp),[1,1,1,2]);assert.equal(r.events.filter(e=>e.kind==='attack').length,3);});
+test('both units adjacent to the same enemy combo even from an L-shaped formation',()=>{const s=blank();s.units[1].x=3;s.units[1].y=3;enemy(s,'bulwark',3,4);const r=E.move(s,'aster',2,4);assert.equal(r.state.enemies[0].hp,1);assert.equal(r.state.combos,1);assert(r.events.some(e=>e.kind==='combo'));});
+test('either unit can act first and neither can act twice before the enemy turn',()=>{let s=blank();enemy(s,'talon',0,0);s=E.move(s,'lumiere',4,4).state;assert.deepEqual(s.acted,['lumiere']);assert.equal(E.moves(s,'lumiere').length,0);assert.equal(s.round,1);s=E.move(s,'aster',2,4).state;assert.equal(s.round,2);assert.deepEqual(s.acted,[]);});
+test('staying in place automatically attacks and consumes the move',()=>{const s=blank();enemy(s,'talon',2,4);const r=E.move(s,'aster',2,5);assert.equal(r.state.enemies[0].hp,1);assert.deepEqual(r.state.acted,['aster']);assert(!r.events.some(e=>e.kind==='move'));});
+test('red crosses cause exactly the forecast damage only after the second move',()=>{let s=blank();enemy(s,'talon',2,4);enemy(s,'talon',6,0);const danger=E.threats(s).flatMap(e=>e.cells);assert(danger.some(p=>p.x===2&&p.y===5));s=E.move(s,'aster',2,5).state;assert.equal(s.units[0].hp,4);const r=E.move(s,'lumiere',4,5);assert.equal(r.state.units[0].hp,3);assert(r.events.some(e=>e.kind==='enemyAttack'));});
+test('an enemy killed before its turn loses its red crosses and cannot attack',()=>{let s=blank();s.units[1].x=4;s.units[1].y=4;enemy(s,'bulwark',3,4);enemy(s,'talon',6,0);s=E.move(s,'aster',2,4).state;assert.equal(s.enemies[0].hp,1);const r=E.move(s,'lumiere',4,4);assert.equal(r.state.enemies[0].hp,0);assert(!r.events.some(e=>e.kind==='enemyAttack'&&e.id==='e0'));assert.equal(r.state.units[0].hp,4);assert(!E.threats(r.state).some(e=>e.id==='e0'));});
+test('straight shots stop at walls and retain their aim across the first move',()=>{const s=blank(),e=enemy(s,'lancer',3,0);s.tiles=[{x:3,y:3,kind:'wall'}];assert.deepEqual(E.attackCells(s,e),[{x:3,y:1},{x:3,y:2}]);s.tiles=[];const r=E.move(s,'aster',1,5);assert.equal(r.state.enemies[0].dx,e.dx);assert.equal(r.state.enemies[0].dy,e.dy);});
+test('approaching enemies move after attacking and never attack from the new position',()=>{let s=blank();enemy(s,'talon',2,2);s=E.move(s,'aster',2,5).state;const r=E.move(s,'lumiere',4,5);assert.equal(r.state.enemies[0].y,3);assert.equal(r.state.units[0].hp,4);const attack=r.events.find(e=>e.kind==='enemyAttack');assert(attack.cells.some(p=>p.x===2&&p.y===3));assert(!attack.cells.some(p=>p.x===2&&p.y===4));});
+test('preview is immutable and equals the actual complete move result',()=>{let s=E.move(E.create(), 'aster',2,3).state;const before=JSON.stringify(s),p=E.preview(s,'lumiere',4,3),r=E.move(s,'lumiere',4,3);assert.equal(JSON.stringify(s),before);assert.deepEqual(p,r);});
+test('partial-turn saves preserve the acted unit and the locked enemy aim',()=>{let s=E.create(3);const p=E.moves(s,'aster').find(p=>p.x!==s.units[0].x);s=E.move(s,'aster',p.x,p.y).state;const r=E.restore(E.save(s));assert.deepEqual(r,s);const next=E.moves(s,'lumiere')[0];assert.deepEqual(E.move(r,'lumiere',next.x,next.y),E.move(s,'lumiere',next.x,next.y));});
+test('defeating the boss ends the fight with other enemies still alive; losing either unit fails',()=>{const s=blank();enemy(s,'boss',2,4,1);enemy(s,'talon',6,0);const r=E.move(s,'aster',2,5);assert.equal(r.state.phase,'won');assert(r.state.enemies[1].hp>0);const t=blank();t.units[0].hp=1;enemy(t,'bulwark',2,4);let q=E.move(t,'aster',2,5).state;q=E.move(q,'lumiere',4,5).state;assert.equal(q.phase,'lost');});
+test('malformed or incompatible saves are rejected without executing them',()=>{const s=E.create(2);for(const change of [r=>r.version=1,r=>r.state.round=-1,r=>r.state.units[0].x=99,r=>r.state.units[0].hp=99,r=>r.state.acted=['aster','aster'],r=>r.state.enemies[0].dx=9]){const save=E.save(s);change(save);assert.equal(E.restore(save),null);}});

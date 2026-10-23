@@ -1,35 +1,42 @@
 {
-  "version": 1,
-  "url": "https://meyonze.github.io/game/aether-pair.html?v=1",
+  "version": 2,
+  "url": "https://meyonze.github.io/game/aether-pair.html?v=2",
   "tests_passed": 36,
   "test_counts": {
-    "engine.test.cjs": 16,
-    "campaign.test.cjs": 7,
-    "ui.test.cjs": 13
+    "engine": 15,
+    "ui": 14,
+    "campaign": 7
   },
   "grid": [
-    9,
-    11
+    7,
+    8
   ],
   "units": 2,
   "missions": 6,
-  "deterministic_forecasts": true,
+  "input": "move_only",
+  "auto_attack": "all_orthogonal_neighbors",
+  "combo": "both_units_adjacent_to_same_enemy",
+  "enemy_turn": "automatic_after_two_units_move",
+  "tutorial_destination_taps": 2,
+  "undo": true,
+  "save_version": 2,
+  "first_move_save_preserves_enemy_aim": true,
   "all_missions_have_legal_clears": true,
-  "full_campaign_tap_test": true,
   "clear_rounds": [
-    4,
-    6,
-    6,
+    1,
+    3,
+    3,
+    5,
     8,
-    7,
-    7
+    8
   ],
-  "external_runtime_assets": false,
+  "full_campaign_destination_tap_test": true,
   "real_browser_tested": false,
   "real_device_audio_tested": false,
   "canvas_images": [
-    "opening.png",
-    "combo-ready.png",
-    "cross-burst.png"
+    "v2-first-tap.png",
+    "v2-second-tap.png",
+    "v2-combo-preview.png",
+    "v2-combo.png"
   ]
 }
