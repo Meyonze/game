@@ -112,30 +112,42 @@
     }
   }
   function staged(){const u=state.units.find(u=>u.id===selected),p=draft||u;try{return E.positioned(state,selected,p.x,p.y);}catch{return state;}}
-  function arrow(a,b,color){const p=point(a.x,a.y),q=point(b.x,b.y);if(p.x===q.x&&p.y===q.y)return;line(p.x,p.y,q.x,q.y,color,2);const angle=Math.atan2(q.y-p.y,q.x-p.x);ctx.save();ctx.translate(q.x,q.y);ctx.rotate(angle);poly([[-9,-5],[0,0],[-9,5]],color);ctx.restore();}
+  function arrow(a,b,color){let p=point(a.x,a.y),q=point(b.x,b.y);const length=Math.hypot(q.x-p.x,q.y-p.y);if(length<1)return;const dx=(q.x-p.x)/length,dy=(q.y-p.y)/length,pad=Math.min(tile*.32,length*.3);p={x:p.x+dx*pad,y:p.y+dy*pad};q={x:q.x-dx*pad,y:q.y-dy*pad};line(p.x,p.y,q.x,q.y,color,2.4);const angle=Math.atan2(dy,dx);ctx.save();ctx.translate(q.x,q.y);ctx.rotate(angle);poly([[-6,-4],[1,0],[-6,4]],color);ctx.restore();}
   function indicators(s,t){
     if(animation||!started||modalOpen||helpOpen)return;
-    for(const p of E.moves(state,selected))box(p.x*tile+3,p.y*tile+3,tile-6,tile-6,4,'#87dff320','#8adef466');
-    const f=E.forecast(s);
-    for(const threat of s.phase==='won'?[]:f.threats){
-      arrow(threat.from,threat.to,'#ffb7b5aa');
-      for(const p of threat.cells){box(p.x*tile+4,p.y*tile+4,tile-8,tile-8,3,'#ff759214','#ff9da05a');text('×',p.x*tile+tile*.83,p.y*tile+tile*.26,tile*.23,'#ffb3b9');}
-      const p=point(threat.from.x,threat.from.y);
+    const pending=hover?hover.result.frames[0].state:s,f=E.forecast(pending),enemy=s.enemies.find(e=>e.id===target);
+    for(const p of E.moves(state,selected)){
+      const candidate=enemy?E.positioned(state,selected,p.x,p.y):null,canAttack=enemy&&E.inRange(candidate,candidate.units.find(u=>u.id===selected),enemy);
+      box(p.x*tile+3,p.y*tile+3,tile-6,tile-6,4,canAttack?'#ffdc7444':'#6ce4f42a',canAttack?'#ffe5a2':'#a0f3ee88');
     }
-    for(const e of E.targets(staged(),selected,mode)){const p=point(e.x,e.y);ring(p.x,p.y,tile*.43,e.id===target?'#fff3ba':'#f4d79699',e.id===target?3:1.5);}
+    for(const threat of pending.phase==='won'?[]:f.threats){
+      arrow(threat.from,threat.to,'#e9eee9a0');
+      if(threat.from.x!==threat.to.x||threat.from.y!==threat.to.y){const q=point(threat.to.x,threat.to.y);ring(q.x,q.y,tile*.16,'#e9eee9a0',1);}
+      const shooter=pending.enemies.find(e=>e.id===threat.id);
+      if(shooter?.type==='boss'&&threat.cells.length)arrow(threat.to,threat.cells.at(-1),'#ff7760aa');
+      for(const u of pending.units)if(u.hp>0&&threat.cells.some(c=>c.x===u.x&&c.y===u.y))arrow(threat.to,u,'#ff735c');
+    }
+    for(const e of E.targets(s,selected,'attack')){const p=point(e.x,e.y);ring(p.x,p.y,tile*.44,e.id===target?'#fff2b9':'#ffe0a4',e.id===target?3:1.5);}
     const u=s.units.find(u=>u.id===selected),original=state.units.find(u=>u.id===selected);
     if(draft&&(u.x!==original.x||u.y!==original.y))arrow(original,u,COLOR[selected]+'99');
-    if(hover)for(const e of hover.result.frames[0].events.filter(e=>['attack','combo'].includes(e.kind))){arrow(e.from,e.to,COLOR.gold);if(e.ally)arrow(e.ally,e.to,COLOR.gold);}
-    for(const u of s.units)if(u.guard){const p=point(u.x,u.y);ring(p.x,p.y,tile*.48,'#b8ffe1',3);if(u.id==='aster')for(const other of s.units)if(other.id!==u.id&&E.distance(u,other)===1){const q=point(other.x,other.y);ring(q.x,q.y,tile*.46,'#b8ffe1',2);}}
+    if(hover)for(const e of hover.result.frames[0].events.filter(e=>['attack','combo'].includes(e.kind))){arrow(e.from,e.to,'#ffea9b');if(e.ally)arrow(e.ally,e.to,'#ffea9b');}
+    for(const u of pending.units)if(u.guard){const p=point(u.x,u.y);ring(p.x,p.y,tile*.48,'#b8ffe1',3);if(u.id==='aster')for(const other of pending.units)if(other.id!==u.id&&E.distance(u,other)===1){const q=point(other.x,other.y);ring(q.x,q.y,tile*.46,'#b8ffe1',2);}}
+  }
+  function predictionBadges(s){
+    if(animation||!active())return;
+    const pending=hover?hover.result.frames[0].state:s,f=E.forecast(pending);
+    function badge(e,str,color){const p=point(e.x,e.y),x=p.x+tile*.22,y=Math.max(tile*.12,p.y-tile*.28);box(x-tile*.22,y-tile*.15,tile*.44,tile*.29,4,color,'#ffead5');text(str,x,y+tile*.075,tile*.22,'#fff');}
+    if(pending.phase!=='won')for(let i=0;i<s.units.length;i++)if(f.damage[i])badge(s.units[i],'−'+f.damage[i],'#c04c40');
+    if(hover)for(const e of s.enemies){const after=pending.enemies.find(v=>v.id===e.id),loss=e.hp-(after?.hp||0);if(loss>0)badge(e,after?.hp?'−'+loss:'×','#a87a22');}
   }
   function entities(s,t){
     for(const e of [...s.enemies,...s.units]){
       if(e.hp<=0)continue;let p=point(e.x,e.y);
       if(animation){const move=animation.frames[animation.index].events.find(v=>v.kind==='move'&&v.id===e.id);if(move){const a=point(move.from.x,move.from.y),k=1-Math.pow(1-clamp((t-animation.at)/210),3);p={x:a.x+(p.x-a.x)*k,y:a.y+(p.y-a.y)*k};}}
-      if(!animation&&hover&&e.id===selected){const old=state.units.find(u=>u.id===selected),from=point(old.x,old.y);if(old.x!==e.x||old.y!==e.y)sprite(old,from.x,from.y,t,.2);}
+      if(!animation&&draft&&e.id===selected){const old=state.units.find(u=>u.id===selected),from=point(old.x,old.y);if(old.x!==e.x||old.y!==e.y)sprite(old,from.x,from.y,t,.2);}
       if(e.id===selected&&!animation&&started&&!modalOpen)ring(p.x,p.y,tile*.48,COLOR[selected],2.5);
       sprite(e,p.x,p.y,t);
-      if(e.type)text('攻'+E.TYPES[e.type].damage,p.x-tile*.27,p.y-tile*.30,tile*.16,'#ffd1c1');
+      
       const col=COLOR[e.id]||COLOR.gold;box(p.x-tile*.34,p.y+tile*.30,tile*.68,tile*.13,2,'#102838');box(p.x-tile*.34,p.y+tile*.30,tile*.68*e.hp/e.maxHp,tile*.13,2,col);text(String(e.hp),p.x,p.y+tile*.43,tile*.18,'#fff');
       if(e.type==='boss'){
         const dx=e.plan.dx,dy=e.plan.dy,cx=p.x+dx*tile*.35,cy=p.y+dy*tile*.35;ctx.save();ctx.translate(cx,cy);ctx.rotate(Math.atan2(dy,dx));poly([[-4,-5],[5,0],[-4,5]],'#ffa7ad','#fff0c7');ctx.restore();
@@ -179,7 +191,7 @@
     requestAnimationFrame(render);if(document.hidden)return;now=t;
     if(animation){if(t-animation.at>=110)beatFX();if(t-animation.at>=animation.duration){animation.index++;if(animation.index>=animation.frames.length)finishMove();else beginBeat();}}
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);ctx.save();if(shake>.1&&!reduced){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.86;}
-    const shown=animation?animation.frames[animation.index].state:hover?hover.result.frames[0].state:started&&!modalOpen?staged():state;terrain(shown,t);indicators(shown,t);entities(shown,t);effects(t);ctx.restore();
+    const shown=animation?animation.frames[animation.index].state:started&&!modalOpen?staged():state;terrain(shown,t);indicators(shown,t);entities(shown,t);predictionBadges(shown);effects(t);ctx.restore();
   }
   function active(){return started&&!modalOpen&&!helpOpen&&!animation&&state.phase==='play';}
   function storeRun(run=state){try{localStorage.setItem('aether-pair-save-v3',JSON.stringify({run:E.save(run)}));}catch{}}
@@ -191,46 +203,44 @@
     }updateHUD();
   }
   function updateHUD(s=state){
-    $('mission-name').textContent='TURN '+s.round+'　'+E.MISSIONS[s.mission].name;
-    const boss=s.enemies.find(e=>e.type==='boss');$('remaining').textContent=boss?'灯台 '+boss.hp+'/'+boss.maxHp:'敵 '+s.enemies.filter(e=>e.hp>0).length+'体';
-    $('energy').textContent='◆'.repeat(s.energy)+'◇'.repeat(5-s.energy);$('energy').setAttribute('aria-label','共有バッテリー '+s.energy+' / 5');
-    $('energy-note').textContent='共有 '+s.energy+'/5 · 毎ターン＋2';
-    $('game').style.setProperty?.('--active',COLOR[selected]);$('active-dot').style.background=COLOR[selected];
-    for(const u of s.units){$('hp-'+u.id).textContent='HP '+u.hp+' / '+u.maxHp;$('unit-'+u.id).classList.toggle('selected',u.id===selected&&!s.acted.includes(u.id));$('unit-'+u.id).classList.toggle('acted',s.acted.includes(u.id));$('status-'+u.id).textContent=s.acted.includes(u.id)?'✓ 行動済み':u.id===selected?'選択中':'未行動';}
+    $('mission-name').textContent='TURN '+s.round;
+    $('remaining').textContent=s.mission===0?'灯台を壊せば勝ち':'敵を倒そう';
+    $('energy').textContent='◆'.repeat(s.energy)+'◇'.repeat(5-s.energy);
+    $('energy').setAttribute('aria-label','共有の力 '+s.energy+' / 5');
+    $('game').style.setProperty?.('--active',COLOR[selected]);
+    for(const u of s.units){
+      $('hp-'+u.id).textContent='♥ '+u.hp;
+      $('unit-'+u.id).classList.toggle('selected',u.id===selected&&!s.acted.includes(u.id));$('unit-'+u.id).classList.toggle('acted',s.acted.includes(u.id));
+      $('status-'+u.id).textContent=s.acted.includes(u.id)?'✓':'●';
+    }
+    const a=active(),board=a?staged():s,isRed=selected==='aster',hasTarget=!!target;
     $('undo').disabled=!!animation||history.length===0;
-    const a=active(),isRed=selected==='aster';
-    for(const kind of ['attack','power','guard','combo']){$('mode-'+kind).classList.toggle('chosen',mode===kind);$('mode-'+kind).disabled=!a||s.energy<E.COST[kind]||(kind==='combo'&&s.acted.length>0);}
-    $('mode-power').innerHTML=isRed?'薙ぎ払い<small>周囲に3 · ◆2</small>':'チャージ砲<small>4ダメージ · ◆2</small>';
-    $('mode-attack').innerHTML='攻撃<small>2ダメージ · 無料</small>';
-    $('mode-guard').innerHTML='守ってためる<small>'+(isRed?'自分と隣を守る':'自分を守る')+' · ◆＋1</small>';
-    $('confirm').disabled=!a||!hover;
-    $('lesson').hidden=true;$('bottom-buttons').style.visibility='visible';
-    if(animation){$('forecast').textContent='';return;}
-    const display=hover?hover.result.frames[0].state:a?staged():state;
-    const f=E.forecast(display),safe=display.phase==='won';
-    $('forecast').textContent=safe?'この手で勝利！':'この配置で敵の番なら：赤 −'+f.damage[0]+' / 青 −'+f.damage[1];
-    $('forecast').className='forecast'+(!safe&&f.state.phase==='lost'?' fatal':'');
-    $('instruction').textContent=hover?'未確定：下のボタンで実行':isRed?'トト：盾とハンマーで接近戦':'ミオ：工具砲で2〜4マス先へ';
-    $('detail').className='detail';
-    $('detail').textContent=mode==='guard'?(isRed?'次の敵の番、自分と隣の味方の被害を1ずつ減らす。':'次の敵の番、自分の被害を1ずつ減らす。'):mode==='combo'?'赤の隣＋青の射程内の敵へ8。2匹とも行動終了。':mode==='power'?(isRed?'隣の敵すべてに3。金色の敵を選んで確認。':'射程内の1体に4。金色の敵を選んで確認。'):'青いマスで移動を試す → 金色の敵を選ぶ。';
-    if(!hover&&a&&mode!=='guard'&&!E.targets(staged(),selected,mode).length)$('detail').textContent=mode==='combo'?'赤を敵の隣へ。青が2〜4マス先にいれば連携可能。':'射程内に敵がいません。移動するか、守ってためる。';
-    $('confirm').textContent=hover?(mode==='guard'?'守ってためる ＋1 を確定':mode==='combo'?'連携8 を確定 · ◆3 / 2匹行動':mode==='power'?'大技を確定 · ◆2':'攻撃2 を確定'):'敵を選ぶ / 守ってためる';
-    if(hover&&hover.result.kills)$('confirm').textContent+=' · '+hover.result.kills+'体撃破';
-    if(hover&&hover.result.state.phase==='lost'){$('detail').textContent='この手で敵の番にネコが倒れます。一手戻すこともできます。';$('detail').className='detail danger';}
+    for(const kind of ['attack','power','combo'])$('mode-'+kind).disabled=!a||!E.targets(board,selected,kind).some(e=>e.id===target);
+    $('mode-guard').disabled=!a;
+    $('attack-options').hidden=!hasTarget;$('tap-hint').hidden=hasTarget;
+    $('mode-combo').hidden=!a||!E.targets(board,selected,'combo').some(e=>e.id===target);
+    $('mode-power').innerHTML=(isRed?'周囲を攻撃':'強く撃つ')+'<b>'+(isRed?'3':'4')+'</b><small>◆◆</small>';
+    $('mode-attack').innerHTML='攻撃<b>2</b><small>消費なし</small>';
+    $('lesson').hidden=true;
+    if(animation)return;
+    const reachable=hasTarget&&E.targets(board,selected,'attack').some(e=>e.id===target);
+    $('instruction').textContent=hasTarget?(reachable?'どちらで攻撃する？':'光るマスまで近づこう'):draft?'敵をタップ / 守る':'動かすか、敵をタップ';
+    if(mode==='guard')$('instruction').textContent='守る：被害−1 / ◆＋1';
+    if(hover?.result.state.phase==='won')$('instruction').textContent='これで勝利！';
   }
   function choose(id){if(!active()||state.acted.includes(id))return;selected=id;resetDraft();sound.init();sound.fx('select');refresh();}
-  function chooseMode(kind){if(!active()||state.energy<E.COST[kind]||kind==='combo'&&state.acted.length)return;mode=kind;target=null;refresh();sound.fx('select');}
+  function previewKind(kind){if(!active())return;mode=kind;refresh();}
+  function perform(kind){
+    if(!active())return;
+    mode=kind;refresh();if(!hover){mode='attack';refresh();return;}commit();
+  }
   function pick(x,y){
     if(!active())return;
     const unit=state.units.find(u=>u.hp>0&&u.x===x&&u.y===y);
     if(unit&&unit.id!==selected){choose(unit.id);return;}
     const enemy=state.enemies.find(e=>e.hp>0&&e.x===x&&e.y===y);
-    if(enemy){
-      if(E.targets(staged(),selected,mode).some(e=>e.id===enemy.id)){target=enemy.id;refresh();sound.fx('select');}
-      else{$('detail').textContent=E.TYPES[enemy.type].name+' HP '+enemy.hp+' / 攻撃'+E.TYPES[enemy.type].damage+'。'+(mode==='guard'?'守る行動を確定できます。':'今の位置・技では攻撃できません。');}
-      return;
-    }
-    if(E.moves(state,selected).some(p=>p.x===x&&p.y===y)){draft={x,y};target=null;refresh();sound.fx('move');}
+    if(enemy){target=enemy.id;mode='attack';refresh();sound.fx('select');return;}
+    if(E.moves(state,selected).some(p=>p.x===x&&p.y===y)){draft={x,y};mode='attack';refresh();sound.fx('move');}
   }
   function commit(){
     if(!active()||!hover)return;
@@ -249,14 +259,14 @@
   canvas.addEventListener('pointerup',e=>{if(!pointer||pointer.id!==e.pointerId)return;pointer=null;const p=cell(e);if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);if(E.inside(p.x,p.y))pick(p.x,p.y);});
   canvas.addEventListener('pointercancel',()=>{pointer=null;});canvas.addEventListener('contextmenu',e=>e.preventDefault());
   for(const id of ['aster','lumiere'])$('unit-'+id).addEventListener('click',()=>choose(id));
-  for(const kind of ['attack','power','guard','combo'])$('mode-'+kind).addEventListener('click',()=>chooseMode(kind));
-  $('confirm').addEventListener('click',commit);$('undo').addEventListener('click',undo);$('result-undo').addEventListener('click',undo);
+  for(const kind of ['attack','power','guard','combo']){const button=$('mode-'+kind);button.addEventListener('click',()=>perform(kind));button.addEventListener('pointerdown',()=>previewKind(kind));button.addEventListener('pointerleave',()=>previewKind('attack'));button.addEventListener('pointercancel',()=>previewKind('attack'));}
+ $('undo').addEventListener('click',undo);$('result-undo').addEventListener('click',undo);
   function showResult(){
     modalOpen=true;const win=state.phase==='won';storeRun();sound.stop();sound.fx(win?'win':'lose');updateHUD();$('result-screen').hidden=false;
-    $('result-tag').textContent=win?'MISSION COMPLETE':'RETRY';$('result-title').textContent=win?(state.mission===1?'操作は、これで全部。':'港に、灯りが戻った。'):'次は、どの一手を変える？';
-    $('result-copy').textContent=win?(state.mission===1?'本番では、警備ロボを残して灯台の制御炉だけを壊しても勝利。':'暴走が止まり、警備ロボも静かに。トトとミオは、夜明けの港へ帰ります。'):'戻して考え直せます。受けるダメージは、確定前に下へ表示されます。';
-    $('journey').innerHTML='<div>'+state.round+'ターン · 被ダメージ '+state.totalDamage+'</div><div>連携 '+state.combos+'回 · 防御 '+state.guards+'回 · 消費 ◆'+state.spent+'</div>';
-    $('next').hidden=!(win&&state.mission===1);$('result-undo').hidden=!history.length;$('retry').textContent='同じ一戦を、もう一度';
+    $('result-tag').textContent=win?'MISSION COMPLETE':'RETRY';$('result-title').textContent=win?(state.mission===1?'練習クリア':'港に、灯りが戻った。'):'もう一度！';
+    $('result-copy').textContent=win?(state.mission===1?'次は、灯台を止めよう。':'灯台の暴走が止まった。'):'一手戻して試せます。';
+    $('journey').innerHTML=state.round+'ターン / ♥ '+state.units.map(u=>u.hp).join('・');
+    $('next').hidden=!(win&&state.mission===1);$('result-undo').hidden=!history.length;$('retry').textContent='もう一度';
   }
   function newMission(index){
     if(animation)return;state=E.create(index);started=true;selected='aster';history=[];resetDraft();helpOpen=false;modalOpen=false;particles=[];floaters=[];
@@ -268,7 +278,7 @@
   $('continue').addEventListener('click',()=>{if(!saved||started)return;state=saved;saved=null;started=true;modalOpen=false;$('start-screen').hidden=true;selected=E.available(state)[0]?.id||'aster';history=[];resetDraft();refresh();resize();if(state.phase==='play')sound.music();else showResult();});
   function closeHelp(){helpOpen=false;$('help-screen').hidden=true;refresh();}
   $('help').addEventListener('click',()=>{if(animation||helpOpen)return;pointer=null;helpOpen=true;$('help-screen').hidden=false;updateHUD();});$('close-help').addEventListener('click',closeHelp);
-  document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;if(helpOpen){if(e.key==='Escape')closeHelp();return;}if(!active())return;if(e.key==='1')choose('aster');if(e.key==='2')choose('lumiere');if(e.key==='Escape'){resetDraft();refresh();}if(e.key==='Backspace'){e.preventDefault();undo();}if(e.key==='Enter'){e.preventDefault();commit();}});
+  document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.metaKey||e.altKey)return;if(helpOpen){if(e.key==='Escape')closeHelp();return;}if(!active())return;if(e.key==='1')choose('aster');if(e.key==='2')choose('lumiere');if(e.key==='Escape'){resetDraft();refresh();}if(e.key==='Backspace'){e.preventDefault();undo();}if(e.key==='Enter'){e.preventDefault();perform('attack');}});
   document.addEventListener('visibilitychange',()=>{
     pointer=null;if(document.hidden){if(animation&&animation.pausedAt===null)animation.pausedAt=performance.now();sound.stop();sound.ctx?.suspend().catch(()=>{});}else{
       if(animation&&animation.pausedAt!==null){const delay=performance.now()-animation.pausedAt;animation.at+=delay;for(const p of particles)p.born+=delay;for(const f of floaters)f.born+=delay;animation.pausedAt=null;}if(started&&state.phase==='play')sound.music();

@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "title": "ネコと鉄の灯台",
-  "test_cases": 34,
+  "test_cases": 36,
   "test_files": 3,
   "grid": [
     7,
@@ -11,9 +11,8 @@
   "forecast_matches_enemy_resolution": true,
   "input_campaigns_completed": true,
   "native_canvas_reviewed": [
-    "v3-opening.png",
-    "v3-preview.png",
-    "v3-title-art.png"
+    "v4-opening.png",
+    "v4-attack.png"
   ],
   "real_browser_verified": false,
   "phone_verified": false,
@@ -83,5 +82,13 @@
       "spent": 2,
       "guards": 0
     }
+  ],
+  "engine_version": 3,
+  "ui_changes": [
+    "target-first contextual attacks",
+    "direct actions without confirmation step",
+    "on-board attack arrows and damage",
+    "combo only shown when legal",
+    "existing saves compatible"
   ]
 }
