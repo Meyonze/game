@@ -56,11 +56,12 @@ module.exports=function boot({width=362,height=480,reduced=false,realCanvas=fals
   const originalCreate=sandbox.window.Hidamari.create;
   sandbox.window.Hidamari.create=(...args)=>{run=originalCreate(...args);return run;};
   vm.runInContext(fs.readFileSync(path.join(root,'skins.js'),'utf8'),vmContext);
+  vm.runInContext(fs.readFileSync(path.join(root,'music.js'),'utf8'),vmContext);
   vm.runInContext(fs.readFileSync(path.join(root,'app.js'),'utf8'),vmContext);
   const $=id=>elements.get(id);
   function tick(ms=16){clock+=ms;for(const i of intervals.values())if(clock>=i.next){i.next=clock+i.ms;i.f();}const jobs=[...frames.values()];frames.clear();jobs.forEach(f=>f(clock));assert.equal(depth,0,'balanced canvas saves');for(const a of audio)for(const o of a.oscillators)if(!o.ended&&o.stopAt<=a.currentTime){o.ended=true;o.onended?.();}}
   function event(x,y,extra={}){const r=$('board').getBoundingClientRect();return{pointerId:1,pointerType:'touch',clientX:r.left+(x+.5)*r.width/7,clientY:r.top+(y+.5)*r.height/7,preventDefault(){},...extra};}
-  const api={$,doc,docEvents,windowEvents,storage,audio,intervals,tick,get game(){return run;},get calls(){return ctxCalls;},debug:()=>sandbox.window.hidamariDebug(),click:id=>$(id).events.click({}),down:(x,y,extra)=>$('board').events.pointerdown(event(x,y,extra)),move:(x,y,extra)=>$('board').events.pointermove?.(event(x,y,extra)),up:(x,y,extra)=>$('board').events.pointerup(event(x,y,extra)),cancel:()=>$('board').events.pointercancel({}),key:key=>docEvents.keydown({key,preventDefault(){}}),resize(w,h){width=w;height=h;windowEvents.resize();},save(file){fs.writeFileSync(file,nativeCanvas.toBuffer('image/png'));}};
+  const api={$,doc,docEvents,windowEvents,storage,audio,intervals,tick,get game(){return run;},get calls(){return ctxCalls;},debug:()=>sandbox.window.hidamariDebug(),click:id=>{$(id).events.click?$(id).events.click({}):$(id).onclick?.({});},down:(x,y,extra)=>$('board').events.pointerdown(event(x,y,extra)),move:(x,y,extra)=>$('board').events.pointermove?.(event(x,y,extra)),up:(x,y,extra)=>$('board').events.pointerup(event(x,y,extra)),cancel:()=>$('board').events.pointercancel({}),key:key=>docEvents.keydown({key,preventDefault(){}}),resize(w,h){width=w;height=h;windowEvents.resize();},save(file){fs.writeFileSync(file,nativeCanvas.toBuffer('image/png'));}};
   api.tap=(x,y)=>{api.down(x,y);api.up(x,y);};
   return api;
 };
