@@ -5,7 +5,7 @@ header>b{font-size:17px;letter-spacing:.5px}header #fall-speed{width:auto;min-wi
 @media(max-width:350px){.goal>img{width:28px;height:28px}.status .goals{gap:5px}header>b{font-size:15px}header #fall-speed{min-width:74px;padding:0 5px;font-size:9px}}
 
 #moves.chain-open{color:#378c68;text-shadow:0 0 8px #71b88a33}
-</style><body><main id="app"><header><a href="./index.html" aria-label="ゲーム一覧">‹</a><b>パズル</b><button id="fall-speed" aria-label="落下速度を切り替える">落下：じんわり</button><button id="sound" aria-label="音の切替">♪</button><button id="help" aria-label="遊び方">?</button></header><section class="status"><div class="stage">GARDEN <b id="stage">1</b></div><div id="goals" class="goals"></div><div class="moves"><small>CHAIN</small><b id="moves">—</b><small>連鎖</small></div></section><div id="arena"><canvas id="board" tabindex="0" aria-label="7列7行のパズル。隣同士をスワイプ、または順にタップして入れ替え、同じ色を3つそろえます。"></canvas><div id="combo" aria-live="polite"></div></div><footer><button id="hint">☀ ヒント</button><span id="score">0</span><button id="retry">↻ やりなおす</button></footer><div class="caption">どれかが動いている間に消すと、チェイン</div><div id="modal" class="overlay"><section class="card"><div id="art" class="sun-art">✿ <span>✦</span> ❧</div><small id="tag">時間を気にせず、ひと息。</small><h1 id="title">フルーツパズル</h1><p id="message">時間も手数も気にせず、<br>連鎖の途中も、次々消そう。</p><button id="primary">はじめる</button><button id="secondary" hidden>もう一度</button></section></div></main><script>(function(root){'use strict';
+</style><body><main id="app"><header><a href="./index.html" aria-label="ゲーム一覧">‹</a><b>パズル</b><button id="fall-speed" aria-label="落下速度を切り替える">落下：じんわり</button><button id="sound" aria-label="音の切替">♪</button><button id="help" aria-label="遊び方">?</button></header><section class="status"><div class="stage">LEVEL <b id="stage">1</b></div><div id="goals" class="goals"></div><div class="moves"><small>CHAIN</small><b id="moves">—</b><small>連鎖</small></div></section><div id="arena"><canvas id="board" tabindex="0" aria-label="7列7行のパズル。隣同士をスワイプ、または順にタップして入れ替え、同じ色を3つそろえます。"></canvas><div id="combo" aria-live="polite"></div></div><footer><button id="hint">☀ ヒント</button><span id="score">0</span><button id="retry">↻ やりなおす</button></footer><div class="caption">どれかが動いている間に消すと、チェイン</div><div id="modal" class="overlay"><section class="card"><div id="art" class="sun-art">✿ <span>✦</span> ❧</div><small id="tag">時間を気にせず、ひと息。</small><h1 id="title">フルーツパズル</h1><p id="message">時間も手数も気にせず、<br>連鎖の途中も、次々消そう。</p><button id="primary">はじめる</button><button id="secondary" hidden>もう一度</button></section></div></main><script>(function(root){'use strict';
 const N=7,copy=o=>JSON.parse(JSON.stringify(o)),stages=[{moves:18,goals:[14,14,0,0,0]},{moves:22,goals:[0,18,18,18,0]},{moves:24,goals:[14,14,14,14,14]}];
 function rand(s,n){s.seed=(Math.imul(s.seed,1664525)+1013904223)>>>0;return Math.floor(s.seed/4294967296*n);}
 function matches(b){const runs=[];for(let axis=0;axis<2;axis++)for(let line=0;line<N;line++){let run=[];for(let k=0;k<=N;k++){const i=axis? k*N+line:line*N+k,c=k<N?b[i]?.c:-2;if(run.length&&c!==b[run[0]].c){if(run.length>=3)runs.push({ids:run,axis});run=[];}if(k<N&&c>=0)run.push(i);}}return runs;}
@@ -70,6 +70,10 @@ const API={themes,paint,icons:[["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA
 </script><script>(()=>{'use strict';const E=window.Hidamari,$=id=>document.getElementById(id),canvas=$('board'),ctx=canvas.getContext('2d'),colors=['#ed9396','#ecc16d','#80bdd8','#8bbb9a','#b49ecf'],dark=['#cd6f7b','#c79b48','#569ab9','#649878','#9077b2'],symbols=['✿','✦','♦','❧','●'],reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let state=E.create(0,Date.now(),true),started=false,selected=null,pointer=null,anim=null,tile=44,size=308,dpr=1,particles=[],now=0,hint=null,modalAction=null,saved=null,muted=false,audio=null,pausedAt=null,drifts=[],revision=0,chainCount=0,pulses=[],beams=[],lastClearAt=-Infinity,motions=[],ghosts=[];
 const skin=0,speeds=[{name:'ふつう',factor:.65},{name:'ゆっくり',factor:1},{name:'じんわり',factor:2.2}];let speed=2;try{const n=Number(localStorage.getItem('hidamari-speed'));if(localStorage.getItem('hidamari-speed')!==null&&Number.isInteger(n)&&speeds[n])speed=n;}catch{}
+function difficulty(s=state){return Math.min(3,1+Math.max(0,(s.round||1)-1)*.12);}
+function speedFactor(s=state){return speeds[speed].factor/difficulty(s);}
+function clearAt(){const f=anim?.frames.slice(anim.index).find(f=>f.kind==='clear');return f?Math.max(0,...f.clear.map(i=>motions[i]?motions[i].at+motions[i].duration:0)):0;}
+function clearReady(t=performance.now()){if(!anim)return false;const f=anim.frames.slice(anim.index).find(f=>f.kind==='clear');return !f||f.clear.every(i=>{const m=motions[i];return !m||t>=m.at+m.duration;});}
 function updateSkin(){colors.splice(0,5,...window.PuzzleSkins.themes[0].colors);$('fall-speed').textContent='落下：'+speeds[speed].name;$('art').textContent='🍒 🍊 🍈';hud();}
 try{saved=E.restore(JSON.parse(localStorage.getItem('hidamari-free-v1')||'null'));muted=localStorage.getItem('hidamari-muted')==='1';}catch{}
 function save(s=state){try{localStorage.setItem('hidamari-free-v1',JSON.stringify(s));}catch{}}
@@ -95,7 +99,7 @@ function hit(x,y){let best=-1,dist=.56;for(let i=0;i<49;i++){const p=position(i)
 function inputBoard(){return state;}
 function canInput(){return started&&$('modal').hidden;}
 function movable(i){return Number.isInteger(i)&&i>=0&&i<49;}
-function draw(t){requestAnimationFrame(draw);if(document.hidden)return;now=t;if(anim&&t-anim.at>=anim.duration&&!pointer&&selected===null&&$('modal').hidden)advanceWave();
+function draw(t){requestAnimationFrame(draw);if(document.hidden)return;now=t;if(anim&&t-anim.at>=anim.duration&&!pointer&&selected===null&&$('modal').hidden&&clearReady(t))advanceWave();
 $('moves').classList.toggle('chain-open',!!anim||hasMotion(t));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size,size);round(0,0,size,size,skin?4:14,skin?'#41515e':'#dfd3b8');for(let i=0;i<49;i++){const x=i%7*tile,y=Math.floor(i/7)*tile;round(x+2,y+2,tile-4,tile-4,skin?tile*.11:tile*.17,skin?((i+Math.floor(i/7))%2?'#d4dddd':'#c5cfd0'):((i+Math.floor(i/7))%2?'#f4ebd5':'#eee3ca'));}
 const b=state.board;
 for(let i=0;i<49;i++){const pos=position(i,t),x=pos.x*tile,y=pos.y*tile,p=pulses.find(p=>p.i===i&&t-p.at<180);const scale=p&&!reduced?1+.1*Math.sin((t-p.at)/180*Math.PI):1;
@@ -105,7 +109,7 @@ ghosts=ghosts.filter(g=>t-g.at<240);for(const g of ghosts){const k=Math.min(1,(t
 beams=beams.filter(e=>t-e.at<240);for(const e of beams){const k=(t-e.at)/240,x=(e.i%7+.5)*tile,y=(Math.floor(e.i/7)+.5)*tile;ctx.save();ctx.globalAlpha=1-k;ctx.strokeStyle='#fff9da';ctx.lineWidth=tile*.16*(1-k);ctx.beginPath();if(e.type==='row'){ctx.moveTo(0,y);ctx.lineTo(size,y);}else if(e.type==='column'){ctx.moveTo(x,0);ctx.lineTo(x,size);}else ctx.arc(x,y,tile*(.4+k*2),0,7);ctx.stroke();ctx.restore();}
 particles=particles.filter(p=>t-p.at<650);for(const p of particles){const k=(t-p.at)/650;ctx.globalAlpha=1-k;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x+p.vx*k,p.y+p.vy*k+40*k*k,p.r*(1-k*.5),0,7);ctx.fill();}ctx.globalAlpha=1;}
 function advanceWave(){
- if(!anim)return;
+ if(!anim||!clearReady())return;
  const a=anim;let clearIndex=a.index;while(clearIndex<a.frames.length&&a.frames[clearIndex].kind!=='clear')clearIndex++;
  if(clearIndex>=a.frames.length){state=a.state;anim=null;hud();save();return;}
  const f=a.frames[clearIndex],drop=a.frames[clearIndex+1],t=performance.now();
@@ -113,7 +117,7 @@ function advanceWave(){
  for(const i of f.clear){const p=oldPositions[i];ghosts.push({p:f.state.board[i],x:p.x,y:p.y,toX:i%7+.5,toY:Math.floor(i/7)+.5,at:t});}
  if(ghosts.length>150)ghosts.splice(0,ghosts.length-150);
  const previous=motions;motions=[];
- for(const fall of drop.falling){const source=fall.from*7+fall.to%7;if(fall.from>=0){if(source===fall.to){motions[fall.to]=previous[source];}else motionAt(fall.to,oldPositions[source],Math.min(2000,1000+Math.abs(fall.from-Math.floor(fall.to/7))*130)*speeds[speed].factor);}else motionAt(fall.to,{x:fall.to%7+.5,y:fall.from+.5},Math.min(2200,1100+(Math.floor(fall.to/7)-fall.from)*130)*speeds[speed].factor);}
+ for(const fall of drop.falling){const source=fall.from*7+fall.to%7;if(fall.from>=0){if(source===fall.to){motions[fall.to]=previous[source];}else motionAt(fall.to,oldPositions[source],Math.min(2000,1000+Math.abs(fall.from-Math.floor(fall.to/7))*130)*speedFactor(drop.state));}else motionAt(fall.to,{x:fall.to%7+.5,y:fall.from+.5},Math.min(2200,1100+(Math.floor(fall.to/7)-fall.from)*130)*speedFactor(drop.state));}
  state=E.copy(drop.state);chainCount=f.chain;lastClearAt=t;hint=null;
  tone(f.chain,f.effects.length>0||f.created.length>0);
  for(const i of f.clear)for(let k=0;k<(reduced?1:5);k++)particles.push({x:(i%7+.5)*tile,y:(Math.floor(i/7)+.5)*tile,vx:(Math.random()-.5)*tile*2,vy:(Math.random()-.8)*tile*2,r:2+Math.random()*3,col:colors[f.state.board[i].c]||'#ffe29b',at:t});
@@ -121,14 +125,14 @@ function advanceWave(){
  pulses=drop.falling.filter(p=>p.from!==Math.floor(p.to/7)).map(p=>({i:p.to,at:t}));
  beams.push(...f.effects.map(e=>({...e,at:t})));if(beams.length>30)beams.splice(0,beams.length-30);
  if(chainCount>1){$('combo').textContent=chainCount+' CHAIN';$('combo').classList.remove('show');void $('combo').offsetWidth;$('combo').classList.add('show');}
- a.index=clearIndex+2;a.at=t;a.duration=reduced?90:Math.max(230,...motions.filter(Boolean).map(m=>m.at+m.duration-t))+60;
+ a.index=clearIndex+2;a.at=t;a.duration=0;
  if(!a.frames.slice(a.index).some(f=>f.kind==='clear')){state=a.state;anim=null;}
  hud();save(anim?.state||state);
 }
 function play(a,z){if(!canInput()||!movable(a)||!movable(z))return;const during=!!anim||hasMotion(),base=E.copy(state),oldPositions=snapshot();hint=null;selected=null;const result=E.turn(base,a,z,during?chainCount:0);
  if(!result){pulses=[{i:a,at:performance.now()},{i:z,at:performance.now()}];return;}
  if(!during)chainCount=0;
- state=E.copy(result.frames[0].state);motionAt(a,oldPositions[z],140);motionAt(z,oldPositions[a],140);anim={...result,index:1,at:performance.now(),duration:180};advanceWave();
+ state=E.copy(result.frames[0].state);motionAt(a,oldPositions[z],140);motionAt(z,oldPositions[a],140);anim={...result,index:1,at:performance.now(),duration:0};hud();save(result.state);
 }
 function finish(){if(anim){state=anim.state;anim=null;}selected=null;hud();save();}
 function show(tag,title,message,label,action,secondary=null){$('modal').hidden=false;$('tag').textContent=tag;$('title').textContent=title;$('message').textContent=message;$('message').style.whiteSpace='pre-line';$('primary').textContent=label;modalAction=action;$('secondary').hidden=!secondary;$('secondary').textContent=secondary?.label||'';$('secondary').onclick=secondary?.action||null;}
@@ -137,12 +141,12 @@ $('primary').addEventListener('click',()=>modalAction?.());modalAction=()=>{if(s
 $('retry').addEventListener('click',()=>{if(!started)return;show('やりなおす','新しい盤面にする？','今の盤面を最初から遊びます。','やりなおす',()=>start(state.level),{label:'このまま続ける',action:()=>{$('modal').hidden=true;}});});
 $('hint').addEventListener('click',()=>{if(!started||!$('modal').hidden)return;hint=E.moves(state.board)[0]||null;selected=null;});
 $('help').addEventListener('click',()=>{show('遊び方','3つそろえるだけ。','隣同士をスワイプして入れ替え。\n連鎖中も盤面全体を操作できます。\n4つ：一列を消すピース。\n5つ：好きな色を全部消すピース。\n時間も手数も制限なし。','戻る',()=>{$('modal').hidden=started;if(!started)show('時間を気にせず、ひと息。','フルーツパズル','同じ色を3つそろえて、花を集めよう。','はじめる',()=>start());});});
-$('fall-speed').addEventListener('click',()=>{const t=performance.now(),old=speeds[speed].factor;speed=(speed+1)%speeds.length;for(let i=0;i<motions.length;i++){const m=motions[i];if(!m?.fall||t>=m.at+m.duration)continue;const p=position(i,t),remaining=(m.at+m.duration-t)*speeds[speed].factor/old;motions[i]={x:p.x,y:p.y,at:t,duration:remaining,fall:true};}if(anim){anim.at=t;anim.duration=Math.max(90,...motions.filter(Boolean).map(m=>m.at+m.duration-t))+60;}try{localStorage.setItem('hidamari-speed',String(speed));}catch{}updateSkin();});
+$('fall-speed').addEventListener('click',()=>{const t=performance.now(),old=speedFactor();speed=(speed+1)%speeds.length;for(let i=0;i<motions.length;i++){const m=motions[i];if(!m?.fall||t>=m.at+m.duration)continue;const p=position(i,t),remaining=(m.at+m.duration-t)*speedFactor()/old;motions[i]={x:p.x,y:p.y,at:t,duration:remaining,fall:true};}if(anim){anim.at=t;anim.duration=0;}try{localStorage.setItem('hidamari-speed',String(speed));}catch{}updateSkin();});
 $('sound').addEventListener('click',()=>{muted=!muted;try{localStorage.setItem('hidamari-muted',muted?'1':'0');}catch{}if(muted)audio?.suspend().catch(()=>{});hud();});
 function cell(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*7,y=(e.clientY-r.top)/r.height*7;if(x<0||y<0||x>=7||y>=7)return -1;return hit(x,y);}
 canvas.addEventListener('pointerdown',e=>{if(!canInput()||pointer)return;const i=cell(e);if(!movable(i))return;e.preventDefault();pointer={id:e.pointerId,i,x:e.clientX,y:e.clientY,revision};canvas.setPointerCapture(e.pointerId);});
 canvas.addEventListener('pointerup',e=>{if(!pointer||pointer.id!==e.pointerId)return;const p=pointer;pointer=null;if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);if(!canInput())return;const dx=e.clientX-p.x,dy=e.clientY-p.y;if(Math.hypot(dx,dy)>tile*.28){const target=p.i+(Math.abs(dx)>Math.abs(dy)?Math.sign(dx):Math.sign(dy)*7);play(p.i,target);return;}const i=p.i;if(!movable(i))return;if(selected!==null&&Math.abs(selected%7-i%7)+Math.abs(Math.floor(selected/7)-Math.floor(i/7))===1)play(selected,i);else selected=selected===i?null:i;hint=null;});canvas.addEventListener('pointercancel',()=>{pointer=null;});
 document.addEventListener('visibilitychange',()=>{pointer=null;if(document.hidden){pausedAt=performance.now();audio?.suspend().catch(()=>{});}else{if(pausedAt!==null){if(anim)anim.at+=performance.now()-pausedAt;for(const p of particles)p.at+=performance.now()-pausedAt;for(const d of pulses)d.at+=performance.now()-pausedAt;for(const b of beams)b.at+=performance.now()-pausedAt;for(const m of motions)if(m)m.at+=performance.now()-pausedAt;for(const g of ghosts)g.at+=performance.now()-pausedAt;}pausedAt=null;}});window.addEventListener('pagehide',()=>{if(started)save(anim?.state||state);});
-window.hidamariDebug=()=>({skin:'fruit',speed,speedName:speeds[speed].name,state:E.copy(state),busy:!!anim,frame:anim?'cascade':null,visible:E.copy(inputBoard()),chain:chainCount,moving:hasMotion(),motionEnds:Math.max(0,...motions.filter(Boolean).map(m=>m.at+m.duration)),pieces:Array.from({length:49},(_,i)=>({i,...position(i)})),ghosts:ghosts.length,movable:Array.from({length:49},(_,i)=>i).filter(movable),selected,hint,modal:!$('modal').hidden});updateSkin();resize();requestAnimationFrame(draw);
+window.hidamariDebug=()=>({skin:'fruit',speed,speedName:speeds[speed].name,difficulty:difficulty(),clearReady:clearReady(),clearAt:clearAt(),clock:performance.now(),state:E.copy(state),busy:!!anim,frame:anim?'cascade':null,visible:E.copy(inputBoard()),chain:chainCount,moving:hasMotion(),motionEnds:Math.max(0,...motions.filter(Boolean).map(m=>m.at+m.duration)),pieces:Array.from({length:49},(_,i)=>({i,...position(i)})),ghosts:ghosts.length,movable:Array.from({length:49},(_,i)=>i).filter(movable),selected,hint,modal:!$('modal').hidden});updateSkin();resize();requestAnimationFrame(draw);
 })();
 </script></body></html>
