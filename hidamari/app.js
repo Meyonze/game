@@ -26,7 +26,7 @@ function inputBoard(){return state;}
 function canInput(){return started&&$('modal').hidden;}
 function movable(i){return Number.isInteger(i)&&i>=0&&i<49;}
 function draw(t){requestAnimationFrame(draw);if(document.hidden)return;now=t;if(anim&&t-anim.at>=anim.duration&&!pointer&&selected===null&&$('modal').hidden)advanceWave();
-ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size,size);round(0,0,size,size,skin?4:14,skin?'#42694b':'#dfd3b8');for(let i=0;i<49;i++){const x=i%7*tile,y=Math.floor(i/7)*tile;round(x+2,y+2,tile-4,tile-4,skin?2:tile*.17,skin?((i+Math.floor(i/7))%2?'#c2dba9':'#b5d09a'):((i+Math.floor(i/7))%2?'#f4ebd5':'#eee3ca'));}
+ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size,size);round(0,0,size,size,skin?4:14,skin?'#41515e':'#dfd3b8');for(let i=0;i<49;i++){const x=i%7*tile,y=Math.floor(i/7)*tile;round(x+2,y+2,tile-4,tile-4,skin?2:tile*.17,skin?((i+Math.floor(i/7))%2?'#d4dddd':'#c5cfd0'):((i+Math.floor(i/7))%2?'#f4ebd5':'#eee3ca'));}
 const b=state.board;
 for(let i=0;i<49;i++){const pos=position(i,t),x=pos.x*tile,y=pos.y*tile,p=pulses.find(p=>p.i===i&&t-p.at<180);const scale=p&&!reduced?1+.1*Math.sin((t-p.at)/180*Math.PI):1;
 if(i===selected||hint?.includes(i)){ctx.strokeStyle=i===selected?'#b7915c':'#c2a35f';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(x-tile/2+3,y-tile/2+3,tile-6,tile-6,tile*.2);ctx.stroke();}

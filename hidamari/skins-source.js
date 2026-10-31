@@ -1,6 +1,6 @@
 (function(root){'use strict';
-const themes=[{id:'round-fruit',colors:['#ef6a6f','#f3a344','#b38bd1','#f0d55c','#91c765'],names:['さくらんぼ','みかん','ぶどう','レモン','メロン']},{id:'block-animals',colors:['#f4ce43','#59bcdd','#b38158','#edece2','#67b666'],names:['ライオン','ゾウ','サル','パンダ','ワニ']}];
-function paint(ctx,skin,p,x,y,r){ctx.save();ctx.translate(x,y);ctx.scale(r/25,r/25);ctx.lineJoin='round';ctx.lineCap='round';const ink=skin?'#29352d':'#68453b',color=themes[skin].colors[p.c];
+const themes=[{id:'round-fruit',colors:['#ef6a6f','#f3a344','#b38bd1','#f0d55c','#91c765'],names:['さくらんぼ','みかん','ぶどう','レモン','メロン']},{id:'block-animals',colors:['#ffdb25','#259fdf','#c35449','#ffffff','#30b76b'],names:['ライオン','ゾウ','サル','パンダ','ワニ']}];
+function paint(ctx,skin,p,x,y,r){ctx.save();ctx.translate(x,y);ctx.scale(r/25,r/25);ctx.lineJoin='round';ctx.lineCap='round';const ink=skin?'#23313b':'#68453b',color=themes[skin].colors[p.c];
 function box(x,y,w,h,c,stroke=true,rad=0){ctx.beginPath();ctx.roundRect(x,y,w,h,rad);ctx.fillStyle=c;ctx.fill();if(stroke){ctx.strokeStyle=ink;ctx.lineWidth=1.8;ctx.stroke();}}
 function oval(x,y,rx,ry,c,stroke=true){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,7);ctx.fillStyle=c;ctx.fill();if(stroke){ctx.strokeStyle=ink;ctx.lineWidth=1.6;ctx.stroke();}}
 function line(x,y,xx,yy,c=ink,w=1.5){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(xx,yy);ctx.stroke();}
@@ -17,11 +17,11 @@ const faceX=p.c===0?9:0,faceY=p.c===0?10:9;oval(faceX-5,faceY-2,1.3,1.9,ink,fals
 }
 else{
 // Square animal blocks with broad color fields and angular, readable faces.
-if(p.c===0){box(-26,-25,52,50,'#cc8c35',true,2);for(const [a,b] of [[-22,-21],[13,-21],[-22,13],[13,13]])box(a,b,9,8,'#f4bc3c',false);box(-20,-20,40,40,color,true,1);box(-8,5,16,12,'#fff0a4',false);poly([[-4,2],[4,2],[0,7]],ink,false);}
-if(p.c===1){box(-27,-17,15,32,'#3aa8ca',true,1);box(12,-17,15,32,'#3aa8ca',true,1);box(-18,-24,36,44,color,true,1);box(-6,3,12,24,color,true,1);box(-3,20,6,5,'#a5e0e5',false);poly([[-15,2],[-8,7],[-13,13]],'#fff2cf');poly([[15,2],[8,7],[13,13]],'#fff2cf');}
-if(p.c===2){box(-27,-9,12,23,'#996c48',true,1);box(15,-9,12,23,'#996c48',true,1);box(-20,-24,40,47,color,true,1);box(-15,-16,30,23,'#f1d399',false,2);box(-12,5,24,13,'#efd098',false,2);line(-6,10,6,10,ink,1.2);}
-if(p.c===3){box(-24,-27,14,13,'#404c42',true,1);box(10,-27,14,13,'#404c42',true,1);box(-24,-20,48,44,color,true,2);box(-17,-10,13,17,'#404c42',false,1);box(4,-10,13,17,'#404c42',false,1);poly([[-4,9],[4,9],[0,14]],ink,false);}
-if(p.c===4){box(-22,-24,15,14,color,true,1);box(6,-24,15,14,color,true,1);box(-25,-13,50,36,color,true,1);box(-21,1,42,18,'#b6d983',false,1);for(let x=-14;x<=14;x+=14)poly([[x,7],[x+5,7],[x+2,12]],'#f8f0d0',false);line(-19,7,19,7,ink,1.5);}
+if(p.c===0){box(-26,-25,52,50,'#de9816',true,2);for(const [a,b] of [[-22,-21],[13,-21],[-22,13],[13,13]])box(a,b,9,8,'#ffca24',false);box(-20,-20,40,40,color,true,1);box(-8,5,16,12,'#fff0a4',false);poly([[-4,2],[4,2],[0,7]],ink,false);}
+if(p.c===1){box(-27,-17,15,32,'#197fb5',true,1);box(12,-17,15,32,'#197fb5',true,1);box(-18,-24,36,44,color,true,1);box(-6,3,12,24,color,true,1);box(-3,20,6,5,'#a5e0e5',false);poly([[-15,2],[-8,7],[-13,13]],'#fff2cf');poly([[15,2],[8,7],[13,13]],'#fff2cf');}
+if(p.c===2){box(-27,-9,12,23,'#943d39',true,1);box(15,-9,12,23,'#943d39',true,1);box(-20,-24,40,47,color,true,1);box(-15,-16,30,23,'#f5bcaa',false,2);box(-12,5,24,13,'#f5bcaa',false,2);line(-6,10,6,10,ink,1.2);}
+if(p.c===3){box(-24,-27,14,13,'#27323e',true,1);box(10,-27,14,13,'#27323e',true,1);box(-24,-20,48,44,color,true,2);box(-17,-10,13,17,'#27323e',false,1);box(4,-10,13,17,'#27323e',false,1);poly([[-4,9],[4,9],[0,14]],ink,false);}
+if(p.c===4){box(-22,-24,15,14,color,true,1);box(6,-24,15,14,color,true,1);box(-25,-13,50,36,color,true,1);box(-21,1,42,18,'#91e0af',false,1);for(let x=-14;x<=14;x+=14)poly([[x,7],[x+5,7],[x+2,12]],'#f8f0d0',false);line(-19,7,19,7,ink,1.5);}
 const eyeY=p.c===4?-15:-7;for(const dx of [-10,10]){box(dx-2,eyeY-3,4,6,p.c===3?'#fff8df':ink,false);if(p.c!==3)box(dx-1,eyeY-3,1.5,2,'#fff3cf',false);}
 }
 if(p.s&&p.s!=='rainbow'){box(10,10,17,17,'#fff8da',true,3);if(p.s==='row')line(13,18,24,18);else if(p.s==='column')line(18,13,18,24);else oval(18,18,4,4,'#fff8da');}
