@@ -8,17 +8,19 @@ function moves(b){const out=[];for(let i=0;i<49;i++)for(const j of [i+1,i+N])if(
 function fresh(s){for(let attempt=0;attempt<200;attempt++){s.board=[];for(let i=0;i<49;i++){let c;do{c=rand(s,5);}while(i%7>=2&&s.board[i-1].c===c&&s.board[i-2].c===c||i>=14&&s.board[i-7].c===c&&s.board[i-14].c===c);s.board.push({c,s:null,age:0});}if(moves(s.board).length)return; }throw Error('board generation failed');}
 function create(level=0,seed=Date.now(),free=false){if(!stages[level])throw Error('unknown stage');const s={version:1,level,seed:seed>>>0,moves:stages[level].moves,goals:stages[level].goals.slice(),score:0,phase:'play',board:[]};if(free){s.moves=0;s.free=true;s.round=1;s.totalMoves=0;s.bestChain=0;}fresh(s);return s;}
 function reshuffle(s){const original=s.board.slice();for(let n=0;n<200;n++){s.board=original.slice();for(let i=48;i>0;i--){const j=rand(s,i+1);[s.board[i],s.board[j]]=[s.board[j],s.board[i]];}if(!matches(s.board).length&&moves(s.board).length)return;}fresh(s);}
-function turn(state,a,z,chainBase=0){
- if(state.phase!=='play'||!legal(state.board,a,z))return null;
- const s=copy(state),frames=[],push=(kind,extra={})=>frames.push({kind,state:copy(s),...extra});if(s.aging)for(const p of s.board)p.age=(p.age||0)+1;if(s.free)s.totalMoves++;else s.moves--;[s.board[a],s.board[z]]=[s.board[z],s.board[a]];push('swap',{a,z});
- let forced=null,rainbowUsed=[];const one=s.board[a],two=s.board[z];if(one.s==='rainbow'||two.s==='rainbow'){rainbowUsed=[a,z].filter(i=>s.board[i].s==='rainbow');const c=one.s==='rainbow'?two.c:one.c;forced=s.board.map((p,i)=>p.c===c||i===a||i===z||one.s===two.s&&one.s==='rainbow'?i:-1).filter(i=>i>=0);}
+function turn(state,a,z,chainBase=0,opts=null){
+ const settle=a===null,ready=i=>!opts?.landed||opts.landed.includes(i);
+ if(state.phase!=='play'||!settle&&!legal(state.board,a,z))return null;
+ const s=copy(state),frames=[],push=(kind,extra={})=>frames.push({kind,state:copy(s),...extra});if(!settle){if(s.aging)for(const p of s.board)p.age=(p.age||0)+1;if(s.free)s.totalMoves++;else s.moves--;[s.board[a],s.board[z]]=[s.board[z],s.board[a]];push('swap',{a,z});}
+ let forced=s.board.map((p,i)=>p.pending&&ready(i)?i:-1).filter(i=>i>=0),rainbowUsed=s.board.map((p,i)=>p.usedRainbow?i:-1).filter(i=>i>=0);if(!forced.length)forced=null;const one=s.board[a],two=s.board[z];if(!settle&&(one.s==='rainbow'||two.s==='rainbow')){rainbowUsed=[a,z].filter(i=>s.board[i].s==='rainbow');const c=one.s==='rainbow'?two.c:one.c;forced=s.board.map((p,i)=>p.c===c||i===a||i===z||one.s===two.s&&one.s==='rainbow'?i:-1).filter(i=>i>=0);}
+ if(opts?.swapOnly){for(const i of forced||[])s.board[i].pending=true;for(const i of rainbowUsed)s.board[i].usedRainbow=true;return {state:s,frames,chain:chainBase};}
  let chain=chainBase;
  for(let wave=0;wave<100;wave++){
-  const runs=matches(s.board);if(!runs.length&&!forced)break;
+  const runs=matches(s.board).filter(r=>r.ids.every(ready));if(!runs.length&&!forced)break;
   chain++;let groups=[];for(const run of runs){let g={ids:new Set(run.ids),runs:[run]};for(let i=groups.length-1;i>=0;i--)if([...g.ids].some(x=>groups[i].ids.has(x))){groups[i].ids.forEach(x=>g.ids.add(x));g.runs.push(...groups[i].runs);groups.splice(i,1);}groups.push(g);}
   const clear=new Set(forced||[]),created=new Map();forced=null;
   for(const g of groups){g.ids.forEach(i=>clear.add(i));let type=null;if(g.runs.some(r=>r.ids.length>=5))type='rainbow';else if(g.runs.length>1)type='bomb';else if(g.ids.size>=4)type=g.runs[0].axis?'column':'row';if(type){const ids=[...g.ids],anchor=wave===0&&ids.includes(z)?z:wave===0&&ids.includes(a)?a:ids[Math.floor(ids.length/2)];created.set(anchor,{c:type==='rainbow'?-1:s.board[anchor].c,s:type,age:0});}}
-  const fired=new Set(wave===0?rainbowUsed:[]),effects=wave===0?rainbowUsed.map(i=>({i,type:'rainbow'})):[];let changed=true;while(changed){changed=false;for(const i of [...clear]){const p=s.board[i];if(!p?.s||fired.has(i))continue;fired.add(i);effects.push({i,type:p.s});let extra=[];
+  const fired=new Set(wave===0?rainbowUsed:[]),effects=wave===0?rainbowUsed.map(i=>({i,type:'rainbow'})):[];let changed=true;while(changed){changed=false;for(const i of [...clear]){const p=s.board[i];if(!ready(i)){p.pending=true;clear.delete(i);continue;}if(!p?.s||fired.has(i))continue;fired.add(i);effects.push({i,type:p.s});let extra=[];
    if(p.s==='row')extra=Array.from({length:7},(_,x)=>Math.floor(i/7)*7+x);
    if(p.s==='column')extra=Array.from({length:7},(_,y)=>y*7+i%7);
    if(p.s==='bomb')for(let y=Math.max(0,Math.floor(i/7)-1);y<=Math.min(6,Math.floor(i/7)+1);y++)for(let x=Math.max(0,i%7-1);x<=Math.min(6,i%7+1);x++)extra.push(y*7+x);
@@ -30,13 +32,15 @@ function turn(state,a,z,chainBase=0){
   push('clear',{clear:[...clear],created:[...created.keys()],effects,chain,gains});for(const i of clear)s.board[i]=null;created.forEach((p,i)=>s.board[i]=p);
   const falling=[];for(let x=0;x<7;x++){let y=6;for(let old=6;old>=0;old--){const p=s.board[old*7+x];if(p){s.board[y*7+x]=p;falling.push({to:y*7+x,from:old});y--;}}for(let k=y;k>=0;k--){s.board[k*7+x]={c:rand(s,5),s:null,age:0};falling.push({to:k*7+x,from:k-y-1});}}
   push('drop',{falling});
+  if(opts?.oneWave)break;
   if(wave===99)throw Error('cascade limit');
  }
+ if(opts?.oneWave)return frames.some(f=>f.kind==='clear')?{state:s,frames,chain}:null;
  s.phase=s.aging&&s.board.some(p=>(p.age||0)>=s.spoilLimit)?'lost':s.free?'play':s.goals.every(n=>!n)?'won':s.moves===0?'lost':'play';
  if(s.phase==='play'&&!moves(s.board).length){reshuffle(s);push('shuffle');}
  return {state:s,frames,chain};
 }
 function restore(s){try{s=copy(s);if(s.version!==1||!stages[s.level]||!Number.isInteger(s.seed)||s.seed<0||s.seed>4294967295||!Number.isInteger(s.moves)||s.moves<0||s.moves>stages[s.level].moves||!Number.isSafeInteger(s.score)||s.score<0||!Array.isArray(s.goals)||s.goals.length!==5||s.goals.some((g,i)=>!Number.isInteger(g)||g<0||g>stages[s.level].goals[i])||s.board?.length!==49||s.board.some(p=>!p||!Number.isInteger(p.c)||p.c< -1||p.c>4||![null,'row','column','bomb','rainbow'].includes(p.s)||(p.c===-1)!==(p.s==='rainbow'))||matches(s.board).length)return null;if(s.free&&(!Number.isSafeInteger(s.totalMoves)||s.totalMoves<0||!Number.isSafeInteger(s.round)||s.round<1||!Number.isSafeInteger(s.bestChain)||s.bestChain<0))return null;if(s.aging&&(s.spoilLimit!==24||s.board.some(p=>!Number.isSafeInteger(p.age)||p.age<0)))return null;const phase=s.aging&&s.board.some(p=>(p.age||0)>=s.spoilLimit)?'lost':s.free?'play':s.goals.every(n=>!n)?'won':s.moves===0?'lost':'play';if(s.phase!==phase||s.phase==='play'&&!moves(s.board).length)return null;return s;}catch{return null;}}
 function enableAging(state){const s=copy(state);s.aging=true;s.spoilLimit=24;s.board.forEach(p=>p.age=p.age||0);return s;}
-const API={N,stages,copy,create,matches,moves,legal,turn,restore,enableAging};if(typeof module!=='undefined')module.exports=API;else root.Hidamari=API;
+const API={N,stages,copy,create,matches,moves,legal,turn,restore,enableAging,swap:(s,a,b,c=0)=>turn(s,a,b,c,{swapOnly:true}),step:(s,c,landed)=>turn(s,null,null,c,{oneWave:true,landed}),settle:(s,c=0)=>turn(s,null,null,c)};if(typeof module!=='undefined')module.exports=API;else root.Hidamari=API;
 })(typeof window!=='undefined'?window:globalThis);
