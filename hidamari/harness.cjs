@@ -32,6 +32,7 @@ module.exports=function boot({width=362,height=480,reduced=false,realCanvas=fals
     for(const k of ['width','height'])Object.defineProperty(el,k,{set(value){if(nativeCanvas)nativeCanvas[k]=value;},get(){return nativeCanvas?nativeCanvas[k]:k==='width'?width:height;}});
     elements.set(id,el);
   }
+  if(elements.has('title'))elements.get('title').innerHTML=html.match(/<h1 id="title">([\s\S]*?)<\/h1>/)?.[1]||'';
   class AudioMock{
     constructor(){this.state='suspended';this.destination={};this.oscillators=[];this.shapers=[];audio.push(this);}
     get currentTime(){return clock/1000;}
