@@ -1,20 +1,20 @@
 (()=>{'use strict';const E=window.Hidamari,$=id=>document.getElementById(id),canvas=$('board'),ctx=canvas.getContext('2d'),colors=['#ed9396','#ecc16d','#80bdd8','#8bbb9a','#b49ecf'],dark=['#cd6f7b','#c79b48','#569ab9','#649878','#9077b2'],symbols=['✿','✦','♦','❧','●'],reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 let state=E.create(0,Date.now(),true),started=false,selected=null,pointer=null,anim=null,tile=44,size=308,dpr=1,particles=[],now=0,hint=null,modalAction=null,saved=null,muted=false,audio=null,pausedAt=null,drifts=[],revision=0,chainCount=0,pulses=[],beams=[],lastClearAt=-Infinity,motions=[],ghosts=[];
 let skin=0;try{skin=localStorage.getItem('puzzle-skin')==='animals'?1:0;}catch{}
-function updateSkin(){const S=window.PuzzleSkins;colors.splice(0,5,...S.themes[skin].colors);$('theme').textContent=(skin?'どうぶつ':'フルーツ')+' ⇄';$('theme').setAttribute('aria-label',(skin?'フルーツ':'動物')+'の絵柄に切り替える');$('art').textContent=skin?'🐱 🐼 🐰':'🍓 🍋 🍇';hud();}
+function updateSkin(){const S=window.PuzzleSkins;colors.splice(0,5,...S.themes[skin].colors);$('theme').textContent=(skin?'どうぶつ':'フルーツ')+' ⇄';$('theme').setAttribute('aria-label',(skin?'フルーツ':'動物')+'の絵柄に切り替える');$('art').textContent=skin?'🦁 🐘 🐼':'🍒 🍊 🍈';hud();}
 try{saved=E.restore(JSON.parse(localStorage.getItem('hidamari-free-v1')||'null'));muted=localStorage.getItem('hidamari-muted')==='1';}catch{}
 function save(s=state){try{localStorage.setItem('hidamari-free-v1',JSON.stringify(s));}catch{}}
 function tone(chain=1,big=false){if(muted)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});const t=audio.currentTime;for(let k=0;k<(big?3:1);k++){const o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=440*Math.pow(2,Math.min(12,chain*2+k*4)/12);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.1,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+.24);o.connect(g);g.connect(audio.destination);o.start(t+k*.045);o.stop(t+.3+k*.045);o.onended=()=>{o.disconnect();g.disconnect();};}}catch{}}
 function resize(){const r=$('arena').getBoundingClientRect();size=Math.max(7,Math.min(r.width,r.height-4));tile=size/7;dpr=Math.min(2,window.devicePixelRatio||1);canvas.width=Math.round(size*dpr);canvas.height=Math.round(size*dpr);canvas.style.width=size+'px';canvas.style.height=size+'px';}
 new ResizeObserver(resize).observe($('arena'));window.addEventListener('resize',resize);window.visualViewport?.addEventListener('resize',resize);
-function hud(s=state){$('stage').textContent=s.round||1;$('moves').textContent=chainCount||'—';$('score').textContent=s.score.toLocaleString();$('goals').innerHTML=E.stages[s.level].goals.map((n,i)=>n?'<div class="goal '+(!s.goals[i]?'done':'')+'"><img src="'+window.PuzzleSkins.icons[skin][i]+'" alt="'+(skin?['ネコ','キツネ','パンダ','ウサギ','カエル']:['いちご','レモン','ぶどう','洋梨','ブルーベリー'])[i]+'"><b>'+ (s.goals[i]||'✓')+'</b></div>':'').join('');$('sound').textContent=muted?'♩':'♪';}
+function hud(s=state){$('stage').textContent=s.round||1;$('moves').textContent=chainCount||'—';$('score').textContent=s.score.toLocaleString();$('goals').innerHTML=E.stages[s.level].goals.map((n,i)=>n?'<div class="goal '+(!s.goals[i]?'done':'')+'"><img src="'+window.PuzzleSkins.icons[skin][i]+'" alt="'+window.PuzzleSkins.themes[skin].names[i]+'"><b>'+ (s.goals[i]||'✓')+'</b></div>':'').join('');$('sound').textContent=muted?'♩':'♪';}
 function round(x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
 function shape(c,x,y,r){ctx.beginPath();if(c===0){const ps=Array.from({length:10},(_,k)=>{const a=k*Math.PI/5-Math.PI/2,rr=k%2?r*.53:r*1.15;return{x:x+Math.cos(a)*rr,y:y+Math.sin(a)*rr};});ctx.moveTo((ps[9].x+ps[0].x)/2,(ps[9].y+ps[0].y)/2);for(let k=0;k<10;k++){const p=ps[k],q=ps[(k+1)%10];ctx.quadraticCurveTo(p.x,p.y,(p.x+q.x)/2,(p.y+q.y)/2);}ctx.closePath();}
 else if(c===1){for(let k=0;k<10;k++){const a=k*Math.PI/5-Math.PI/2,rr=k%2?r*.49:r;const px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr;k?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();}
 else if(c===2){ctx.moveTo(x,y-r);ctx.bezierCurveTo(x+r*.2,y-r*.5,x+r*1.2,y+r*.5,x+r*.4,y+r*.8);ctx.bezierCurveTo(x-r*.9,y+r*1.2,x-r*.9,y-r*.1,x,y-r);}
 else if(c===3){ctx.moveTo(x-r*.7,y+r*.65);ctx.bezierCurveTo(x-r*1.3,y-r*.6,x-r*.1,y-r,x+r*.8,y-r*.7);ctx.bezierCurveTo(x+r*1.1,y+r*.4,x+r*.1,y+r,x-r*.7,y+r*.65);}
 else ctx.roundRect(x-r*.83,y-r*.83,r*1.66,r*1.66,r*.55);}
-function gem(p,x,y,scale=1,alpha=1){if(!p)return;ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.scale(scale,scale);window.PuzzleSkins.paint(ctx,skin,p,0,0,tile*.34);ctx.restore();}
+function gem(p,x,y,scale=1,alpha=1){if(!p)return;ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.scale(scale,scale);window.PuzzleSkins.paint(ctx,skin,p,0,0,(skin?tile*.41:tile*.36));ctx.restore();}
 function position(i,t=performance.now()){
  const m=motions[i],end={x:i%7+.5,y:Math.floor(i/7)+.5};if(!m||reduced)return end;
  const k=Math.max(0,Math.min(1,(t-m.at)/m.duration)),ease=1-Math.pow(1-k,3);return{x:m.x+(end.x-m.x)*ease,y:m.y+(end.y-m.y)*ease};
@@ -26,7 +26,7 @@ function inputBoard(){return state;}
 function canInput(){return started&&$('modal').hidden;}
 function movable(i){return Number.isInteger(i)&&i>=0&&i<49;}
 function draw(t){requestAnimationFrame(draw);if(document.hidden)return;now=t;if(anim&&t-anim.at>=anim.duration&&!pointer&&selected===null&&$('modal').hidden)advanceWave();
-ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size,size);round(0,0,size,size,14,'#dfd3b8');for(let i=0;i<49;i++){const x=i%7*tile,y=Math.floor(i/7)*tile;round(x+2,y+2,tile-4,tile-4,tile*.17,(i+Math.floor(i/7))%2?'#f4ebd5':'#eee3ca');}
+ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size,size);round(0,0,size,size,skin?4:14,skin?'#42694b':'#dfd3b8');for(let i=0;i<49;i++){const x=i%7*tile,y=Math.floor(i/7)*tile;round(x+2,y+2,tile-4,tile-4,skin?2:tile*.17,skin?((i+Math.floor(i/7))%2?'#c2dba9':'#b5d09a'):((i+Math.floor(i/7))%2?'#f4ebd5':'#eee3ca'));}
 const b=state.board;
 for(let i=0;i<49;i++){const pos=position(i,t),x=pos.x*tile,y=pos.y*tile,p=pulses.find(p=>p.i===i&&t-p.at<180);const scale=p&&!reduced?1+.1*Math.sin((t-p.at)/180*Math.PI):1;
 if(i===selected||hint?.includes(i)){ctx.strokeStyle=i===selected?'#b7915c':'#c2a35f';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(x-tile/2+3,y-tile/2+3,tile-6,tile-6,tile*.2);ctx.stroke();}
