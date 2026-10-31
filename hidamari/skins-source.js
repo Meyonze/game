@@ -1,5 +1,5 @@
 (function(root){'use strict';
-const themes=[{id:'round-fruit',colors:['#ef6a6f','#f3a344','#b38bd1','#f0d55c','#91c765'],names:['さくらんぼ','みかん','ぶどう','レモン','メロン']},{id:'block-animals',colors:['#ffdb25','#259fdf','#c35449','#ffffff','#30b76b'],names:['ライオン','ゾウ','サル','パンダ','ワニ']}];
+const themes=[{id:'round-fruit',colors:['#ef6a6f','#f3a344','#b38bd1','#f0d55c','#91c765'],names:['さくらんぼ','みかん','ぶどう','レモン','メロン']},{id:'block-animals',colors:['#ffdb25','#259fdf','#c35449','#ffffff','#30b76b'],names:['ライオン','ゾウ','レッサーパンダ','パンダ','ワニ']}];
 function paint(ctx,skin,p,x,y,r){ctx.save();ctx.translate(x,y);ctx.scale(r/25,r/25);ctx.lineJoin='round';ctx.lineCap='round';const ink=skin?'#23313b':'#68453b',color=themes[skin].colors[p.c];
 function box(x,y,w,h,c,stroke=true,rad=0){ctx.beginPath();ctx.roundRect(x,y,w,h,rad);ctx.fillStyle=c;ctx.fill();if(stroke){ctx.strokeStyle=ink;ctx.lineWidth=1.8;ctx.stroke();}}
 function oval(x,y,rx,ry,c,stroke=true){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,7);ctx.fillStyle=c;ctx.fill();if(stroke){ctx.strokeStyle=ink;ctx.lineWidth=1.6;ctx.stroke();}}
@@ -16,13 +16,14 @@ if(p.c===4){oval(0,2,25,25,color);ctx.strokeStyle='#618e4e';ctx.lineWidth=3;for(
 const faceX=p.c===0?9:0,faceY=p.c===0?10:9;oval(faceX-5,faceY-2,1.3,1.9,ink,false);oval(faceX+5,faceY-2,1.3,1.9,ink,false);ctx.strokeStyle=ink;ctx.lineWidth=1;ctx.beginPath();ctx.arc(faceX,faceY+1,3,0,Math.PI);ctx.stroke();
 }
 else{
-// Square animal blocks with broad color fields and angular, readable faces.
-if(p.c===0){box(-26,-25,52,50,'#de9816',true,2);for(const [a,b] of [[-22,-21],[13,-21],[-22,13],[13,13]])box(a,b,9,8,'#ffca24',false);box(-20,-20,40,40,color,true,1);box(-8,5,16,12,'#fff0a4',false);poly([[-4,2],[4,2],[0,7]],ink,false);}
-if(p.c===1){box(-27,-17,15,32,'#197fb5',true,1);box(12,-17,15,32,'#197fb5',true,1);box(-18,-24,36,44,color,true,1);box(-6,3,12,24,color,true,1);box(-3,20,6,5,'#a5e0e5',false);poly([[-15,2],[-8,7],[-13,13]],'#fff2cf');poly([[15,2],[8,7],[13,13]],'#fff2cf');}
-if(p.c===2){box(-27,-9,12,23,'#943d39',true,1);box(15,-9,12,23,'#943d39',true,1);box(-20,-24,40,47,color,true,1);box(-15,-16,30,23,'#f5bcaa',false,2);box(-12,5,24,13,'#f5bcaa',false,2);line(-6,10,6,10,ink,1.2);}
-if(p.c===3){box(-24,-27,14,13,'#27323e',true,1);box(10,-27,14,13,'#27323e',true,1);box(-24,-20,48,44,color,true,2);box(-17,-10,13,17,'#27323e',false,1);box(4,-10,13,17,'#27323e',false,1);poly([[-4,9],[4,9],[0,14]],ink,false);}
-if(p.c===4){box(-22,-24,15,14,color,true,1);box(6,-24,15,14,color,true,1);box(-25,-13,50,36,color,true,1);box(-21,1,42,18,'#91e0af',false,1);for(let x=-14;x<=14;x+=14)poly([[x,7],[x+5,7],[x+2,12]],'#f8f0d0',false);line(-19,7,19,7,ink,1.5);}
-const eyeY=p.c===4?-15:-7;for(const dx of [-10,10]){box(dx-2,eyeY-3,4,6,p.c===3?'#fff8df':ink,false);if(p.c!==3)box(dx-1,eyeY-3,1.5,2,'#fff3cf',false);}
+// Rounded animal blocks, with distinct ears, masks and a side-profile crocodile.
+if(p.c===0){box(-26,-25,52,50,'#de9816',true,10);oval(-17,-17,7,7,color);oval(17,-17,7,7,color);box(-20,-19,40,39,color,true,8);box(-8,5,16,12,'#fff0a4',false,6);poly([[-4,2],[4,2],[0,7]],ink,false);}
+if(p.c===1){box(-27,-17,15,32,'#197fb5',true,7);box(12,-17,15,32,'#197fb5',true,7);box(-18,-24,36,44,color,true,8);box(-6,3,12,24,color,true,5);box(-3,20,6,5,'#a5e0e5',false,2);poly([[-15,2],[-8,7],[-13,13]],'#fff2cf');poly([[15,2],[8,7],[13,13]],'#fff2cf');}
+if(p.c===2){oval(-17,-21,9,10,'#fff0cf');oval(17,-21,9,10,'#fff0cf');oval(-17,-21,5,6,'#823f36',false);oval(17,-21,5,6,'#823f36',false);box(-23,-19,46,43,color,true,11);oval(-11,-8,8,6,'#fff0cf',false);oval(11,-8,8,6,'#fff0cf',false);poly([[-22,1],[-13,5],[-6,15],[-14,20],[-22,12]],'#fff0cf',false);poly([[22,1],[13,5],[6,15],[14,20],[22,12]],'#fff0cf',false);oval(0,12,12,8,'#fff0cf',false);poly([[-5,5],[5,5],[0,10]],ink,false);line(0,10,0,14,ink,1.2);}
+if(p.c===3){oval(-17,-22,9,8,'#27323e');oval(17,-22,9,8,'#27323e');box(-24,-19,48,43,color,true,11);oval(-10,-4,7,9,'#27323e',false);oval(10,-4,7,9,'#27323e',false);poly([[-4,9],[4,9],[0,14]],ink,false);}
+if(p.c===4){box(-26,-17,34,40,color,true,9);poly([[-23,-17],[-18,-25],[-13,-17]],'#23975a');box(-9,-5,36,28,color,true,8);box(-7,11,31,10,'#91e0af',false,4);oval(-14,-11,5,7,'#fff7dc');oval(-13,-10,1.8,3,ink,false);oval(18,1,1.5,1.2,'#176d43',false);oval(23,1,1.2,1,'#176d43',false);line(-14,10,25,10,ink,1.5);for(const x of [-2,11])poly([[x,10],[x+6,10],[x+3,17]],'#fff9de');poly([[18,10],[23,10],[21,5]],'#fff9de');}
+if(p.c!==4)for(const dx of [-10,10]){oval(dx,p.c===2?-7:-6,2,3,p.c===3?'#fff8df':ink,false);if(p.c!==3)oval(dx-.5,p.c===2?-8:-7,0.7,0.9,'#fff3cf',false);}
+
 }
 if(p.s&&p.s!=='rainbow'){box(10,10,17,17,'#fff8da',true,3);if(p.s==='row')line(13,18,24,18);else if(p.s==='column')line(18,13,18,24);else oval(18,18,4,4,'#fff8da');}
 ctx.restore();}
