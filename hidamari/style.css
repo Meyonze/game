@@ -3,3 +3,5 @@
 /* Clear motif skins: identical mechanics, selectable while playing. */
 header>b{font-size:17px;letter-spacing:.5px}header #theme{width:auto;min-width:81px;padding:0 8px;font-size:10px;white-space:nowrap;border-radius:8px;background:#e8e4d7;color:#45413d;border-color:#b6ad9c}.goal>img{display:block;width:34px;height:34px;object-fit:contain;margin:auto}.sun-art{font-size:44px;letter-spacing:3px}.card h1{font-size:22px}#app{background:#eee9dd}canvas{box-shadow:0 6px 0 #b8ad98,0 13px 22px #82795f22}.status .goals{gap:8px}@media(max-height:650px){.goal>img{width:28px;height:28px}.sun-art{font-size:36px}}
 @media(max-width:350px){.goal>img{width:28px;height:28px}.status .goals{gap:5px}header>b{font-size:15px}header #theme{min-width:74px;padding:0 5px;font-size:9px}}
+
+#moves.chain-open{color:#378c68;text-shadow:0 0 8px #71b88a33}
