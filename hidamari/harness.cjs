@@ -54,6 +54,7 @@ module.exports=function boot({width=362,height=480,reduced=false,realCanvas=fals
   vm.runInContext(fs.readFileSync(path.join(root,'engine.js'),'utf8'),vmContext);
   const originalCreate=sandbox.window.Hidamari.create;
   sandbox.window.Hidamari.create=(...args)=>{run=originalCreate(...args);return run;};
+  vm.runInContext(fs.readFileSync(path.join(root,'skins.js'),'utf8'),vmContext);
   vm.runInContext(fs.readFileSync(path.join(root,'app.js'),'utf8'),vmContext);
   const $=id=>elements.get(id);
   function tick(ms=16){clock+=ms;for(const i of intervals.values())if(clock>=i.next){i.next=clock+i.ms;i.f();}const jobs=[...frames.values()];frames.clear();jobs.forEach(f=>f(clock));assert.equal(depth,0,'balanced canvas saves');for(const a of audio)for(const o of a.oscillators)if(!o.ended&&o.stopAt<=a.currentTime){o.ended=true;o.onended?.();}}
