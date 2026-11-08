@@ -167,15 +167,16 @@ function position(i,t=performance.now()){
 }
 function hasMotion(t=performance.now()){return motions.some((m,i)=>m&&t<m.at+m.duration&&(Math.abs(m.x-(i%7+.5))>1e-8||Math.abs(m.y-(Math.floor(i/7)+.5))>1e-8));}
 function snapshot(){return Array.from({length:49},(_,i)=>position(i));}
-function motionAt(i,p,duration=260){motions[i]={x:p.x,y:p.y,at:performance.now(),duration:duration,fall:duration>500};}
+function motionAt(i,p,duration=260,fall){motions[i]={x:p.x,y:p.y,at:performance.now(),duration:duration,fall:fall??duration>500};}
 function hit(x,y){let best=-1,dist=.56;for(let i=0;i<49;i++){const p=position(i),d=Math.hypot(p.x-x,p.y-y);if(d<dist){best=i;dist=d;}}return best;}
 function inputBoard(){return state;}
 function canInput(){return started&&$('modal').hidden&&state.phase==='play';}
 function movable(i){return Number.isInteger(i)&&i>=0&&i<49;}
-function draw(t){requestAnimationFrame(draw);if(document.hidden)return;now=t;const dt=lastTick===null?0:Math.max(0,t-lastTick);lastTick=t;if(started&&state.phase==='play'&&$('modal').hidden)state.playMs=(state.playMs||0)+dt;if(started&&state.phase==='play'&&!pointer&&selected===null&&$('modal').hidden){if(swapWave||clearReady(t))advanceWave();else if(needsSettle&&!hasMotion(t)&&!E.matches(state.board).length&&!state.board.some(p=>p.pending)){const done=E.settle(state,chainCount);state=done.state;anim=null;needsSettle=false;hud();save();checkEnd();}}
+function draw(t){requestAnimationFrame(draw);if(document.hidden)return;now=t;const dt=lastTick===null?0:Math.max(0,t-lastTick);lastTick=t;if(started&&state.phase==='play'&&$('modal').hidden)state.playMs=(state.playMs||0)+dt;if(started&&state.phase==='play'&&!pointer&&$('modal').hidden){if(swapWave||clearReady(t))advanceWave();else if(needsSettle&&!hasMotion(t)&&!E.matches(state.board).length&&!state.board.some(p=>p.pending)){const done=E.settle(state,chainCount);state=done.state;anim=null;needsSettle=false;hud();save();checkEnd();}}
 $('moves').classList.toggle('chain-open',!!anim||hasMotion(t));ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,size,size);round(0,0,size,size,skin?4:14,skin?'#41515e':'#dfd3b8');
 const b=state.board;let arrived=false;souls=souls.filter(s=>{const i=b.findIndex(p=>p.uid===s.uid);if(i<0)return false;if(t-s.at>=s.duration){pulses.push({i,at:t});arrived=true;return false;}return true;});if(arrived)tone(4,true);
-for(let i=0;i<49;i++){const pos=position(i,t),x=pos.x*tile,y=pos.y*tile,p=pulses.find(p=>p.i===i&&t-p.at<180);const scale=p&&!reduced?1+.1*Math.sin((t-p.at)/180*Math.PI):1;
+pulses=pulses.filter(p=>t-p.at<180);
+for(let i=0;i<49;i++){const pos=position(i,t),x=pos.x*tile,y=pos.y*tile,p=pulses.find(p=>p.i===i&&t>=p.at&&t-p.at<180);const scale=p&&!reduced?1+.1*Math.sin((t-p.at)/180*Math.PI):1;
 if(i===selected||hint?.includes(i)){ctx.strokeStyle=i===selected?'#b7915c':'#c2a35f';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(x-tile/2+3,y-tile/2+3,tile-6,tile-6,tile*.2);ctx.stroke();}
 const age=b[i].age||0,heldAge=souls.filter(s=>s.uid===b[i].uid).reduce((n,s)=>n+s.amount,0),visibleAge=age+heldAge,shake=!reduced&&visibleAge>=20?Math.sin(t*.045+i*7)*Math.min(1.7,(visibleAge-18)*.3):0;gem(heldAge?{...b[i],age:age+heldAge}:b[i],x+shake,y,scale);}
 ghosts=ghosts.filter(g=>t-g.at<240);for(const g of ghosts){const k=Math.min(1,(t-g.at)/110),p={x:g.x+(g.toX-g.x)*k,y:g.y+(g.toY-g.y)*k},fade=Math.max(0,(t-g.at-80)/160);gem(g.p,p.x*tile,p.y*tile,1+.15*fade,1-fade);}
@@ -186,7 +187,7 @@ particles=particles.filter(p=>t-p.at<650);for(const p of particles){const k=(t-p
 function advanceWave(){
  const immediate=swapWave,pair=swapPair;swapWave=false;swapPair=null;
  let result;
- if(immediate&&pair){const readyNow=new Set(landed());readyNow.add(pair[0]);readyNow.add(pair[1]);for(const r of E.matches(state.board))if(r.ids.includes(pair[0])||r.ids.includes(pair[1]))r.ids.forEach(i=>readyNow.add(i));result=E.step(state,chainCount,[...readyNow],true);}
+ if(immediate&&pair){const readyNow=new Set(landed());readyNow.add(pair[0]);readyNow.add(pair[1]);result=E.step(state,chainCount,[...readyNow],true);}
  else result=E.step(state,chainCount,landed());
  if(!result)return;
  const f=result.frames.find(f=>f.kind==='clear'),drop=result.frames.find(f=>f.kind==='drop'),t=performance.now();if(!f||!drop)return;
@@ -197,21 +198,23 @@ function advanceWave(){
  const from=f.clear.reduce((p,i)=>({x:p.x+oldPositions[i].x/f.clear.length,y:p.y+oldPositions[i].y/f.clear.length}),{x:0,y:0});for(const heal of f.heals||[])souls.push({...heal,from,at:t,duration:reduced?150:650});
  flashes.push({at:t,points:f.clear.map(i=>oldPositions[i])});
  const previous=motions;motions=[];
- for(const fall of drop.falling){const source=fall.from*7+fall.to%7;if(fall.from>=0){if(source===fall.to){motions[fall.to]=previous[source];}else motionAt(fall.to,oldPositions[source],Math.min(2000,1000+Math.abs(fall.from-Math.floor(fall.to/7))*130)*speedFactor(drop.state));}else motionAt(fall.to,{x:fall.to%7+.5,y:fall.from+.5},Math.min(2200,1100+(Math.floor(fall.to/7)-fall.from)*130)*speedFactor(drop.state));}
+ const durFor=vd=>Math.max(90,Math.min(2200,(120+vd*260)*speedFactor(drop.state)));
+ for(const fall of drop.falling){const source=fall.from*7+fall.to%7;if(fall.from>=0){if(source===fall.to){motions[fall.to]=previous[source];}else motionAt(fall.to,oldPositions[source],durFor(Math.abs(Math.floor(fall.to/7)+.5-oldPositions[source].y)),true);}else motionAt(fall.to,{x:fall.to%7+.5,y:fall.from+.5},durFor(Math.abs(Math.floor(fall.to/7)-fall.from)),true);}
  needsSettle=true;state=E.copy(drop.state);chainCount=f.chain;lastClearAt=t;hint=null;
  tone(f.chain,f.effects.length>0||f.created.length>0);
- for(const i of f.clear)for(let k=0;k<(reduced?1:(f.count>=4?12:7));k++)particles.push({x:(i%7+.5)*tile,y:(Math.floor(i/7)+.5)*tile,vx:(Math.random()-.5)*tile*2,vy:(Math.random()-.8)*tile*2,r:2+Math.random()*3,col:colors[f.state.board[i].c]||'#ffe29b',at:t});
+ for(const i of f.clear)for(let k=0;k<(reduced?1:(f.count>=4?12:7));k++)particles.push({x:oldPositions[i].x*tile,y:oldPositions[i].y*tile,vx:(Math.random()-.5)*tile*2,vy:(Math.random()-.8)*tile*2,r:2+Math.random()*3,col:colors[f.state.board[i].c]||'#ffe29b',at:t});
  if(particles.length>600)particles.splice(0,particles.length-600);
- pulses=drop.falling.filter(p=>p.from!==Math.floor(p.to/7)).map(p=>({i:p.to,at:t}));
+ for(const p of drop.falling)if(p.from!==Math.floor(p.to/7)&&motions[p.to])pulses.push({i:p.to,at:reduced?t:motions[p.to].at+motions[p.to].duration});
  beams.push(...f.effects.map(e=>({...e,at:t})));if(beams.length>30)beams.splice(0,beams.length-30);
  if(chainCount>1){$('combo').textContent=chainCount+' CHAIN';$('combo').classList.remove('show');void $('combo').offsetWidth;$('combo').classList.add('show');}
+ if(selected!==null&&(f.clear.includes(selected)||drop.falling.some(fl=>fl.from>=0&&fl.from*7+fl.to%7===selected&&fl.to!==selected)))selected=null;
  anim=(E.matches(state.board).length||state.board.some(p=>p.pending))?{state}:null;
  hud();save();
  if(state.relax&&state.phase==='play'&&state.goals.every(n=>!n)&&E.missionDone(state)){state.phase='won';anim=null;motions=[];needsSettle=false;hud();stageClearScreen();}
 
 }
-function play(a,z){if(!canInput()||!movable(a)||!movable(z))return;const during=!!anim||hasMotion(),base=E.copy(state),oldPositions=snapshot();base.ageRate=1+progress(state);hint=null;selected=null;const result=E.swap(base,a,z,during?chainCount:0);
- if(!result){pulses=[{i:a,at:performance.now()},{i:z,at:performance.now()}];return;}
+function play(a,z){if(!canInput()||!movable(a)||!movable(z))return;const grabAt=performance.now(),fallingNow=i=>{const m=motions[i];return m&&m.fall&&grabAt<m.at+m.duration;};if(fallingNow(a)||fallingNow(z)){pulses.push({i:a,at:grabAt});return;}const during=!!anim||hasMotion(),base=E.copy(state),oldPositions=snapshot();base.ageRate=1+progress(state);hint=null;selected=null;const result=E.swap(base,a,z,during?chainCount:0);
+ if(!result){pulses.push({i:a,at:performance.now()},{i:z,at:performance.now()});return;}
  if(!during)chainCount=0;
  needsSettle=true;swapWave=true;swapPair=[a,z];state=E.copy(result.state);motionAt(a,oldPositions[z],140);motionAt(z,oldPositions[a],140);anim={state};hud();save();
 }
@@ -234,7 +237,7 @@ function start(level=0){state=E.enableAging(E.create(level,Date.now(),true));sta
 $('primary').addEventListener('click',()=>modalAction?.());modalAction=()=>{if(saved){state=saved;saved=null;state.runId??=runId();state.runMode??=speed;started=true;$('modal').hidden=true;hud();if(state.phase!=='play'){anim={state,frames:[],index:0};finish();}else playMusic();}else start();};if(saved)$('primary').textContent='続きから';$('secondary').hidden=false;$('secondary').textContent='のんびりステージ';$('secondary').onclick=showStageSelect;$('secondary').classList.add('stage-entry');
 $('retry').addEventListener('click',()=>{if(!started)return;show('やりなおす','新しい盤面にする？','今の盤面を最初から遊びます。','やりなおす',()=>state.relax?startStage(state.level):start(state.level),{label:'このまま続ける',action:()=>{$('modal').hidden=true;checkEnd();}});});
 $('hint').addEventListener('click',()=>{if(!started||!$('modal').hidden)return;hint=E.moves(state.board)[0]||null;selected=null;});
-$('help').addEventListener('click',()=>{show('遊び方','3つそろえるだけ。','隣同士をスワイプして入れ替え。\n連鎖中も盤面全体を操作できます。\n4つ：一列を消すピース。\n5つ：好きな色を全部消すピース。\n時間も手数も制限なし。\nのんびりステージではフルーツは傷まず、手数も無制限です。','戻る',()=>{$('modal').hidden=started;if(started)checkEnd();if(!started)show('つなげて、はじける。','Fruits Fever','傷む前に消して、大連鎖。','はじめる',()=>start(),{label:'のんびりステージ',action:showStageSelect});});});
+$('help').addEventListener('click',()=>{show('遊び方','3つそろえるだけ。','隣同士をスワイプして入れ替え。\n連鎖中も操作できます（落ちている最中のピースは、着地してから動かせます）。\n4つ：一列を消すピース。\n5つ：好きな色を全部消すピース。\n時間も手数も制限なし。\nのんびりステージではフルーツは傷まず、手数も無制限です。','戻る',()=>{$('modal').hidden=started;if(started)checkEnd();if(!started)show('つなげて、はじける。','Fruits Fever','傷む前に消して、大連鎖。','はじめる',()=>start(),{label:'のんびりステージ',action:showStageSelect});});});
 $('fall-speed').addEventListener('click',()=>{const t=performance.now(),old=speedFactor();speed=(speed+1)%speeds.length;if(started&&state.phase==='play')state.runMode=Math.min(state.runMode??speed,speed);for(let i=0;i<motions.length;i++){const m=motions[i];if(!m?.fall||t>=m.at+m.duration)continue;const p=position(i,t),remaining=(m.at+m.duration-t)*speedFactor()/old;motions[i]={x:p.x,y:p.y,at:t,duration:remaining,fall:true};}try{localStorage.setItem('fruits-fever-difficulty',String(speed));}catch{}updateSkin();});
 $('sound').addEventListener('click',()=>{muted=!muted;try{localStorage.setItem('hidamari-muted',muted?'1':'0');}catch{}if(muted){music.stop();audio?.suspend().catch(()=>{});}else if(state.phase==='play'||!started)playMusic();hud();});
 function cell(e){const r=canvas.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*7,y=(e.clientY-r.top)/r.height*7;if(x<0||y<0||x>=7||y>=7)return -1;return hit(x,y);}
