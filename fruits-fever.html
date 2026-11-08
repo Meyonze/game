@@ -213,7 +213,7 @@ function advanceWave(){
  if(state.relax&&state.phase==='play'&&state.goals.every(n=>!n)&&E.missionDone(state)){state.phase='won';anim=null;motions=[];needsSettle=false;hud();stageClearScreen();}
 
 }
-function play(a,z){if(!canInput()||!movable(a)||!movable(z))return;const grabAt=performance.now(),fallingNow=i=>{const m=motions[i];return m&&m.fall&&grabAt<m.at+m.duration;};if(fallingNow(a)||fallingNow(z)){pulses.push({i:a,at:grabAt});return;}const during=!!anim||hasMotion(),base=E.copy(state),oldPositions=snapshot();base.ageRate=1+progress(state);hint=null;selected=null;const result=E.swap(base,a,z,during?chainCount:0);
+function play(a,z){if(!canInput()||!movable(a)||!movable(z))return;const grabAt=performance.now(),fallingNow=i=>{const m=motions[i];if(!m||!m.fall||grabAt>=m.at+m.duration)return false;const p=position(i,grabAt);return Math.hypot(p.x-(i%7+.5),p.y-(Math.floor(i/7)+.5))>.6;};if(fallingNow(a)||fallingNow(z)){pulses.push({i:a,at:grabAt});return;}const motionEnd=Math.max(0,...motions.filter(Boolean).map(m=>m.at+m.duration)),during=!!anim||hasMotion()||(chainCount>0&&grabAt<Math.max(lastClearAt,motionEnd)+1000),base=E.copy(state),oldPositions=snapshot();base.ageRate=1+progress(state);hint=null;selected=null;const result=E.swap(base,a,z,during?chainCount:0);
  if(!result){pulses.push({i:a,at:performance.now()},{i:z,at:performance.now()});return;}
  if(!during)chainCount=0;
  needsSettle=true;swapWave=true;swapPair=[a,z];state=E.copy(result.state);motionAt(a,oldPositions[z],140);motionAt(z,oldPositions[a],140);anim={state};hud();save();
