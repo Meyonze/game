@@ -1,5 +1,6 @@
 import * as T from '../neon-rift-duel/vendor/three.module.js';
 const C={ink:'#241b26',red:'#e74d40',deep:'#ae3038',cream:'#ffe5b3',brown:'#85513d',tan:'#ca8a59',gold:'#ffc34c',cloth:'#38303e',pink:'#c58a67'};
+export const STRIKE_DURATION=1.5;
 export function buildAkamaru(){
  const root=new T.Group();root.name='AKAMARU';const body=new T.Group();root.add(body);const outlines=[],materials=[],parts={};
  const gradient=new T.DataTexture(new Uint8Array([85,170,255]),3,1,T.RedFormat);gradient.minFilter=gradient.magFilter=T.NearestFilter;gradient.generateMipmaps=false;gradient.needsUpdate=true;
@@ -25,8 +26,8 @@ export function buildAkamaru(){
   const hip=group(body,[side*.39,1.15,.02]);parts[side<0?'legR':'legL']=hip;
   ball(hip,'cloth',[0,-.22,0],[.25,.36,.25]);const knee=group(hip,[0,-.42,0]);parts[side<0?'kneeR':'kneeL']=knee;
   ball(knee,'red',[0,-.02,.16],[.28,.20,.17]);ball(knee,'cream',[0,-.25,0],[.24,.3,.24]);
-  const foot=group(knee,[0,-.45,.16]);ball(foot,'cloth',[0,0,0],[.36,.25,.52]);ball(foot,'cream',[0,.045,.16],[.33,.21,.39]);
-  line(foot,[[-.15,.15,.44],[-.15,.10,.49],[-.15,.01,.51]],'brown',.012);line(foot,[[.13,.15,.44],[.13,.10,.49],[.13,.01,.51]],'brown',.012);
+  const foot=group(knee,[0,-.45,0]);parts[side<0?'footR':'footL']=foot;const shoe=group(foot,[0,0,.16]);ball(shoe,'cloth',[0,0,0],[.36,.25,.52]);ball(shoe,'cream',[0,.045,.16],[.33,.21,.39]);
+  line(shoe,[[-.15,.15,.44],[-.15,.10,.49],[-.15,.01,.51]],'brown',.012);line(shoe,[[.13,.15,.44],[.13,.10,.49],[.13,.01,.51]],'brown',.012);
  }
  // Tail is one continuous striped curved surface, not a stack of primitives.
  const tail=group(body,[0,1.25,-.35]);parts.tail=tail;
@@ -36,15 +37,15 @@ export function buildAkamaru(){
  const tailGeo=new T.BufferGeometry();tailGeo.setAttribute('position',new T.Float32BufferAttribute(positions,3));tailGeo.setAttribute('normal',new T.Float32BufferAttribute(normals,3));tailGeo.setAttribute('color',new T.Float32BufferAttribute(colors,3));tailGeo.setIndex(indices);add(tail,tailGeo,material('#ffffff',true));
  // Arms with shoulder and elbow pivots for the strike animation.
  for(const side of [-1,1]){
-  const arm=group(body,[side*.78,2.19,0]);parts[side<0?'armR':'armL']=arm;arm.rotation.z=side*.22;
+  const arm=group(body,[side*.72,2.19,.06]);parts[side<0?'armR':'armL']=arm;arm.rotation.z=side*.22;
   ball(arm,'cloth',[side*.05,-.2,0],[.23,.36,.24]);const pad=ball(arm,'red',[side*.1,.0,.01],[.39,.28,.37]);pad.rotation.z=side*.12;ball(arm,'cream',[side*.1,.07,.30],[.30,.07,.075],false);
-  const elbow=group(arm,[side*.08,-.43,0]);parts[side<0?'elbowR':'elbowL']=elbow;
+  const elbow=group(arm,[0,-.53,0]);parts[side<0?'elbowR':'elbowL']=elbow;
   ball(elbow,'deep',[0,-.16,0],[.28,.30,.29]);ball(elbow,'red',[0,-.12,.19],[.25,.24,.12]);line(elbow,[[-.19,-.18,.29],[0,-.18,.32],[.19,-.18,.29]],'deep',.017);
-  const hand=group(elbow,[0,-.43,.025]);parts[side<0?'handR':'handL']=hand;ball(hand,'cloth',[0,0,0],[.26,.25,.24]);ball(hand,'brown',[side*-.18,0,.14],[.11,.16,.12]);
+  const hand=group(elbow,[0,-.55,0]);hand.scale.setScalar(.85);parts[side<0?'handR':'handL']=hand;ball(hand,'cloth',[0,0,0],[.26,.25,.24]);ball(hand,'brown',[side*-.18,0,.14],[.11,.16,.12]);
  }
  // Short, broad curved blade. Ivory cutting edge and a dark blade face.
- const sword=group(parts.handR,[0,-.05,.13]);parts.sword=sword;sword.rotation.z=2.55;sword.rotation.y=-.15;
- ball(sword,'cloth',[0,.06,0],[.105,.24,.10]);for(let i=0;i<3;i++)line(sword,[[-.07,-.06+i*.09,.09],[.07,.02+i*.09,.09]],'tan',.016);
+ const sword=group(body,[0,1.9,.64]);parts.sword=sword;sword.rotation.z=2.55;sword.rotation.y=-.15;
+ ball(sword,'cloth',[0,-.06,0],[.10,.36,.10]);for(let i=0;i<5;i++)line(sword,[[-.07,-.29+i*.10,.09],[.07,-.21+i*.10,.09]],'tan',.016);
  const guard=add(sword,new T.TorusGeometry(.20,.055,10,40),'gold',[0,.29,0],[1,1,.75]);guard.rotation.x=Math.PI/2;
  const bladePoints=[[-.12,.34],[.13,.34],[.15,1.2],[.36,1.58],[.07,1.5],[-.12,1.24]];
  add(sword,shape(bladePoints,.065,.025),'cream');add(sword,shape([[-.075,.38],[.095,.38],[.10,1.19],[.22,1.43],[.05,1.35],[-.075,1.19]],.012,.007),'cloth',[0,0,.055],[1,1,1],false);add(sword,shape([[-.075,.38],[.095,.38],[.10,1.19],[.22,1.43],[.05,1.35],[-.075,1.19]],.012,.007),'cloth',[0,0,-.055],[1,1,1],false);
@@ -80,17 +81,54 @@ export function buildAkamaru(){
   add(ribbon,shape([[0,.11],[-.55,.30],[-1.23,.38],[-1.62,.15],[-1.25,.08],[-1.42,-.19],[-.68,-.10],[0,-.15]],.055,.035),'red',[0,0,-i*.13]);line(ribbon,[[-.12,0,.055],[-.7,.05,.055],[-1.16,.18,.055]],'deep',.016);
  }
  const knot=group(body,[.59,2.31,.62]);for(let i=0;i<4;i++){const a=i*Math.PI/2,m=ball(knot,'gold',[Math.sin(a)*.15,Math.cos(a)*.15,0],[.105,.15,.065]);m.rotation.z=-a;}ball(knot,'gold',[0,0,.07],[.105,.105,.06]);
- let time=0,slashTime=-1;
- function update(dt,{run=0,strike=false}={}){
-  time+=dt;if(strike&&slashTime<0)slashTime=0;if(slashTime>=0){slashTime+=dt;if(slashTime>1.05)slashTime=-1;}
-  const gait=time*10,bob=Math.sin(time*2.3)*.025;body.position.y=bob+Math.abs(Math.sin(gait))*run*.07;body.rotation.x=run*.10;body.rotation.y=0;
-  parts.head.rotation.set(Math.sin(time*1.8)*.025,Math.sin(time*.8)*.055,Math.sin(time*1.4)*.018);
-  for(const side of [-1,1]){const suffix=side<0?'R':'L',phase=gait+(side<0?0:Math.PI);parts['leg'+suffix].rotation.x=Math.sin(phase)*.65*run;parts['knee'+suffix].rotation.x=Math.max(0,-Math.sin(phase))*.62*run;parts['arm'+suffix].rotation.set(-Math.sin(phase)*.5*run,0,side*(.22+run*.05));parts['elbow'+suffix].rotation.x=-.12-run*.2;}
-  parts.tail.rotation.y=Math.sin(time*2.5)*(.12+run*.14);parts.tail.rotation.x=Math.sin(gait)*run*.08;parts.ribbon0.rotation.y=.12+Math.sin(time*4)*.12+run*.25;parts.ribbon1.rotation.y=-.32+Math.sin(time*4-1)*.14+run*.3;parts.ribbon0.rotation.z=run*-.18;parts.ribbon1.rotation.z=run*-.25;
-  parts.sword.rotation.set(0,-.15,2.55);
-  if(slashTime>=0){const t=slashTime;let swing;if(t<.26)swing=T.MathUtils.smoothstep(t,0,.26);else if(t<.49)swing=1-T.MathUtils.smoothstep(t,.26,.49)*2;else swing=-1+T.MathUtils.smoothstep(t,.49,1.05);body.rotation.y=-swing*.62;parts.armR.rotation.set(-.65-Math.max(0,swing)*.6,-swing*1.1,-.25-swing*.85);parts.elbowR.rotation.x=-.6;parts.sword.rotation.z=1.45;parts.head.rotation.y=swing*.18;parts.armL.rotation.x=.45;body.position.y-=Math.sin(Math.min(1,t/.8)*Math.PI)*.12;}
-  root.updateMatrixWorld(true);return {striking:slashTime>=0,slash:slashTime,tip:parts.bladeTip.getWorldPosition(new T.Vector3()),hand:parts.handR.getWorldPosition(new T.Vector3())};
+ // Author the weapon first, then solve both arms onto its handle. The blade's
+ // cutting edge stays in the cutting plane; wrists never spin it independently.
+ const bladeBase=new T.Object3D();bladeBase.position.set(0,.34,0);sword.add(bladeBase);parts.bladeBase=bladeBase;
+ const down=new T.Vector3(0,-1,0),xAxis=new T.Vector3(1,0,0),yAxis=new T.Vector3(0,1,0),zAxis=new T.Vector3(0,0,1);
+ const gripR=new T.Vector3(0,.13,0),gripL=new T.Vector3(0,-.29,0);
+ const poses=[
+  {t:0, p:[0,1.90,.64],pitch:1.14,tilt:.06,yaw:0,drop:0,step:0},
+  {t:.25,p:[-.16,2.47,.73],pitch:.22,tilt:.50,yaw:-.12,drop:-.035,step:-.035},
+  {t:.40,p:[-.16,2.48,.73],pitch:.20,tilt:.50,yaw:-.14,drop:-.045,step:0},
+  {t:.60,p:[-.05,1.85,.55],pitch:2.10,tilt:.50,yaw:.13,drop:-.055,step:.27},
+  {t:.88,p:[-.05,1.85,.55],pitch:2.10,tilt:.50,yaw:.13,drop:-.055,step:.27},
+  {t:1.50,p:[0,1.90,.64],pitch:1.14,tilt:.06,yaw:0,drop:0,step:0}
+ ];
+ function poseAt(t){let a=poses[0],b=poses[1];for(let i=1;i<poses.length;i++){a=poses[i-1];b=poses[i];if(t<=b.t)break;}const u=T.MathUtils.smoothstep(t,a.t,b.t),out={p:a.p.map((v,i)=>T.MathUtils.lerp(v,b.p[i],u))};for(const key of['pitch','tilt','yaw','drop','step'])out[key]=T.MathUtils.lerp(a[key],b[key],u);return out;}
+ function armIK(side,target,weaponQuaternion){
+  const suffix=side<0?'R':'L',arm=parts['arm'+suffix],elbow=parts['elbow'+suffix],hand=parts['hand'+suffix],start=arm.position;
+  const to=target.clone().sub(start),distance=to.length(),axis=to.clone().normalize(),length=.53,lower=.55;
+  const d=T.MathUtils.clamp(distance,.03,length+lower-.0001),a=(length*length-lower*lower+d*d)/(2*d),h=Math.sqrt(Math.max(0,length*length-a*a));
+  const pole=new T.Vector3(side*1.35,1.55,.55).sub(start),bend=pole.addScaledVector(axis,-pole.dot(axis)).normalize();
+  const joint=start.clone().addScaledVector(axis,a).addScaledVector(bend,h),upperQ=new T.Quaternion().setFromUnitVectors(down,joint.clone().sub(start).normalize()),lowerQ=new T.Quaternion().setFromUnitVectors(down,target.clone().sub(joint).normalize());
+  arm.quaternion.copy(upperQ);elbow.quaternion.copy(upperQ).invert().multiply(lowerQ);hand.quaternion.copy(lowerQ).invert().multiply(weaponQuaternion);
  }
+ // Plant the feet while the hips load and the right foot makes a short step.
+ function plantLeg(side,step,drop,lift){
+  const suffix=side<0?'R':'L',hip=parts['leg'+suffix],knee=parts['knee'+suffix],foot=parts['foot'+suffix];
+  const ankle=new T.Vector3(side*.39,.28+lift,.02+(side<0?step:0)).sub(body.position).applyQuaternion(body.quaternion.clone().invert()),start=hip.position,to=ankle.clone().sub(start),axis=to.clone().normalize(),d=Math.min(to.length(),.8699),a=(.42*.42-.45*.45+d*d)/(2*d),h=Math.sqrt(Math.max(0,.42*.42-a*a));
+  const pole=new T.Vector3(0,0,1).addScaledVector(axis,-axis.z).normalize(),joint=start.clone().addScaledVector(axis,a).addScaledVector(pole,h),q1=new T.Quaternion().setFromUnitVectors(down,joint.clone().sub(start).normalize()),q2=new T.Quaternion().setFromUnitVectors(down,ankle.clone().sub(joint).normalize());
+  hip.quaternion.copy(q1);knee.quaternion.copy(q1).invert().multiply(q2);foot.position.set(0,-.45,0);foot.quaternion.copy(q2).invert().multiply(body.quaternion.clone().invert());
+ }
+ let time=0,slashTime=-1,runWeight=0;
+ function update(dt,{run=0,strike=false}={}){
+  time+=dt;if(strike&&slashTime<0)slashTime=0;else if(slashTime>=0){slashTime+=dt;if(slashTime>=STRIKE_DURATION)slashTime=-1;}
+  const striking=slashTime>=0,pose=poseAt(striking?slashTime:0),gait=time*10;
+  runWeight=T.MathUtils.damp(runWeight,striking?0:run,12,dt);
+  const bob=Math.sin(time*2.3)*.015*(striking?0:1),runBob=Math.abs(Math.sin(gait))*runWeight*.06;
+  body.position.set(0,bob+runBob+pose.drop,striking?pose.step*.12:0);body.rotation.set(runWeight*.06,pose.yaw,0);
+  parts.head.rotation.set(Math.sin(time*1.8)*.015*(striking?0:1),-pose.yaw*.65,0);
+  for(const side of [-1,1]){const suffix=side<0?'R':'L',phase=gait+(side<0?0:Math.PI);parts['leg'+suffix].rotation.set(Math.sin(phase)*.65*runWeight,0,0);parts['knee'+suffix].rotation.set(Math.max(0,-Math.sin(phase))*.62*runWeight,0,0);parts['foot'+suffix].rotation.set(0,0,0);}
+  if(striking){const lift=slashTime>.40&&slashTime<.60?Math.sin((slashTime-.40)/.20*Math.PI)*.06:slashTime>.88?Math.sin((slashTime-.88)/.62*Math.PI)*.04:0;plantLeg(-1,pose.step,body.position.y,lift);plantLeg(1,0,body.position.y,0);}
+  sword.position.set(...pose.p);sword.position.y+=Math.sin(gait)*runWeight*.025;
+  sword.quaternion.setFromAxisAngle(zAxis,pose.tilt).multiply(new T.Quaternion().setFromAxisAngle(xAxis,pose.pitch)).multiply(new T.Quaternion().setFromAxisAngle(yAxis,-Math.PI/2));
+  for(const side of [-1,1]){const grip=(side<0?gripR:gripL).clone().applyQuaternion(sword.quaternion).add(sword.position);armIK(side,grip,sword.quaternion);}
+  parts.tail.rotation.y=Math.sin(time*2.5)*(.10+runWeight*.12)-pose.yaw*.35;parts.tail.rotation.x=Math.sin(gait)*runWeight*.06;
+  parts.ribbon0.rotation.y=.12+Math.sin(time*4)*.08+runWeight*.25-pose.yaw*.5;parts.ribbon1.rotation.y=-.32+Math.sin(time*4-1)*.1+runWeight*.3-pose.yaw*.4;parts.ribbon0.rotation.z=runWeight*-.18;parts.ribbon1.rotation.z=runWeight*-.25;
+  root.updateMatrixWorld(true);
+  return {striking,slash:slashTime,cutting:slashTime>=.40&&slashTime<=.60,phase:!striking?'構え':slashTime<.40?'振りかぶり':slashTime<=.60?'斬り下ろし':slashTime<.88?'残心':'構えへ',tip:parts.bladeTip.getWorldPosition(new T.Vector3()),hand:bladeBase.getWorldPosition(new T.Vector3())};
+ }
+
  function setOutline(pixels){edgeMat.uniforms.thickness.value=pixels;for(const o of outlines)o.visible=pixels>0;}
- return {root,parts,update,setOutline,resize:(w,h)=>edgeMat.uniforms.resolution.value.set(w,h),materials,gradient,edgeMat};
+ return {root,parts,update,setOutline,get isStriking(){return slashTime>=0;},resize:(w,h)=>edgeMat.uniforms.resolution.value.set(w,h),materials,gradient,edgeMat};
 }
