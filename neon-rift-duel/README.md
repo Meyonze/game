@@ -11,7 +11,13 @@ Japanese third-person 1v1 mech combat. Choose crimson AKATSUKI (RONIN / 04, mele
 - Touch: left stick plus labeled action buttons
 - FX: change rendering quality; SOUND: toggle synthesized audio
 
-The hangar previews both animated models. Combat includes attack anticipation, perfect guards, invulnerability during boosts, energy and weapon heat, cover collision, swept projectile collision, AI movement and attacks, a timed result, rematches, and browser-local victory counts.
+The hangar previews both animated models and offers PILOT (default, longer warnings) and ACE (faster, stronger rival). Combat includes attack anticipation, perfect guards, invulnerability during boosts, energy and weapon heat, cover collision, swept projectile collision, announced AI volleys with recovery windows, a timed result, rematches, and browser-local victory counts.
+
+## Combat revision
+
+Rival attacks follow approach → warning → attack → recovery. The HUD and an orange ground ring announce the next attack. PILOT gives 1.05 seconds of warning and 1.8 seconds of recovery; ACE uses 0.7 / 1.1 seconds. Rival armor scales by difficulty so duels last long enough to use the mechanics. Player shots lead moving targets using flight time, while slower enemy shots can be evaded.
+
+Hits build BREAK on the rival (shots 4, plasma 24, melee 30; perfect melee guard adds 65). A full gauge disables the rival for 2.8 seconds on PILOT / 2 seconds on ACE. During BREAK, melee deals 1.75× and other damage 1.4×. Breaking restores up to 60 player armor and 20 overdrive charge. The player starts at 35 charge. Melee lunges from within 11 m, with a short input buffer. Dash costs 20 energy, grants 0.36 seconds of invulnerability and can escape hit stagger. Normal melee no longer cancels a rival's announced attack; BREAK does.
 
 ## Implementation and assets
 
@@ -23,9 +29,9 @@ Lighting includes an HDR environment, shadows, an eclipse skyline, and optional 
 
 ## Validation
 
-Run `node tests/combat.mjs`, `node tests/models.mjs`, and `node tests/controller.mjs`.
+Run `node tests/combat.mjs`, `node tests/models.mjs`, `node tests/controller.mjs`, and `node tests/balance.mjs`.
 
-Combat checks cover damage, guard/parry timing, melee anticipation, boost cost and invulnerability, projectiles and cover, jump landing, arena collisions, pause, restart, defeat and time-limit draws. Both frames' win tests use a stationary opponent to verify damage and progression; they do not establish difficulty or balance.
+Combat checks cover damage, guard/parry timing, melee anticipation, boost cost and invulnerability, projectiles and cover, jump landing, arena collisions, pause, restart, defeat and time-limit draws. Both frames' win tests use a stationary opponent to verify damage and progression; they only establish damage/progression. The additional balance suite retains the actual AI and runs 24 deterministic seeds for both frames, both difficulties and four input policies (384 bouts). It checks an idle pilot cannot win, simple active play usually wins on PILOT, and movement / close follow-ups offer benefits. This is simulation evidence, not a human playtest or proof that the game feels fun.
 
 Model checks parse both real GLBs, verify skeleton references, exercise seven motion states, and check finite transforms and bounds. Controller checks cover loading, selection, deployment, countdown, desktop/portrait camera projection, pause, guide, result, rematch and navigation.
 
