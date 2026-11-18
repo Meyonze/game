@@ -47,9 +47,28 @@ export function buildAkamaru(){
  const sword=group(body,[0,1.9,.64]);parts.sword=sword;sword.rotation.z=2.55;sword.rotation.y=-.15;
  ball(sword,'cloth',[0,-.06,0],[.10,.36,.10]);for(let i=0;i<5;i++)line(sword,[[-.07,-.29+i*.10,.09],[.07,-.21+i*.10,.09]],'tan',.016);
  const guard=add(sword,new T.TorusGeometry(.20,.055,10,40),'gold',[0,.29,0],[1,1,.75]);guard.rotation.x=Math.PI/2;
- const bladePoints=[[-.12,.34],[.13,.34],[.15,1.2],[.36,1.58],[.07,1.5],[-.12,1.24]];
- add(sword,shape(bladePoints,.065,.025),'cream');add(sword,shape([[-.075,.38],[.095,.38],[.10,1.19],[.22,1.43],[.05,1.35],[-.075,1.19]],.012,.007),'cloth',[0,0,.055],[1,1,1],false);add(sword,shape([[-.075,.38],[.095,.38],[.10,1.19],[.22,1.43],[.05,1.35],[-.075,1.19]],.012,.007),'cloth',[0,0,-.055],[1,1,1],false);
- const bladeTip=new T.Object3D();bladeTip.position.set(.25,1.48,0);sword.add(bladeTip);parts.bladeTip=bladeTip;
+ // +X is the cutting side. Sori bends toward the -X spine, away from
+ // the edge. A separate tapered bevel makes the sharpened side unambiguous.
+ const bladePositions=[],bladeIndices=[],bladeGroups=[],bladeSections=[];
+ const stations=40,ringSize=5;
+ for(let i=0;i<=stations;i++){
+  const t=i/stations,y=.34+1.44*t,spine=-.10-.22*t*t;
+  const tipT=T.MathUtils.clamp((t-.82)/.18,0,1),width=.20*(1-.18*t)*(1-tipT),thickness=(1-tipT)*.035;
+  const section=[[spine,y,thickness*.65],[spine+width*.48,y,thickness],[spine+width,y,0],[spine+width*.48,y,-thickness],[spine,y,-thickness*.65]];
+  bladeSections.push({y,spine,edge:spine+width});
+  for(const v of section)bladePositions.push(...v);
+ }
+ for(let side=0;side<ringSize;side++){
+  const offset=bladeIndices.length;
+  for(let i=0;i<stations;i++){const a=i*ringSize+side,b=i*ringSize+(side+1)%ringSize,c=b+ringSize,d=a+ringSize;bladeIndices.push(a,b,d);if(i<stations-1)bladeIndices.push(b,c,d);}
+  bladeGroups.push({start:offset,count:bladeIndices.length-offset,material:side===1||side===2?1:0});
+ }
+ const bladeGeometry=new T.BufferGeometry();bladeGeometry.setAttribute('position',new T.Float32BufferAttribute(bladePositions,3));bladeGeometry.setIndex(bladeIndices);bladeGeometry.computeVertexNormals();
+ for(const g of bladeGroups)bladeGeometry.addGroup(g.start,g.count,g.material);
+ // Match the existing ivory/ink palette, but put ivory only on the cutting bevel.
+ const blade=add(sword,bladeGeometry,[mats.cloth,mats.cream],[0,0,0],[1,1,1],true,'katana-blade');parts.blade=blade;
+ blade.userData.sections=bladeSections;
+ const bladeTip=new T.Object3D();bladeTip.position.set(-.32,1.78,0);sword.add(bladeTip);parts.bladeTip=bladeTip;
  // Large expressive face. Eye patches and muzzle remain smooth geometry at every angle.
  const head=group(body,[0,2.95,.04]);parts.head=head;
  ball(head,'brown',[0,0,0],[.97,.78,.75]);ball(head,'cream',[0,-.13,.55],[.79,.59,.30]);
@@ -91,13 +110,31 @@ export function buildAkamaru(){
  const gripR=new T.Vector3(0,.13,0),gripL=new T.Vector3(0,-.29,0);
  const poses=[
   {t:0, p:[-.02,1.88,.69],pitch:1.12,tilt:.08,yaw:-.34,chest:.16,lean:.10,drop:-.34,step:0,shift:0},
-  {t:.25,p:[-.16,2.42,.75],pitch:.22,tilt:.50,yaw:-.46,chest:.05,lean:.07,drop:-.37,step:0,shift:-.035},
-  {t:.40,p:[-.16,2.44,.75],pitch:.20,tilt:.50,yaw:-.42,chest:.10,lean:.07,drop:-.37,step:.04,shift:0},
-  {t:.60,p:[-.05,1.85,.55],pitch:2.10,tilt:.50,yaw:.04,chest:.22,lean:.14,drop:-.38,step:.24,shift:.16},
-  {t:.88,p:[-.05,1.85,.55],pitch:2.10,tilt:.50,yaw:.04,chest:.22,lean:.14,drop:-.38,step:.24,shift:.16},
+  {t:.10,p:[-.02,1.80,1.24],pitch:1.12,tilt:.10,yaw:-.38,chest:.12,lean:.08,drop:-.35,step:0,shift:-.01},
+  {t:.25,p:[-.04,2.38,1.32],pitch:.65,tilt:.30,yaw:-.46,chest:.05,lean:.07,drop:-.37,step:0,shift:-.035},
+  {t:.40,p:[-.04,2.40,1.32],pitch:.63,tilt:.30,yaw:-.42,chest:.10,lean:.07,drop:-.37,step:.04,shift:0},
+  {t:.52,p:[-.04,1.87,1.22],pitch:1.64,tilt:.42,yaw:-.10,chest:.19,lean:.12,drop:-.38,step:.17,shift:.11},
+  {t:.60,p:[-.05,1.73,.64],pitch:2.10,tilt:.50,yaw:.04,chest:.22,lean:.14,drop:-.38,step:.24,shift:.16},
+  {t:.88,p:[-.05,1.73,.64],pitch:2.10,tilt:.50,yaw:.04,chest:.22,lean:.14,drop:-.38,step:.24,shift:.16},
   {t:1.50,p:[-.02,1.88,.69],pitch:1.12,tilt:.08,yaw:-.34,chest:.16,lean:.10,drop:-.34,step:0,shift:0}
  ];
- function poseAt(t){let a=poses[0],b=poses[1];for(let i=1;i<poses.length;i++){a=poses[i-1];b=poses[i];if(t<=b.t)break;}const u=T.MathUtils.smoothstep(t,a.t,b.t),out={p:a.p.map((v,i)=>T.MathUtils.lerp(v,b.p[i],u))};for(const key of['pitch','tilt','yaw','chest','lean','drop','step','shift'])out[key]=T.MathUtils.lerp(a[key],b[key],u);return out;}
+ function poseAt(t){
+  let i=1;while(i<poses.length-1&&t>poses[i].t)i++;
+  const a=poses[i-1],b=poses[i],span=b.t-a.t,u=T.MathUtils.clamp((t-a.t)/span,0,1);
+  const value=(pose,key,j)=>j===undefined?pose[key]:pose[key][j];
+  function interpolate(key,j){
+   const av=value(a,key,j),bv=value(b,key,j);
+   // Preserve velocity through the clearance waypoint inside the cut. Other
+   // poses deliberately settle; stopping halfway down would look like two cuts.
+   function slope(index){
+    if(poses[index].t!==.52)return 0;
+    const prev=poses[index-1],mid=poses[index],next=poses[index+1],l=(value(mid,key,j)-value(prev,key,j))/(mid.t-prev.t),r=(value(next,key,j)-value(mid,key,j))/(next.t-mid.t);
+    return l*r>0?2*l*r/(l+r):0;
+   }
+   return (2*u*u*u-3*u*u+1)*av+(u*u*u-2*u*u+u)*span*slope(i-1)+(-2*u*u*u+3*u*u)*bv+(u*u*u-u*u)*span*slope(i);
+  }
+  const out={p:[0,1,2].map(j=>interpolate('p',j))};for(const key of['pitch','tilt','yaw','chest','lean','drop','step','shift'])out[key]=interpolate(key);return out;
+ }
  function armIK(side,target,weaponQuaternion){
   const suffix=side<0?'R':'L',arm=parts['arm'+suffix],elbow=parts['elbow'+suffix],hand=parts['hand'+suffix],start=arm.position;
   const to=target.clone().sub(start),distance=to.length(),axis=to.clone().normalize(),length=.53,lower=.55;
@@ -133,8 +170,12 @@ export function buildAkamaru(){
   parts.head.rotation.set(-pose.lean*.65+Math.sin(time*1.8)*.008*(striking?0:1),-body.rotation.y-chest.rotation.y,0);
   const lift=striking&&slashTime>.25&&slashTime<.60?Math.sin((slashTime-.25)/.35*Math.PI)*.055:striking&&slashTime>.88?Math.sin((slashTime-.88)/.62*Math.PI)*.04:0;
   plantLeg(-1,pose.step,lift,runWeight,gait);plantLeg(1,0,0,runWeight,gait);
-  sword.position.set(...pose.p);sword.position.y+=Math.sin(gait)*runWeight*.025;
+  sword.position.set(...pose.p);sword.position.y+=Math.sin(gait)*runWeight*.025-runWeight*.08;sword.position.z+=runWeight*.13;
   sword.quaternion.setFromAxisAngle(zAxis,pose.tilt).multiply(new T.Quaternion().setFromAxisAngle(xAxis,pose.pitch)).multiply(new T.Quaternion().setFromAxisAngle(yAxis,-Math.PI/2));
+  // The shoulder girdle reaches forward with the lift; do not extend the
+  // forearms or pull the weapon back through the oversized head.
+  const reach=striking?T.MathUtils.smoothstep(slashTime,0,.10)*(1-T.MathUtils.smoothstep(slashTime,.52,.70)):0;
+  for(const side of [-1,1])parts[side<0?'armR':'armL'].position.set(side*(.72-.14*reach),.69+.08*reach,.06+.40*reach+runWeight*.08);
   const chestInverse=chest.quaternion.clone().invert(),gripRotation=chestInverse.clone().multiply(sword.quaternion);
   for(const side of [-1,1]){const grip=(side<0?gripR:gripL).clone().applyQuaternion(sword.quaternion).add(sword.position).sub(chest.position).applyQuaternion(chestInverse);armIK(side,grip,gripRotation);}
   parts.tail.rotation.y=Math.sin(time*2.5)*(.10+runWeight*.12)-pose.yaw*.35;parts.tail.rotation.x=Math.sin(gait)*runWeight*.06;

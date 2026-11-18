@@ -1,5 +1,5 @@
 import * as T from '../neon-rift-duel/vendor/three.module.js';
-import {buildAkamaru,STRIKE_DURATION} from './character.js?v=stance-2';
+import {buildAkamaru,STRIKE_DURATION} from './character.js?v=blade-3';
 const $=id=>document.getElementById(id),canvas=$('stage'),status=$('status');
 try{
  const renderer=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.NoToneMapping;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
@@ -25,7 +25,7 @@ try{
  $('idle').onclick=()=>setMode('idle');$('run').onclick=()=>setMode('run');$('slash').onclick=slash;for(const v of['front','side','back','follow'])$(v).onclick=()=>setView(v);$('reset').onclick=()=>{setView('front');setMode('idle');motionPaused=false;$('pause').textContent='停止';$('pause').setAttribute('aria-pressed','false');};
  $('rotate').onclick=()=>{if(view==='follow')setView('front');autoRotate=!autoRotate;$('rotate').textContent=autoRotate?'ON':'OFF';$('rotate').setAttribute('aria-pressed',String(autoRotate));};
  $('outline').oninput=()=>{const value=Number($('outline').value);hero.setOutline(value);$('outlineValue').textContent=value.toFixed(1)+' px';};
- $('shading').onclick=()=>{toon=!toon;$('shading').textContent=toon?'セル調 / 3段階':'なめらかな陰影';$('shading').setAttribute('aria-pressed',String(toon));hero.root.traverse(m=>{if(m.isMesh&&m.name!=='outline'){const source=toon?smoothMaterials:hero.materials,index=source.indexOf(m.material);if(index>=0)m.material=(toon?hero.materials:smoothMaterials)[index];}});};
+ $('shading').onclick=()=>{toon=!toon;$('shading').textContent=toon?'セル調 / 3段階':'なめらかな陰影';$('shading').setAttribute('aria-pressed',String(toon));hero.root.traverse(m=>{if(m.isMesh&&m.name!=='outline'){const source=toon?smoothMaterials:hero.materials,target=toon?hero.materials:smoothMaterials;const swap=mat=>{const index=source.indexOf(mat);return index>=0?target[index]:mat;};m.material=Array.isArray(m.material)?m.material.map(swap):swap(m.material);}});};
  function resize(){const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();hero.resize(r.width,r.height);}
  new ResizeObserver(resize).observe(canvas.parentElement);resize();
  canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);points.set(e.pointerId,{x:e.clientX,y:e.clientY});drag={x:e.clientX,y:e.clientY};autoRotate=false;if(points.size===2){const p=[...points.values()];zoomStart={gap:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),distance};}});

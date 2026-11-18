@@ -1,0 +1,12 @@
+{
+  "name": "akamaru-character-study",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node test.mjs && node motion-test.mjs && node controller-test.mjs && node blade-test.mjs"
+  },
+  "devDependencies": {
+    "three": "0.170.0",
+    "three-mesh-bvh": "0.8.3"
+  }
+}
