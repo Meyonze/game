@@ -81,48 +81,62 @@ export function buildAkamaru(){
   add(ribbon,shape([[0,.11],[-.55,.30],[-1.23,.38],[-1.62,.15],[-1.25,.08],[-1.42,-.19],[-.68,-.10],[0,-.15]],.055,.035),'red',[0,0,-i*.13]);line(ribbon,[[-.12,0,.055],[-.7,.05,.055],[-1.16,.18,.055]],'deep',.016);
  }
  const knot=group(body,[.59,2.31,.62]);for(let i=0;i<4;i++){const a=i*Math.PI/2,m=ball(knot,'gold',[Math.sin(a)*.15,Math.cos(a)*.15,0],[.105,.15,.065]);m.rotation.z=-a;}ball(knot,'gold',[0,0,.07],[.105,.105,.06]);
- // Author the weapon first, then solve both arms onto its handle. The blade's
- // cutting edge stays in the cutting plane; wrists never spin it independently.
+ // The chest turns around the waist independently from the planted hips.
+ // Reparent the existing surfaces without changing their authored shapes.
+ const upperParts=body.children.filter(o=>o!==sword&&o.position.y>=1.7);
+ const chest=group(body,[0,1.5,0]);parts.chest=chest;parts.hips=body;
+ for(const o of upperParts){body.remove(o);o.position.sub(chest.position);chest.add(o);}
  const bladeBase=new T.Object3D();bladeBase.position.set(0,.34,0);sword.add(bladeBase);parts.bladeBase=bladeBase;
  const down=new T.Vector3(0,-1,0),xAxis=new T.Vector3(1,0,0),yAxis=new T.Vector3(0,1,0),zAxis=new T.Vector3(0,0,1);
  const gripR=new T.Vector3(0,.13,0),gripL=new T.Vector3(0,-.29,0);
  const poses=[
-  {t:0, p:[0,1.90,.64],pitch:1.14,tilt:.06,yaw:0,drop:0,step:0},
-  {t:.25,p:[-.16,2.47,.73],pitch:.22,tilt:.50,yaw:-.12,drop:-.035,step:-.035},
-  {t:.40,p:[-.16,2.48,.73],pitch:.20,tilt:.50,yaw:-.14,drop:-.045,step:0},
-  {t:.60,p:[-.05,1.85,.55],pitch:2.10,tilt:.50,yaw:.13,drop:-.055,step:.27},
-  {t:.88,p:[-.05,1.85,.55],pitch:2.10,tilt:.50,yaw:.13,drop:-.055,step:.27},
-  {t:1.50,p:[0,1.90,.64],pitch:1.14,tilt:.06,yaw:0,drop:0,step:0}
+  {t:0, p:[-.02,1.88,.69],pitch:1.12,tilt:.08,yaw:-.34,chest:.16,lean:.10,drop:-.34,step:0,shift:0},
+  {t:.25,p:[-.16,2.42,.75],pitch:.22,tilt:.50,yaw:-.46,chest:.05,lean:.07,drop:-.37,step:0,shift:-.035},
+  {t:.40,p:[-.16,2.44,.75],pitch:.20,tilt:.50,yaw:-.42,chest:.10,lean:.07,drop:-.37,step:.04,shift:0},
+  {t:.60,p:[-.05,1.85,.55],pitch:2.10,tilt:.50,yaw:.04,chest:.22,lean:.14,drop:-.38,step:.24,shift:.16},
+  {t:.88,p:[-.05,1.85,.55],pitch:2.10,tilt:.50,yaw:.04,chest:.22,lean:.14,drop:-.38,step:.24,shift:.16},
+  {t:1.50,p:[-.02,1.88,.69],pitch:1.12,tilt:.08,yaw:-.34,chest:.16,lean:.10,drop:-.34,step:0,shift:0}
  ];
- function poseAt(t){let a=poses[0],b=poses[1];for(let i=1;i<poses.length;i++){a=poses[i-1];b=poses[i];if(t<=b.t)break;}const u=T.MathUtils.smoothstep(t,a.t,b.t),out={p:a.p.map((v,i)=>T.MathUtils.lerp(v,b.p[i],u))};for(const key of['pitch','tilt','yaw','drop','step'])out[key]=T.MathUtils.lerp(a[key],b[key],u);return out;}
+ function poseAt(t){let a=poses[0],b=poses[1];for(let i=1;i<poses.length;i++){a=poses[i-1];b=poses[i];if(t<=b.t)break;}const u=T.MathUtils.smoothstep(t,a.t,b.t),out={p:a.p.map((v,i)=>T.MathUtils.lerp(v,b.p[i],u))};for(const key of['pitch','tilt','yaw','chest','lean','drop','step','shift'])out[key]=T.MathUtils.lerp(a[key],b[key],u);return out;}
  function armIK(side,target,weaponQuaternion){
   const suffix=side<0?'R':'L',arm=parts['arm'+suffix],elbow=parts['elbow'+suffix],hand=parts['hand'+suffix],start=arm.position;
   const to=target.clone().sub(start),distance=to.length(),axis=to.clone().normalize(),length=.53,lower=.55;
   const d=T.MathUtils.clamp(distance,.03,length+lower-.0001),a=(length*length-lower*lower+d*d)/(2*d),h=Math.sqrt(Math.max(0,length*length-a*a));
-  const pole=new T.Vector3(side*1.35,1.55,.55).sub(start),bend=pole.addScaledVector(axis,-pole.dot(axis)).normalize();
+  const pole=new T.Vector3(side*1.15,.02,.48).sub(start),bend=pole.addScaledVector(axis,-pole.dot(axis)).normalize();
   const joint=start.clone().addScaledVector(axis,a).addScaledVector(bend,h),upperQ=new T.Quaternion().setFromUnitVectors(down,joint.clone().sub(start).normalize()),lowerQ=new T.Quaternion().setFromUnitVectors(down,target.clone().sub(joint).normalize());
   arm.quaternion.copy(upperQ);elbow.quaternion.copy(upperQ).invert().multiply(lowerQ);hand.quaternion.copy(lowerQ).invert().multiply(weaponQuaternion);
  }
- // Plant the feet while the hips load and the right foot makes a short step.
- function plantLeg(side,step,drop,lift){
+ // Ankle targets are in character space: neither breathing nor hip turns
+ // drag the feet. The forward knee bends over the toes; the rear foot opens out.
+ function plantLeg(side,step,lift,runWeight,gait){
   const suffix=side<0?'R':'L',hip=parts['leg'+suffix],knee=parts['knee'+suffix],foot=parts['foot'+suffix];
-  const ankle=new T.Vector3(side*.39,.28+lift,.02+(side<0?step:0)).sub(body.position).applyQuaternion(body.quaternion.clone().invert()),start=hip.position,to=ankle.clone().sub(start),axis=to.clone().normalize(),d=Math.min(to.length(),.8699),a=(.42*.42-.45*.45+d*d)/(2*d),h=Math.sqrt(Math.max(0,.42*.42-a*a));
-  const pole=new T.Vector3(0,0,1).addScaledVector(axis,-axis.z).normalize(),joint=start.clone().addScaledVector(axis,a).addScaledVector(pole,h),q1=new T.Quaternion().setFromUnitVectors(down,joint.clone().sub(start).normalize()),q2=new T.Quaternion().setFromUnitVectors(down,ankle.clone().sub(joint).normalize());
-  hip.quaternion.copy(q1);knee.quaternion.copy(q1).invert().multiply(q2);foot.position.set(0,-.45,0);foot.quaternion.copy(q2).invert().multiply(body.quaternion.clone().invert());
+  const phase=gait+(side<0?0:Math.PI),stride=Math.sin(phase)*.42*runWeight;
+  const stanceZ=side<0?.38+step:-.38;
+  const ankle=new T.Vector3(side*(.53-.10*runWeight),.25+lift+Math.max(0,Math.cos(phase))*.20*runWeight,stanceZ*(1-runWeight)+stride).sub(body.position).applyQuaternion(body.quaternion.clone().invert());
+  const start=hip.position,to=ankle.clone().sub(start),axis=to.clone().normalize(),d=T.MathUtils.clamp(to.length(),.03,.8699),a=(.42*.42-.45*.45+d*d)/(2*d),h=Math.sqrt(Math.max(0,.42*.42-a*a));
+  const pole=new T.Vector3(side*.22,0,1);pole.addScaledVector(axis,-pole.dot(axis)).normalize();
+  const joint=start.clone().addScaledVector(axis,a).addScaledVector(pole,h),q1=new T.Quaternion().setFromUnitVectors(down,joint.clone().sub(start).normalize()),q2=new T.Quaternion().setFromUnitVectors(down,ankle.clone().sub(joint).normalize());
+  hip.quaternion.copy(q1);knee.quaternion.copy(q1).invert().multiply(q2);foot.position.set(0,-.45,0);
+  const sole=new T.Quaternion().setFromAxisAngle(yAxis,(side<0?-.08:.38)*(1-runWeight));
+  foot.quaternion.copy(q2).invert().multiply(body.quaternion.clone().invert()).multiply(sole);
  }
  let time=0,slashTime=-1,runWeight=0;
  function update(dt,{run=0,strike=false}={}){
   time+=dt;if(strike&&slashTime<0)slashTime=0;else if(slashTime>=0){slashTime+=dt;if(slashTime>=STRIKE_DURATION)slashTime=-1;}
   const striking=slashTime>=0,pose=poseAt(striking?slashTime:0),gait=time*10;
   runWeight=T.MathUtils.damp(runWeight,striking?0:run,12,dt);
-  const bob=Math.sin(time*2.3)*.015*(striking?0:1),runBob=Math.abs(Math.sin(gait))*runWeight*.06;
-  body.position.set(0,bob+runBob+pose.drop,striking?pose.step*.12:0);body.rotation.set(runWeight*.06,pose.yaw,0);
-  parts.head.rotation.set(Math.sin(time*1.8)*.015*(striking?0:1),-pose.yaw*.65,0);
-  for(const side of [-1,1]){const suffix=side<0?'R':'L',phase=gait+(side<0?0:Math.PI);parts['leg'+suffix].rotation.set(Math.sin(phase)*.65*runWeight,0,0);parts['knee'+suffix].rotation.set(Math.max(0,-Math.sin(phase))*.62*runWeight,0,0);parts['foot'+suffix].rotation.set(0,0,0);}
-  if(striking){const lift=slashTime>.40&&slashTime<.60?Math.sin((slashTime-.40)/.20*Math.PI)*.06:slashTime>.88?Math.sin((slashTime-.88)/.62*Math.PI)*.04:0;plantLeg(-1,pose.step,body.position.y,lift);plantLeg(1,0,body.position.y,0);}
+  const bob=Math.sin(time*2.3)*.008*(striking?0:1),runBob=Math.abs(Math.sin(gait))*runWeight*.035;
+  body.position.set(-.025*(1-runWeight),pose.drop+bob+runWeight*.09+runBob,pose.shift);
+  body.rotation.set(0,pose.yaw*(1-runWeight*.75),0);
+  chest.rotation.set(pose.lean+runWeight*.06,pose.chest*(1-runWeight*.65),0);
+  // Keep the gaze on the opponent while the trunk loads and unwinds.
+  parts.head.rotation.set(-pose.lean*.65+Math.sin(time*1.8)*.008*(striking?0:1),-body.rotation.y-chest.rotation.y,0);
+  const lift=striking&&slashTime>.25&&slashTime<.60?Math.sin((slashTime-.25)/.35*Math.PI)*.055:striking&&slashTime>.88?Math.sin((slashTime-.88)/.62*Math.PI)*.04:0;
+  plantLeg(-1,pose.step,lift,runWeight,gait);plantLeg(1,0,0,runWeight,gait);
   sword.position.set(...pose.p);sword.position.y+=Math.sin(gait)*runWeight*.025;
   sword.quaternion.setFromAxisAngle(zAxis,pose.tilt).multiply(new T.Quaternion().setFromAxisAngle(xAxis,pose.pitch)).multiply(new T.Quaternion().setFromAxisAngle(yAxis,-Math.PI/2));
-  for(const side of [-1,1]){const grip=(side<0?gripR:gripL).clone().applyQuaternion(sword.quaternion).add(sword.position);armIK(side,grip,sword.quaternion);}
+  const chestInverse=chest.quaternion.clone().invert(),gripRotation=chestInverse.clone().multiply(sword.quaternion);
+  for(const side of [-1,1]){const grip=(side<0?gripR:gripL).clone().applyQuaternion(sword.quaternion).add(sword.position).sub(chest.position).applyQuaternion(chestInverse);armIK(side,grip,gripRotation);}
   parts.tail.rotation.y=Math.sin(time*2.5)*(.10+runWeight*.12)-pose.yaw*.35;parts.tail.rotation.x=Math.sin(gait)*runWeight*.06;
   parts.ribbon0.rotation.y=.12+Math.sin(time*4)*.08+runWeight*.25-pose.yaw*.5;parts.ribbon1.rotation.y=-.32+Math.sin(time*4-1)*.1+runWeight*.3-pose.yaw*.4;parts.ribbon0.rotation.z=runWeight*-.18;parts.ribbon1.rotation.z=runWeight*-.25;
   root.updateMatrixWorld(true);

@@ -1,11 +1,22 @@
 import assert from 'node:assert/strict';import * as T from '../neon-rift-duel/vendor/three.module.js';import {buildAkamaru,STRIKE_DURATION} from './character.js';
 const hero=buildAkamaru(),p=hero.parts,frames=[];let maxGripError=0,maxBladeJump=0,maxFootError=0,last=null;
-hero.update(0);hero.update(0,{strike:true});
+hero.update(0);
+const front=p.footR.getWorldPosition(new T.Vector3()),rear=p.footL.getWorldPosition(new T.Vector3());
+assert.ok(front.z-rear.z>.6&&rear.x-front.x>.9,'Guard needs a visibly staggered, broad support base');
+for(let i=0;i<120;i++){
+ hero.update(1/60);
+ for(const [side,planted]of[['R',front],['L',rear]]){
+  const ankle=p['foot'+side].getWorldPosition(new T.Vector3()),hip=p['leg'+side].getWorldPosition(new T.Vector3());
+  assert.ok(ankle.distanceTo(planted)<.002,'Breathing must not slide the guard feet');
+  assert.ok(ankle.distanceTo(hip)<.83,'Guard knees must remain bent, not locked straight');
+ }
+}
+hero.update(0,{strike:true});
 for(let i=0;i<=360;i++){
  const result=hero.update(i?1/240:0);const right=new T.Vector3(0,.13,0).applyMatrix4(p.sword.matrixWorld),left=new T.Vector3(0,-.29,0).applyMatrix4(p.sword.matrixWorld);
  for(const [hand,grip]of[[p.handR,right],[p.handL,left]])maxGripError=Math.max(maxGripError,hand.getWorldPosition(new T.Vector3()).distanceTo(grip));
- for(const foot of[p.footR,p.footL]){const up=new T.Vector3(0,1,0).applyQuaternion(foot.getWorldQuaternion(new T.Quaternion()));assert.ok(up.y>.999,'Feet should stay level during the cut');const y=foot.getWorldPosition(new T.Vector3()).y;assert.ok(y>=.279&&y<.35,'Step must not penetrate the ground');}
- const backFoot=p.footL.getWorldPosition(new T.Vector3());maxFootError=Math.max(maxFootError,backFoot.distanceTo(new T.Vector3(.39,.28,.02)));
+ for(const foot of[p.footR,p.footL]){const up=new T.Vector3(0,1,0).applyQuaternion(foot.getWorldQuaternion(new T.Quaternion()));assert.ok(up.y>.999,'Feet should stay level during the cut');const y=foot.getWorldPosition(new T.Vector3()).y;assert.ok(y>=.249&&y<.32,'Step must not penetrate the ground');}
+ const backFoot=p.footL.getWorldPosition(new T.Vector3());maxFootError=Math.max(maxFootError,backFoot.distanceTo(new T.Vector3(.53,.25,-.38)));
  if(last)maxBladeJump=Math.max(maxBladeJump,result.tip.distanceTo(last));last=result.tip.clone();frames.push({...result,t:i/240,right,left,edge:new T.Vector3(1,0,0).applyQuaternion(p.sword.getWorldQuaternion(new T.Quaternion()))});
 }
 assert.ok(maxGripError<.001,'Both palms must stay attached to the same handle');assert.ok(maxFootError<.002,'Rear foot must remain planted');assert.ok(maxBladeJump<.14,'No per-frame wrist teleport or sudden reset');
