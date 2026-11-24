@@ -244,18 +244,50 @@ const INK='#4a3f35';          // outline dark brown
 const PAPER='#efe7d8';        // bg cream
 
 // ══ AUDIO ══
+// 構成: 各音 → seGain / bgmバス → コンプレッサー(音割れ防止) → 出力、＋共有リバーブ（生成インパルス）
 const Audio2={
-  ctx:null,bgmNode:null,bgmGain:null,seGain:null,
+  ctx:null,comp:null,rev:null,bgmGain:null,seGain:null,bgmNode:null,bgmVol:0.11,
   init(){
     if(this.ctx)return;
-    this.ctx=new(window.AudioContext||window.webkitAudioContext)();
-    this.bgmGain=this.ctx.createGain();this.bgmGain.gain.value=0.18;this.bgmGain.connect(this.ctx.destination);
-    this.seGain=this.ctx.createGain();this.seGain.gain.value=0.24;this.seGain.connect(this.ctx.destination);
+    this._setup(new(window.AudioContext||window.webkitAudioContext)());
+  },
+  // 本番/オフライン検証の両方から使えるようにノード構築を分離
+  _setup(ac){
+    this.ctx=ac;
+    this.comp=ac.createDynamicsCompressor();
+    this.comp.threshold.value=-14;this.comp.knee.value=12;this.comp.ratio.value=4;
+    this.comp.attack.value=0.003;this.comp.release.value=0.2;
+    this.comp.connect(ac.destination);
+    // リバーブ: 減衰ノイズ（やや暗め）をインパルス応答に使う
+    this.rev=ac.createConvolver();
+    const rl=Math.floor(ac.sampleRate*1.7),ib=ac.createBuffer(2,rl,ac.sampleRate);
+    for(let c=0;c<2;c++){
+      const d=ib.getChannelData(c);let y=0;
+      for(let i=0;i<rl;i++){y=y*0.55+(Math.random()*2-1)*0.45;d[i]=y*Math.pow(1-i/rl,2.6);}
+    }
+    this.rev.buffer=ib;
+    const rg=ac.createGain();rg.gain.value=0.7;this.rev.connect(rg);rg.connect(this.comp);
+    this.seGain=ac.createGain();this.seGain.gain.value=0.75;this.seGain.connect(this.comp);
+    // 共有ノイズ（2秒）
+    const nl=Math.floor(ac.sampleRate*2);
+    this._nbuf=ac.createBuffer(1,nl,ac.sampleRate);
+    const nd=this._nbuf.getChannelData(0);
+    for(let i=0;i<nl;i++)nd[i]=Math.random()*2-1;
+    // 歪み用カーブ（雷・怒りの音のざらつき）
+    const cv=new Float32Array(2048);
+    for(let i=0;i<2048;i++){const x=i/1024-1;cv[i]=Math.tanh(x*6);}
+    this._dist=cv;
   },
   resume(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();},
-  // ─ BGM: 壮大な4部構成ループ（約46秒 / 124bpm / Eマイナーペンタ）
-  // A:静かな主題 → B:躍動(ベース8分駆動+ハット) → C:クライマックス(高音域+5度下ハモリ+4つ打ち) → D:解決
-  // ノード生成はセクション単位（約11.6秒ごと）に分割スケジュールしてモバイル負荷を平準化
+
+  // ─────────────── BGM ───────────────
+  // Eマイナー / 124bpm / 8小節×4セクション(約62秒ループ)
+  // A:静かなヴァース(ピアノ風+パッド) → B:ビルド(ドラム+8分ベース) → C:サビ(フル編成) → D:ブレイク(ドラム抜き)→ライザー
+  _hz(n){
+    const m=/^([A-G])([#b]?)(\d)$/.exec(n);
+    const pc={C:0,D:2,E:4,F:5,G:7,A:9,B:11}[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0);
+    return 440*Math.pow(2,((12*(+m[3]+1)+pc)-69)/12);
+  },
   _note(freq,t,d,vol,type,vib=0,lp=0){
     const ac=this.ctx;
     const o=ac.createOscillator(),g=ac.createGain();
@@ -266,7 +298,7 @@ const Audio2={
       lfo.connect(lg);lg.connect(o.frequency);lfo.start(t);lfo.stop(t+d+0.05);
     }
     g.gain.setValueAtTime(0,t);
-    g.gain.linearRampToValueAtTime(vol,t+0.04);
+    g.gain.linearRampToValueAtTime(vol,t+0.03);
     g.gain.setValueAtTime(vol,t+d*0.7);
     g.gain.exponentialRampToValueAtTime(0.001,t+Math.max(d*0.96,0.05));
     if(lp){const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.value=lp;o.connect(f);f.connect(g);}
@@ -274,236 +306,335 @@ const Audio2={
     g.connect(this.bgmGain);
     o.start(t);o.stop(t+d+0.06);
   },
-  _kick(t){
+  // ピアノ/ハープ風: 即アタック→指数減衰（bellで1オクターブ上の倍音を足す）
+  _pluck(freq,t,d,vol,type,bell=0){
+    const ac=this.ctx,o=ac.createOscillator(),g=ac.createGain();
+    o.type=type;o.frequency.setValueAtTime(freq,t);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0008,t+d);
+    o.connect(g);g.connect(this.bgmGain);o.start(t);o.stop(t+d+0.05);
+    if(bell)this._pluck(freq*2,t,d*0.6,vol*bell,'sine');
+  },
+  // 和音パッド: 2本ずつデチューンしたノコギリ波をローパスで丸める（1和音につきフィルタ1個）
+  _pad(freqs,t,d,vol,lp,atk){
+    const ac=this.ctx,f=ac.createBiquadFilter();
+    f.type='lowpass';f.frequency.value=lp;f.Q.value=0.5;
+    const g=ac.createGain();
+    const a=atk!==undefined?atk:Math.min(0.5,d*0.3);
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.linearRampToValueAtTime(vol,t+a);
+    g.gain.setValueAtTime(vol,t+Math.max(a,d*0.8));
+    g.gain.linearRampToValueAtTime(0.0001,t+d+0.3);
+    f.connect(g);g.connect(this.bgmGain);
+    for(const fr of freqs)for(const dt of[-7,7]){
+      const o=ac.createOscillator();o.type='sawtooth';o.frequency.value=fr;o.detune.value=dt;
+      o.connect(f);o.start(t);o.stop(t+d+0.35);
+    }
+  },
+  _kick(t,vol=0.5){
     const ac=this.ctx,o=ac.createOscillator(),g=ac.createGain();
     o.type='sine';
-    o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(45,t+0.09);
-    g.gain.setValueAtTime(0.5,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.13);
-    o.connect(g);g.connect(this.bgmGain);o.start(t);o.stop(t+0.15);
+    o.frequency.setValueAtTime(160,t);o.frequency.exponentialRampToValueAtTime(42,t+0.1);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.16);
+    o.connect(g);g.connect(this.bgmGain);o.start(t);o.stop(t+0.18);
   },
-  _hat(t,vol){
+  _noiseHit(t,d,vol,ft,f0,f1,q){
     const ac=this.ctx,src=ac.createBufferSource();src.buffer=this._nbuf;
-    const f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=6500;
+    const f=ac.createBiquadFilter();f.type=ft;f.Q.value=q||0.7;
+    f.frequency.setValueAtTime(f0,t);
+    if(f1)f.frequency.exponentialRampToValueAtTime(f1,t+d);
     const g=ac.createGain();
-    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.045);
-    src.connect(f);f.connect(g);g.connect(this.bgmGain);src.start(t);src.stop(t+0.06);
+    g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+d);
+    src.connect(f);f.connect(g);g.connect(this.bgmGain);
+    src.start(t,Math.random()*0.5,d+0.05);
+  },
+  _hat(t,vol){this._noiseHit(t,0.045,vol,'highpass',6500);},
+  _snare(t,vol){
+    this._noiseHit(t,0.15,vol,'bandpass',1900,900,0.8);
+    const ac=this.ctx,o=ac.createOscillator(),g=ac.createGain();
+    o.type='triangle';o.frequency.setValueAtTime(220,t);o.frequency.exponentialRampToValueAtTime(130,t+0.09);
+    g.gain.setValueAtTime(vol*0.9,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.11);
+    o.connect(g);g.connect(this.bgmGain);o.start(t);o.stop(t+0.13);
+  },
+  _crash(t,vol){this._noiseHit(t,1.4,vol,'highpass',5200,3000,0.5);},
+  // ライザー: ノイズのフィルタを上げながら音量も上げる（次の展開への期待感）
+  _riser(t,d,vol){
+    const ac=this.ctx,src=ac.createBufferSource();src.buffer=this._nbuf;
+    const f=ac.createBiquadFilter();f.type='bandpass';f.Q.value=1.2;
+    f.frequency.setValueAtTime(400,t);f.frequency.exponentialRampToValueAtTime(7000,t+d);
+    const g=ac.createGain();
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+d);
+    g.gain.linearRampToValueAtTime(0.0001,t+d+0.05);
+    src.connect(f);f.connect(g);g.connect(this.bgmGain);
+    src.start(t,0.2,d+0.1);
+  },
+  _bgmData(){
+    if(this._SEC)return this._SEC;
+    const parse=s=>{let st=0;const ev=[];for(const tok of s.trim().split(/\s+/)){
+      const[n,d]=tok.split(':');if(n!=='-')ev.push([st,this._hz(n),+d]);st+=+d;}return ev;};
+    // コード: [根音ピッチクラス,長/短]
+    const CH={Em:[4,'m'],C:[0,'M'],G:[7,'M'],D:[2,'M'],Am:[9,'m'],B:[11,'M']};
+    this._SEC=[
+      { // A: 静かなヴァース（ピアノ風メロ＋柔らかいパッド＋ゆったりアルペジオ）
+        id:'A',lead:'soft',melVol:0.13,padVol:0.03,padLp:900,bass:'long',bassVol:0.15,arp:{every:4,base:60,vol:0.035},
+        chords:['Em','C','G','D','Em','C','D','B'],
+        mel:parse(`E5:6 D5:2 B4:4 G4:4  C5:4 E5:4 G5:6 E5:2  D5:4 B4:4 G4:4 B4:2 D5:2  A4:6 F#4:2 A4:4 D5:4
+                   E5:6 G5:2 B5:4 G5:4  C6:4 B5:2 A5:2 G5:4 E5:4  F#5:4 E5:2 D5:2 F#5:4 A5:4  D#5:6 F#5:2 B5:4 -:4`)},
+      { // B: ビルド（キック・スネア・8分ベース・16分気味の細かいメロ）
+        id:'B',lead:'bright',melVol:0.16,padVol:0.04,padLp:1300,bass:'pulse',bassVol:0.2,arp:{every:2,base:60,vol:0.03},
+        chords:['Em','G','C','D','Em','G','Am','B'],
+        mel:parse(`B4:2 E5:2 G5:4 B5:4 G5:2 E5:2  D5:2 G5:2 B5:4 D6:4 B5:2 G5:2  E5:2 G5:2 C6:4 B5:2 A5:2 G5:2 E5:2  F#5:2 A5:2 D6:4 C#6:2 D6:2 A5:4
+                   G5:4 B5:4 E6:4 D6:2 B5:2  B5:4 D6:4 G6:4 D6:2 B5:2  C6:4 E6:4 A5:4 C6:2 E6:2  D#6:2 F#6:2 B5:4 D#6:2 F#6:2 B6:4`)},
+      { // C: サビ（厚いリード＋オクターブ下＋コードスタブ＋4つ打ち＋16分ハット）
+        id:'C',lead:'full',melVol:0.21,padVol:0.06,padLp:2000,bass:'drive',bassVol:0.26,arp:{every:1,base:60,vol:0.022},
+        chords:['C','G','D','Em','C','D','B','Em'],
+        mel:parse(`G5:4 E6:4 D6:2 C6:2 E6:4  D6:4 G6:4 F#6:2 G6:2 D6:4  A5:4 D6:4 F#6:4 E6:2 D6:2  E6:8 B5:4 G5:4
+                   C6:2 E6:2 G6:4 E6:4 C6:2 D6:2  D6:2 F#6:2 A6:4 F#6:4 D6:4  F#6:4 D#6:4 B5:4 D#6:2 F#6:2  E6:12 -:4`)},
+      { // D: ブレイク（ドラム抜き。パッドとピアノだけ→最後にライザー）
+        id:'D',lead:'soft',melVol:0.12,padVol:0.045,padLp:1000,bass:'long',bassVol:0.13,arp:{every:2,base:60,vol:0.03},
+        chords:['Am','Em','C','G','Am','B','Em','B'],
+        mel:parse(`E5:8 C5:4 A4:4  B4:8 G4:4 E4:4  C5:4 E5:4 G5:8  B4:4 D5:4 G5:4 D5:4
+                   A4:4 C5:4 E5:4 A5:4  F#5:6 D#5:2 B4:8  G5:4 E5:4 B4:4 E5:4  D#5:8 F#5:4 D#5:4`)},
+    ];
+    this._CH=CH;
+    this._step=60/124/4;   // 1単位=16分音符（秒）
+    return this._SEC;
+  },
+  // 4小節ぶんを予約（モバイルの負荷平準化のため半セクションずつ）
+  _bgmChunk(n,t0){
+    const SEC=this._bgmData(),S=SEC[Math.floor(n/2)%4],step=this._step,b0=(n%2)*4;
+    const mtoHz=m=>440*Math.pow(2,(m-69)/12);
+    // メロディ
+    for(const[st,f,du]of S.mel){
+      if(st<b0*16||st>=(b0+4)*16)continue;
+      const t=t0+(st-b0*16)*step,d=du*step;
+      if(S.lead==='soft'){
+        const dd=Math.min(1.3,d*1.5+0.25);
+        this._pluck(f,t,dd,S.melVol,'triangle',0.35);
+        this._pluck(f*1.003,t,dd,S.melVol*0.4,'sine');
+      }else{
+        this._note(f,t,d,S.melVol,'triangle',4);
+        this._note(f*1.005,t,d,S.melVol*0.5,'triangle');
+        this._note(f,t,d,S.melVol*0.3,'sawtooth',0,S.lead==='full'?2600:1400);
+        if(S.lead==='full')this._note(f/2,t,d,S.melVol*0.45,'triangle');   // オクターブ下で厚み
+      }
+    }
+    for(let k=0;k<4;k++){
+      const bar=b0+k,bt=t0+k*16*step,cn=S.chords[bar],[pc,q]=this._CH[cn];
+      const tri=[0,q==='m'?3:4,7];
+      // パッド（1小節ロングトーン）
+      this._pad(tri.map(i=>mtoHz(48+pc+i)),bt,16*step,S.padVol,S.padLp);
+      // アルペジオ（和音の構成音を上下）
+      const pat=[0,1,2,3,2,1];   // 根音,3度,5度,オクターブ,5度,3度
+      for(let u=0,i=0;u<16;u+=S.arp.every,i++){
+        const idx=pat[i%pat.length],m=S.arp.base+pc+(idx===3?12:tri[idx]);
+        this._pluck(mtoHz(m),bt+u*step,S.id==='C'?0.16:0.32,S.arp.vol,'triangle');
+      }
+      // ベース
+      const r=mtoHz(36+pc);
+      let seq;
+      if(S.bass==='long')seq=[[r,14],[0,2]];
+      else if(S.bass==='pulse')seq=Array.from({length:8},()=>[r,2]);
+      else seq=[[r,2],[r,2],[r*2,2],[r,2],[r,2],[r*2,2],[r,2],[r*2,2]];
+      let bb=bt;
+      for(const[f,du]of seq){
+        const d=step*du;
+        if(f){
+          this._note(f,bb,d,S.bassVol,S.bass==='long'?'sine':'triangle');
+          if(S.bass!=='long')this._note(f*2,bb,d,S.bassVol*0.4,'triangle');
+        }
+        bb+=d;
+      }
+      // ドラム・演出（セクションごとにメリハリ）
+      const hit=(arr,fn)=>{for(const u of arr)fn(bt+u*step,u);};
+      if(S.id==='A'){
+        if(bar>=4)hit([4,12],t=>this._hat(t,0.025));
+      }else if(S.id==='B'){
+        hit(bar===7?[0]:[0,8],t=>this._kick(t,0.45));
+        hit(bar===7?[]:[4,12],t=>this._snare(t,0.1));
+        hit([2,6,10,14],t=>this._hat(t,0.05));
+        if(bar===7){
+          hit([4,6,8,10,12,13,14,15],(t,u)=>this._snare(t,0.05+0.012*(u-4)));
+          this._riser(bt+4*step,12*step,0.18);
+        }
+      }else if(S.id==='C'){
+        if(bar===0)this._crash(bt,0.2);
+        hit([0,4,8,12],t=>this._kick(t,0.7));
+        if(bar!==7)hit([4,12],t=>this._snare(t,0.17));
+        hit([0,2,4,6,8,10,12,14],(t,u)=>this._hat(t,u%4===2?0.06:0.035));
+        hit([1,3,5,7,9,11,13,15],t=>this._hat(t,0.02));
+        // コードスタブ（シンコペーション）
+        hit([0,10],t=>this._pad(tri.map(i=>mtoHz(60+pc+i)),t,0.22,0.035,2800,0.004));
+        if(bar===7)hit([12,13,14,15],(t,u)=>this._snare(t,0.1+0.03*(u-12)));
+      }else{ // D
+        if(bar===7){
+          this._riser(bt,16*step,0.2);
+          hit([8,10,12,13,14,15],(t,u)=>this._snare(t,0.04+0.012*(u-8)));
+        }
+      }
+    }
   },
   startBGM(){
     if(!this.ctx||this.bgmNode)return;
     const ac=this.ctx;
-    // stopBGMでミュートしている可能性があるため音量を復帰
-    this.bgmGain.gain.cancelScheduledValues(ac.currentTime);
-    this.bgmGain.gain.setValueAtTime(0.18,ac.currentTime);
-    const bpm=124,step=60/bpm/4;   // 1単位=16分音符（秒）
-    // ドラム用ノイズバッファ（共有・初回のみ生成）
-    if(!this._nbuf){
-      const len=Math.floor(ac.sampleRate*0.2);
-      this._nbuf=ac.createBuffer(1,len,ac.sampleRate);
-      const ch=this._nbuf.getChannelData(0);
-      for(let i=0;i<len;i++)ch[i]=Math.random()*2-1;
-    }
-    // 音名（Eマイナーペンタトニック）
-    const D4=293.7,E4=329.6,G4=392,A4=440,B4=493.9,D5=587.3,E5=659.3,G5=784;
-    const bE=82.4,bG=98,bA=110,bB=123.5,bC=130.8,bD=146.8;
-    // 各セクション96単位＝6小節（1小節16単位）
-    const SEC=[
-      { // A: 静かな主題提示
-        mel:[[E4,4],[G4,2],[A4,2],[B4,6],[0,2],[A4,2],[G4,2],[E4,4],[D4,4],[E4,6],[0,2],
-             [E4,4],[G4,2],[A4,2],[B4,4],[D5,4],[B4,2],[A4,2],[G4,4],[A4,6],[0,2],
-             [G4,2],[A4,2],[B4,4],[E4,4],[G4,2],[A4,2],[G4,4],[E4,6],[0,2]],
-        bars:[bE,bC,bG,bD,bE,bB],bass:'long',kick:[],hat:[],
-        melVol:0.16,harm:false,padVol:0.05},
-      { // B: 躍動（ベース8分駆動＋オフビートハット）
-        mel:[[B4,4],[D5,2],[E5,2],[D5,4],[B4,4],[A4,2],[B4,2],[A4,4],[G4,4],[E4,6],[0,2],
-             [G4,4],[A4,2],[B4,2],[D5,4],[E5,4],[D5,2],[B4,2],[A4,4],[B4,6],[0,2],
-             [A4,2],[B4,2],[D5,4],[E5,4],[D5,2],[B4,2],[A4,2],[G4,2],[A4,6],[0,2]],
-        bars:[bE,bC,bG,bD,bA,bB],bass:'pulse',kick:[0,8],hat:[4,12],
-        melVol:0.18,harm:false,padVol:0.06},
-      { // C: クライマックス（高音域主旋律＋5度下ハモリ＋4つ打ち）
-        mel:[[E5,6],[D5,2],[B4,4],[D5,4],[E5,4],[G5,4],[E5,4],[D5,4],
-             [B4,4],[D5,2],[E5,2],[D5,4],[B4,2],[A4,2],[B4,8],[0,4],[D5,2],[E5,2],
-             [G5,4],[E5,4],[D5,4],[B4,4],[D5,4],[E5,2],[D5,2],[B4,4],[A4,2],[G4,2]],
-        bars:[bC,bG,bD,bE,bC,bD],bass:'drive',kick:[0,4,8,12],hat:[2,6,10,14],
-        melVol:0.20,harm:true,padVol:0.08},
-      { // D: 解決・ブリッジ（末尾の上行フレーズでAへ回帰）
-        mel:[[E4,8],[G4,4],[A4,4],[B4,8],[A4,4],[G4,4],
-             [E4,4],[D4,4],[E4,8],[0,4],[G4,2],[A4,2],
-             [B4,4],[A4,4],[G4,4],[A4,4],
-             [B4,2],[D5,2],[E5,4],[B4,4],[A4,2],[B4,2],[0,8]],
-        bars:[bE,bC,bA,bB,bE,bE],bass:'half',kick:[0],hat:[],
-        melVol:0.15,harm:false,padVol:0.07},
-    ];
-    const secLen=96*step;
-    // ベースの小節パターン（16単位）
-    const bassBar=(style,r)=>{
-      if(style==='long') return[[r,14],[0,2]];
-      if(style==='pulse')return[[r,2],[r,2],[r,2],[r,2],[r,2],[r,2],[r,2],[r,2]];
-      if(style==='drive')return[[r,2],[r,2],[r*2,2],[r,2],[r,2],[r*2,2],[r,2],[r*2,2]];
-      return[[r,7],[0,1],[r,7],[0,1]];  // half
-    };
-    const playSection=(idx,t0)=>{
+    // 毎回新しいバスを作る: stopBGMで切り離せば、予約済みの旧ノートが次回再生に混ざって二重に聞こえない
+    const bus=ac.createGain();
+    bus.gain.setValueAtTime(this.bgmVol,ac.currentTime);
+    bus.connect(this.comp);
+    const send=ac.createGain();send.gain.value=0.22;bus.connect(send);send.connect(this.rev);
+    this.bgmGain=bus;
+    this._bgmData();
+    const chunkLen=4*16*this._step;
+    const run=(n,t0)=>{
       if(!this.bgmNode)return;
-      const S=SEC[idx%4];
-      // メロディ: triangle主体＋微デチューン重ね＋sawtooth倍音層（ローパス）で厚み
-      let tt=t0;
-      for(const[f,du]of S.mel){
-        const d=step*du;
-        if(f){
-          this._note(f,tt,d,S.melVol,'triangle',4);
-          this._note(f*1.005,tt,d,S.melVol*0.5,'triangle');
-          this._note(f,tt,d,S.melVol*0.3,'sawtooth',0,1400);
-          if(S.harm)this._note(f*2/3,tt,d,S.melVol*0.45,'triangle');  // 5度下ハモリ
-        }
-        tt+=d;
-      }
-      // 小節単位: ベース＋パッド＋ドラム
-      for(let bar=0;bar<6;bar++){
-        const bt=t0+bar*16*step,r=S.bars[bar];
-        let bb=bt;
-        for(const[f,du]of bassBar(S.bass,r)){
-          const d=step*du;
-          if(f){
-            this._note(f,bb,d,0.22,'triangle');
-            this._note(f*2,bb,d,0.09,'triangle');  // オクターブ上層（小型スピーカー可聴性）
-          }
-          bb+=d;
-        }
-        // パッド: ルート＋5度のロングトーン
-        this._note(r*2,bt,16*step,S.padVol,'sine');
-        this._note(r*3,bt,16*step,S.padVol*0.8,'sine');
-        for(const u of S.kick)this._kick(bt+u*step);
-        for(const u of S.hat)this._hat(bt+u*step,0.09);
-      }
-      this._bgmTimer=setTimeout(()=>playSection(idx+1,t0+secLen),
-        Math.max(100,(t0+secLen-ac.currentTime-0.4)*1000));
+      this._bgmChunk(n,t0);
+      this._bgmTimer=setTimeout(()=>run(n+1,t0+chunkLen),
+        Math.max(100,(t0+chunkLen-ac.currentTime-0.5)*1000));
     };
     this.bgmNode={};
-    playSection(0,ac.currentTime+0.05);
+    run(0,ac.currentTime+0.05);
   },
   stopBGM(){
     this.bgmNode=null;
     clearTimeout(this._bgmTimer);
-    // 直前セクションで予約済みのノート（最大約11.6秒分）がclearTimeoutだけでは止まらず
-    // 次回startBGM時に旧ノートと新ノートが重なって二重再生に聞こえるため、
-    // マスターゲインを即ミュートして物理的に音を止める
-    if(this.ctx&&this.bgmGain){
+    const bus=this.bgmGain;
+    if(this.ctx&&bus){
       const t=this.ctx.currentTime;
-      this.bgmGain.gain.cancelScheduledValues(t);
-      this.bgmGain.gain.setValueAtTime(this.bgmGain.gain.value,t);
-      this.bgmGain.gain.linearRampToValueAtTime(0,t+0.05);
+      bus.gain.cancelScheduledValues(t);
+      bus.gain.setValueAtTime(bus.gain.value,t);
+      bus.gain.linearRampToValueAtTime(0,t+0.06);
+      setTimeout(()=>{try{bus.disconnect();}catch(e){}},250);   // 予約済みノートごと物理的に切り離す
     }
   },
-  // ─ SE
+
+  // ─────────────── SE ───────────────
   play(type){
     if(!this.ctx)return;
-    // 連続再生スロットル: kill/hitは短時間に重複させない
     const now=performance.now();
+    // 連続キル: 0.5秒以内に続けて倒すと音階が上がっていく（スロットルより前に数える）
+    if(type==='kill'){
+      this._combo=(now-(this._lastKill||0)<500)?Math.min(7,(this._combo||0)+1):0;
+      this._lastKill=now;
+    }
     this._lastPlay=this._lastPlay||{};
-    const minGap={kill:90,hit:70,shot:50,beam:60,bounce:50,blade:80,boomer:120,bolt:100,bomb:100,poison:120,spin:60,pierce:60,fan:60};
+    const minGap={kill:90,hit:70,shot:50,beam:60,bounce:60,blade:80,boomer:120,bolt:100,bomb:100,poison:120,spin:60,pierce:60,fan:60,home:60,bomblaunch:100,poisonlaunch:120,wisp:250};
     const gap=minGap[type]!==undefined?minGap[type]:0;
     if(gap>0&&this._lastPlay[type]&&now-this._lastPlay[type]<gap)return;
     this._lastPlay[type]=now;
-    const ac=this.ctx,t=ac.currentTime;
-    const g=ac.createGain();
-    // やさしい音のためにマスターゲインを低めに
-    g.connect(this.seGain);
-    const mkO=(freq,wt,start,dur,vol=0.3,bend=0)=>{
-      const o=ac.createOscillator();o.type=wt;
-      o.frequency.setValueAtTime(freq,t+start);
-      if(bend)o.frequency.exponentialRampToValueAtTime(Math.max(20,freq*bend),t+start+dur);
-      g.gain.setValueAtTime(0,t+start);
-      g.gain.linearRampToValueAtTime(vol,t+start+0.01);
-      g.gain.exponentialRampToValueAtTime(0.001,t+start+dur);
-      o.connect(g);o.start(t+start);o.stop(t+start+dur+0.02);
+    const ac=this.ctx,t=ac.currentTime+0.005;
+    const out=ac.createGain();out.connect(this.seGain);
+    const rv=a=>{const s=ac.createGain();s.gain.value=a;out.connect(s);s.connect(this.rev);};
+    // 発振器: o.to=終端周波数 / o.lp,o.lpTo=ローパス掃引 / o.vib=[Hz,深さ] / o.shape=歪み
+    const O=(wt,f0,s,d,v,o={})=>{
+      const os=ac.createOscillator();os.type=wt;os.frequency.setValueAtTime(f0,t+s);
+      if(o.to)os.frequency.exponentialRampToValueAtTime(Math.max(20,o.to),t+s+d);
+      const g=ac.createGain(),a=o.atk||0.005;
+      g.gain.setValueAtTime(0.0001,t+s);g.gain.linearRampToValueAtTime(v,t+s+a);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+s+d);
+      let n=os;
+      if(o.lp){const f=ac.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(o.lp,t+s);
+        if(o.lpTo)f.frequency.exponentialRampToValueAtTime(o.lpTo,t+s+d);n.connect(f);n=f;}
+      if(o.shape){const w=ac.createWaveShaper();w.curve=this._dist;n.connect(w);n=w;}
+      if(o.vib){const l=ac.createOscillator();l.frequency.value=o.vib[0];
+        const lg=ac.createGain();lg.gain.value=o.vib[1];l.connect(lg);lg.connect(os.frequency);
+        l.start(t+s);l.stop(t+s+d+0.05);}
+      n.connect(g);g.connect(out);os.start(t+s);os.stop(t+s+d+0.05);
     };
-    // ノイズバースト（filterで質感調整）
-    const mkN=(start,dur,vol,fType,fFreq,fQ,sweep)=>{
-      const len=Math.ceil(ac.sampleRate*dur);
-      const buf=ac.createBuffer(1,len,ac.sampleRate);
-      const d=buf.getChannelData(0);
-      for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*(1-i/len);
-      const src=ac.createBufferSource();src.buffer=buf;
-      const flt=ac.createBiquadFilter();flt.type=fType;
-      flt.frequency.setValueAtTime(fFreq,t+start);
-      if(sweep)flt.frequency.exponentialRampToValueAtTime(Math.max(60,sweep),t+start+dur);
-      flt.Q.value=fQ||1;
-      const ng=ac.createGain();
-      ng.gain.setValueAtTime(0,t+start);
-      ng.gain.linearRampToValueAtTime(vol,t+start+0.008);
-      ng.gain.exponentialRampToValueAtTime(0.001,t+start+dur);
-      src.connect(flt);flt.connect(ng);ng.connect(this.seGain);
-      src.start(t+start);src.stop(t+start+dur+0.02);
+    // ノイズ: フィルタ種別とf0→f1の掃引で質感を作る
+    const N=(s,d,v,ft,f0,f1,q)=>{
+      const src=ac.createBufferSource();src.buffer=this._nbuf;
+      const f=ac.createBiquadFilter();f.type=ft;f.Q.value=q||0.7;
+      f.frequency.setValueAtTime(f0,t+s);
+      if(f1)f.frequency.exponentialRampToValueAtTime(Math.max(40,f1),t+s+d);
+      const g=ac.createGain();
+      g.gain.setValueAtTime(0.0001,t+s);g.gain.linearRampToValueAtTime(v,t+s+0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+s+d);
+      src.connect(f);f.connect(g);g.connect(out);
+      src.start(t+s,Math.random()*0.5,d+0.05);
     };
-    const lpf=ac.createBiquadFilter();lpf.type='lowpass';lpf.frequency.value=3200;lpf.Q.value=0.4;
-    g.connect(lpf);lpf.connect(this.seGain);
-    g.disconnect(this.seGain);
 
-    if(type==='shot'){
-      // ピッ：短い電子音
-      mkO(780,'triangle',0,0.06,0.18,0.7);
-    }else if(type==='pierce'){
-      // ズン：重い突き
-      mkO(160,'sawtooth',0,0.14,0.3,0.5);mkO(90,'sine',0,0.16,0.28);
-    }else if(type==='spin'){
-      // ブンッ：空を切る音（ノイズスイープ）
-      mkN(0,0.22,0.4,'bandpass',1400,1.2,300);
-      mkO(220,'sine',0,0.2,0.18,0.55);
-    }else if(type==='blade'){
-      // バシッ：鋭い剣気
-      mkN(0,0.14,0.5,'highpass',1800,0.8);
-      mkO(1400,'square',0,0.05,0.12,0.5);mkO(500,'sawtooth',0,0.1,0.2,0.6);
-    }else if(type==='beam'){
-      // ピュン：高音の下降
-      mkO(1600,'sine',0,0.12,0.16,0.35);mkO(2200,'triangle',0,0.08,0.1,0.4);
-    }else if(type==='home'){
-      // ピョン：跳ねる電子音
-      mkO(600,'square',0,0.08,0.14,1.6);
-    }else if(type==='fan'){
-      // シャッ：広がる発射
-      mkN(0,0.1,0.25,'bandpass',1800,0.8);
-      mkO(700,'triangle',0,0.07,0.14,0.85);
-    }else if(type==='boomer'){
-      // シュン：回転して飛ぶ（ビブラート）
-      const o=ac.createOscillator();o.type='triangle';
-      o.frequency.setValueAtTime(700,t);
-      o.frequency.linearRampToValueAtTime(500,t+0.06);
-      o.frequency.linearRampToValueAtTime(750,t+0.14);
-      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.22,t+0.01);
-      g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
-      o.connect(g);o.start(t);o.stop(t+0.22);
-    }else if(type==='hit'){
-      // コツ：軽い着弾
-      mkO(280,'triangle',0,0.05,0.12,0.6);
-    }else if(type==='kill'){
-      // 消滅音：ふわっと消える（下降＋ノイズ）
-      mkO(520,'sine',0,0.13,0.16,0.45);
-      mkN(0,0.1,0.12,'lowpass',1200,0.5,300);
-    }else if(type==='bolt'){
-      // ドガッ：重い雷
-      mkN(0,0.35,0.45,'lowpass',800,0.7,120);
-      mkO(70,'sawtooth',0,0.35,0.4,0.6);mkO(130,'sine',0,0.2,0.3);
-      mkO(1500,'triangle',0,0.1,0.2,0.4);
-    }else if(type==='bomb'){
-      // ドォン：爆発
-      mkN(0,0.4,0.4,'lowpass',600,0.6,80);
-      mkO(80,'sine',0,0.35,0.4,0.5);mkO(140,'sawtooth',0,0.2,0.25,0.7);
-    }else if(type==='poison'){
-      // シュワ：毒が広がる
-      mkN(0,0.3,0.2,'bandpass',900,0.6,400);
-      mkO(330,'sine',0,0.2,0.12,1.3);
-    }else if(type==='chest'){
-      [523,659,784,1047].forEach((f,i)=>mkO(f,'triangle',i*0.06,0.18,0.22+i*0.02));
-    }else if(type==='levelup'){
-      [392,523,659,784,1047].forEach((f,i)=>mkO(f,'triangle',i*0.06,0.2+i*0.04,0.26));
-    }else if(type==='gameover'){
-      mkO(440,'sine',0,0.5,0.28,0.5);mkO(330,'sine',0.35,0.55,0.3,0.6);mkO(220,'sine',0.75,0.8,0.32,0.7);
-    }else if(type==='wisp'){
-      mkO(880,'sine',0,0.22,0.14,1.1);mkO(1320,'sine',0.04,0.25,0.1,0.9);
-    }else if(type==='wavestart'){
-      mkO(330,'triangle',0,0.16,0.26);mkO(440,'triangle',0.1,0.18,0.26);mkO(523,'triangle',0.2,0.22,0.3);
-    }else if(type==='breachwarn'){
-      // 突破コース警告: 緊急感のある短い二連ビープ（wavestartと区別できる音色）
-      mkO(700,'square',0,0.09,0.20);mkO(700,'square',0.15,0.09,0.20);
+    if(type==='shot'){          // ピッ：軽い弾
+      O('triangle',1050,0,0.07,0.16,{to:700});N(0,0.02,0.05,'highpass',4000);rv(0.05);
+    }else if(type==='pierce'){  // ズシュッ：重い槍の突き
+      N(0,0.18,0.3,'bandpass',2500,500,1.5);
+      O('sawtooth',260,0,0.2,0.18,{to:70,lp:1800,lpTo:300});
+      O('sine',90,0,0.22,0.32,{to:45});rv(0.1);
+    }else if(type==='spin'){    // シュバッ：空を切る＋金属の響き
+      N(0,0.2,0.3,'bandpass',600,2600,1.2);N(0.12,0.22,0.28,'bandpass',2800,500,1.2);
+      O('sine',2093,0.04,0.45,0.07);O('sine',3136,0.04,0.4,0.045);O('sine',4186,0.04,0.35,0.03);rv(0.22);
+    }else if(type==='blade'){   // ヒュウン：飛ぶ剣気（高く澄んだ上昇音）
+      N(0,0.25,0.2,'highpass',3000,9000,0.7);
+      O('sine',900,0,0.25,0.15,{to:2600});O('triangle',1800,0.05,0.25,0.07,{to:3600});rv(0.28);
+    }else if(type==='beam'){    // ピュイン：レーザー
+      O('sawtooth',2600,0,0.14,0.11,{to:500,lp:5000});O('sine',1800,0,0.12,0.12,{to:400});
+      N(0,0.03,0.07,'highpass',6000);
+    }else if(type==='home'){    // ピョーン：跳ねる弾の発射
+      O('sine',420,0,0.18,0.2,{to:1100});O('triangle',840,0,0.14,0.08,{to:1700});
+    }else if(type==='bounce'){  // ポヨッ：壁で跳ね返る
+      O('sine',700,0,0.07,0.14,{to:350});N(0,0.02,0.05,'bandpass',3000,3000,2);
+    }else if(type==='fan'){     // シャシャシャッ：5方向に広がる
+      for(let i=0;i<5;i++){
+        N(i*0.025,0.06,0.15,'bandpass',1500+i*450,900+i*300,1);
+        O('triangle',500+i*160,i*0.025,0.06,0.08,{to:380+i*120});
+      }
+      rv(0.08);
+    }else if(type==='bomblaunch'){ // ポンッ：筒から打ち出す
+      O('sine',260,0,0.14,0.28,{to:90});N(0,0.06,0.14,'lowpass',900,300);
+    }else if(type==='poisonlaunch'){ // ぷるっ：毒玉を投げる
+      O('sine',300,0,0.1,0.2,{to:900});O('sine',500,0.07,0.1,0.15,{to:1200});
+    }else if(type==='bomb'){    // ドォーン：爆発（破裂音＋重低音＋砂煙）
+      N(0,0.05,0.5,'highpass',2000);
+      N(0,0.6,0.5,'lowpass',2500,100,0.7);
+      O('sine',130,0,0.55,0.6,{to:32});
+      O('sawtooth',90,0,0.25,0.25,{to:35,lp:500});rv(0.3);
+    }else if(type==='poison'){  // ジュワァ：泡立つ毒
+      N(0,0.5,0.2,'bandpass',900,400,0.8);
+      for(let i=0;i<6;i++){const f=280+Math.random()*420;O('sine',f,i*0.06,0.09,0.1,{to:f*1.9});}
+      rv(0.2);
+    }else if(type==='bolt'){    // ズガン！：雷（閃光のクラック→落雷の衝撃→ゴロゴロ）
+      N(0,0.05,0.9,'highpass',1500,5000,0.5);                 // バリッ（空気が裂ける）
+      O('sawtooth',3200,0,0.12,0.4,{to:180,shape:true});       // ビシャッ（放電）
+      N(0,0.12,0.5,'lowpass',1200,200);O('sine',110,0,0.1,0.4,{to:70}); // ズ…
+      O('sine',150,0.06,0.5,0.85,{to:30});                      // ガン（衝撃）
+      O('square',70,0.06,0.2,0.3,{to:30,lp:400});
+      N(0.06,0.25,0.7,'lowpass',3500,150);
+      N(0.15,1.1,0.45,'lowpass',500,70,0.8);                    // ゴロゴロ（残響する雷鳴）
+      N(0.35,0.9,0.3,'lowpass',350,60,0.8);
+      rv(0.45);
+    }else if(type==='boomer'){  // ヒュンッ：回転しながら飛ぶ
+      O('triangle',620,0,0.22,0.15,{vib:[14,60]});N(0,0.2,0.12,'bandpass',900,1800,1);
+    }else if(type==='wisp'){    // ふぅ…：幽霊の出現
+      O('sine',620,0,0.7,0.14,{to:880,atk:0.15,vib:[6,10]});O('sine',1240,0.05,0.6,0.05,{atk:0.15});rv(0.5);
+    }else if(type==='hit'){     // コツ：軽い着弾
+      O('triangle',320,0,0.04,0.1,{to:200});N(0,0.02,0.05,'bandpass',2200,2200,1);
+    }else if(type==='kill'){    // ポコッ：撃破（連続キルで音階が上がる）
+      const sc=[523,587,659,784,880,1047,1175,1319],f=sc[this._combo||0];
+      O('sine',f,0,0.14,0.18,{to:f*0.6});O('triangle',f*2,0,0.07,0.07,{to:f});
+      N(0,0.05,0.1,'lowpass',2500,500);rv(0.08);
+    }else if(type==='chest'){   // キラキラ：宝箱
+      [1319,1568,1976,2637,3136].forEach((f,i)=>{O('sine',f,i*0.055,0.35,0.15);O('triangle',f*2,i*0.055,0.25,0.04);});
+      O('sine',659,0,0.5,0.1);rv(0.35);
+    }else if(type==='levelup'){ // ファンファーレ：Cメジャーの上昇＋和音を伸ばす
+      [523,659,784,1047,1319].forEach((f,i)=>{O('triangle',f,i*0.07,0.35+i*0.04,0.17);O('sine',f*2,i*0.07,0.3,0.04);});
+      [523,659,784,1047].forEach(f=>O('triangle',f,0.35,0.8,0.09,{atk:0.03}));
+      O('sine',2093,0.4,0.5,0.05);rv(0.3);
+    }else if(type==='gameover'){ // 下降するマイナー＋低いドローン
+      [392,311,262,196].forEach((f,i)=>{O('triangle',f,i*0.3+(i===3?0.05:0),0.6+i*0.15,0.22);O('sine',f/2,i*0.3,0.7,0.15);});
+      O('sawtooth',98,0,1.7,0.12,{lp:400,lpTo:150,to:65});rv(0.4);
+    }else if(type==='wavestart'){ // パパパーン：ウェーブ開始（金管風の3連上昇）
+      [330,440,523].forEach((f,i)=>{O('sawtooth',f,i*0.1,0.26,0.1,{lp:1800});O('triangle',f,i*0.1,0.26,0.14);});rv(0.15);
+    }else if(type==='bosswave'){ // ボス出現：重低音＋Emのスタブ
+      O('sawtooth',110,0,0.9,0.2,{lp:700,to:98});N(0,0.8,0.25,'lowpass',500,80,0.8);
+      [165,196,247].forEach(f=>O('sawtooth',f,0.45,0.5,0.1,{lp:1500}));rv(0.3);
+    }else if(type==='rage'){    // ボス激怒：唸り声＋サイレン
+      O('sawtooth',70,0,0.5,0.3,{shape:true,lp:600,vib:[18,12]});
+      O('square',440,0,0.5,0.09,{to:660,lp:2000});N(0,0.4,0.2,'lowpass',800,200);
+    }else if(type==='breachwarn'){ // 警告アラート：2連
+      O('sawtooth',880,0,0.1,0.17,{lp:3000});O('sawtooth',880,0.16,0.1,0.17,{lp:3000});
+      O('sine',110,0,0.1,0.2);O('sine',110,0.16,0.1,0.2);
+    }else if(type==='select'){  // ポピッ：選択決定
+      O('triangle',660,0,0.08,0.14,{to:990});O('sine',1320,0.04,0.1,0.08);
     }
   },
 };
@@ -1062,7 +1193,7 @@ function stepWorms(dt){
         v.raging=true;v._rageT=0;
         burstBig(v.face.px,v.face.py,'#d96c5f',8,24,0.7);
         G.shake=Math.max(G.shake,300);
-        Audio2.play('wavestart');
+        Audio2.play('rage');
       }else if(v.raging&&v._rageT>=2200){
         v.raging=false;v._rageT=0;
       }
@@ -1336,7 +1467,7 @@ function fireAll(dt){
         rad:st.rad,
         dot:st.dot, dotDmg:st.dmg,
       });
-      Audio2.play('shot');
+      Audio2.play('poisonlaunch');
     }else if(id==='home'){
       // リフレクト弾: 斜め上に発射、壁で跳ね返る
       const ang=-Math.PI/2+(Math.random()-0.5)*1.2; // ±約35°のランダム
@@ -1352,7 +1483,7 @@ function fireAll(dt){
       const tx=tgt||{x:G.px,y:G.py-120};
       const dx=tx.x-G.px,dy=tx.y-G.py;const l=Math.sqrt(dx*dx+dy*dy)||1;
       G.bullets.push({x:G.px,y:G.py-G.pr,vx:dx/l*st.spd,vy:dy/l*st.spd,dmg:st.dmg,r:9,type:'bomb',pen:false,hit:new Set(),age:0,rad:st.rad});
-      Audio2.play('shot');
+      Audio2.play('bomblaunch');
     }else if(id==='fan'){
       for(const a of[-46,-23,0,23,46]){const rad=a*Math.PI/180;
         G.bullets.push({x:G.px,y:G.py-G.pr,vx:Math.sin(rad)*st.spd,vy:-Math.cos(rad)*st.spd,dmg:st.dmg,r:4.5,type:'fan',pen:false,hit:new Set()});}
@@ -1420,6 +1551,7 @@ function moveBullets(dt){
         b.bouncesLeft--;
         b.hit.clear(); // 跳ね返り後は同セグに再ヒット可
         burst(b.x,b.y,'#e8c84a',3,5,0.25);
+        Audio2.play('bounce');
         if(b.bouncesLeft<0)return false;
       }
     }
@@ -1665,6 +1797,7 @@ function renderChoiceCards(choices){
   });
   function closePick(){
     G._curChoices=null;
+    Audio2.play('select');
     hide('upg-screen');G.paused=false;G.lastTime=performance.now();
     Audio2.startBGM();  // 選択中に裏へ回ってBGMが止まっていた場合に再開（再生中なら何もしない）
     renderWbar();setTimeout(procChest,80);
@@ -2129,6 +2262,7 @@ function updateBoomers(dt){
 function spawnWisp(st){
   // プレイヤー本体から幽体離脱して出発
   const ang=Math.random()*Math.PI*2;
+  Audio2.play('wisp');
   return {
     x:G.px,y:G.py,                     // 本体位置から出る
     vx:Math.cos(ang)*2.2,vy:Math.sin(ang)*2.2-1, // 上方向にふわっと
@@ -2582,7 +2716,7 @@ function announce(txt){
   const el=document.getElementById('announce');
   el.textContent=txt;el.style.opacity='1';
   setTimeout(()=>el.style.opacity='0',2200);
-  Audio2.play('wavestart');
+  Audio2.play(txt.includes('BOSS')?'bosswave':'wavestart');
 }
 function drawPauseIcon(paused){
   const c=document.getElementById('pause-icon');if(!c)return;

@@ -1,6 +1,6 @@
 // SQUIRIUM BUSTER — Service Worker
 // 更新時はCACHE_NAMEのバージョンを上げること（古いキャッシュは自動削除される）
-const CACHE_NAME = 'squirium-buster-v3';
+const CACHE_NAME = 'squirium-buster-v4';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
