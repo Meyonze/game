@@ -812,19 +812,36 @@ function updateUI(){
 
 // ── Main loop ──
 let raf;
-// 固定タイムステップ: 画面のリフレッシュレート(60/120/144Hz)に関係なく、ゲームは常に1秒60ステップで進める
+// 固定タイムステップ: 画面のリフレッシュレート(60/90/120/144Hz)に関係なく、ゲームは常に1秒60ステップで進める。
+// ステップと描画のタイミングがずれてもカクつかないよう、描画では直前のステップとの間を補間（なめらかに繋ぐ）する。
 const STEP_MS = 1000/60;
 let lastTs = null, acc = 0;
+function snapshotPrev(){
+  const list=[paddle,ball,...(balls2||[]),...(lasers||[]),...(drops||[]),...(enemyBullets||[])];
+  for(const o of list){ if(o){ o._px=o.x; o._py=o.y; } }
+}
+function drawInterpolated(alpha){
+  const list=[paddle,ball,...(balls2||[]),...(lasers||[]),...(drops||[]),...(enemyBullets||[])];
+  const saved=[];
+  for(const o of list){
+    if(!o || o._px===undefined) continue;
+    // 瞬間移動（リスポーン・ボール交代など）は補間しない
+    if(Math.hypot(o.x-o._px,o.y-o._py)>30) continue;
+    saved.push([o,o.x,o.y]);
+    o.x=o._px+(o.x-o._px)*alpha; o.y=o._py+(o.y-o._py)*alpha;
+  }
+  drawAll();
+  for(const [o,x,y] of saved){ o.x=x; o.y=y; }
+}
 function loop(ts){
   raf=requestAnimationFrame(loop);
   if(lastTs===null) lastTs=ts;
   acc += Math.min(ts-lastTs, 250); // タブ復帰時などの大きな飛びは切り捨て
   lastTs = ts;
-  // 60Hz画面の微小なズレで0回/2回が交互にならないよう1msの余裕を持たせる
-  while(acc >= STEP_MS-1){ step(); acc -= STEP_MS; }
+  while(acc >= STEP_MS){ snapshotPrev(); step(); acc -= STEP_MS; }
   ctx.clearRect(0,0,FW,FH);
   drawBg();
-  drawAll();
+  drawInterpolated(acc/STEP_MS);
 }
 
 function step(){
