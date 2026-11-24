@@ -219,7 +219,16 @@ function resize(){
   const r=canvas.getBoundingClientRect();
   if(r.width<10||r.height<10){requestAnimationFrame(resize);return;}
   const dpr=window.devicePixelRatio||1;
+  const oW=W,oH=H;
   W=r.width;H=r.height;
+  // 画面回転などでサイズが変わったら、出現済みの敵の経路も新しい画面サイズに合わせて伸縮する
+  if(oW&&oH&&(oW!==W||oH!==H)&&G&&G.worms){
+    const sx=W/oW,sy=H/oH;
+    for(const v of G.worms){
+      for(const p of v.path){p.x*=sx;p.y*=sy;}
+      for(const p of v.route){p.x*=sx;p.y*=sy;}
+    }
+  }
   canvas.width=Math.round(W*dpr);
   canvas.height=Math.round(H*dpr);
   ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -1133,7 +1142,7 @@ function fireAll(dt){
       const HOLD_START=180; // 出現時の溜め停止（ms）
       const HOLD_END=220;   // 終端残像停止（ms）
       // 初期化
-      if(ws.sweepA===undefined){ws.sweepA=0;ws.sweeping=false;ws.timer=st.cd*(m.cd||1);ws.holdTimer=0;ws.holdPhase=null;}
+      if(ws.sweepA===undefined){ws.sweepA=0;ws.sweeping=false;ws.timer=st.cd;ws.holdTimer=0;ws.holdPhase=null;}
       ws.timer-=dt;
       // CDが切れたらスイープ開始（必ず左→右）
       if(!ws.sweeping&&ws.timer<=0&&ws.holdPhase===null){
@@ -1150,7 +1159,7 @@ function fireAll(dt){
             ws.holdPhase=null; // 停止終了→スイープ本体へ
           }else if(ws.holdPhase==='end'){
             ws.holdPhase=null;ws.sweeping=false;
-            ws.timer=st.cd*(m.cd||1);
+            ws.timer=st.cd;
           }
         }
       }
@@ -1167,7 +1176,7 @@ function fireAll(dt){
           const bladeOff=st.blades>1?(bi/(st.blades-1)-0.5)*fanHalf*0.5:0;
           const a=-Math.PI/2+ws.sweepA+bladeOff;
           for(let sIdx=0;sIdx<=4;sIdx++){
-            const rr2=(st.r+st.len*(sIdx/4))*(m.area||1);
+            const rr2=st.r+st.len*(sIdx/4);  // st.lenは範囲拡大適用済み（描画と同じ長さ）
             const bx=G.px+Math.cos(a)*rr2,by=G.py+Math.sin(a)*rr2;
             for(const v of G.worms){if(v.done)continue;
               for(let si=0;si<v.segs.length;si++){
@@ -1175,7 +1184,7 @@ function fireAll(dt){
                 const sp=segPos(v,si),ddx=bx-sp.x,ddy=by-sp.y;
                 const hitKey='sp'+bi+'_'+si+'_'+v.id;
                 if(ddx*ddx+ddy*ddy<(10+seg.r)**2&&(seg._sk!==hitKey||G.t-(seg._skT||0)>120)){
-                  seg._sk=hitKey;seg._skT=G.t;hitSeg(v,si,st.dmg*(m.dmg||1));
+                  seg._sk=hitKey;seg._skT=G.t;hitSeg(v,si,st.dmg);
                 }
               }
             }
@@ -1186,7 +1195,7 @@ function fireAll(dt){
           // スイープ中間（sweepA ≒ 0）を通過したら発射
           if(ws.sweepA>=0){
             ws._bladeFired=true;
-            const effLen2=st.len*(m.area||1);
+            const effLen2=st.len;
             const spd=(8+ws.lv*0.2)*(m.spd||1);
             // なぎ払い幅: 刃の先端が描く弧の横幅（fanHalf*2の弦長）
             const fanHalf2=Math.PI*0.42;
@@ -1195,11 +1204,11 @@ function fireAll(dt){
               x:G.px,y:G.py,  // キャラ中央
               vx:0,vy:-spd,
               gravX:0,gravY:0,
-              dmg:st.dmg*(m.dmg||1)*0.5,  // 剣本体の半分
+              dmg:st.dmg*0.5,  // 剣本体の半分
               r:5,type:'spin',pen:true,maxPen:6,hit:new Set(),
               isBlade:true,life:2400,
               arcDir:ws.sweepA>0?1:-1,
-              sweepWidth,
+              sweepWidth,baseWidth:sweepWidth,
               grow:!!(m.bladeGrow),  // 膨張オプション
             });
             Audio2.play('blade'); // バシッ
@@ -1212,7 +1221,7 @@ function fireAll(dt){
     if(id==='boomer'){
       const cnt=(st.count||1)+(m.count||0);
       if(!ws.slots||ws.slots.length!==cnt){
-        ws.slots=Array.from({length:cnt},(_,i)=>i===0?0:st.cd*(m.cd||1)*(i/cnt));
+        ws.slots=Array.from({length:cnt},(_,i)=>i===0?0:st.cd*(i/cnt));
       }
       for(let si2=0;si2<cnt;si2++){
         ws.slots[si2]-=dt;
@@ -1232,13 +1241,13 @@ function fireAll(dt){
               hit:new Set(),active:true,
               slot:si2,
             });
-            ws.slots[si2]=st.cd*(m.cd||1);
+            ws.slots[si2]=st.cd;
           }
         }
       }
       continue;
     }
-    ws.timer-=dt;if(ws.timer>0)continue;ws.timer=Math.max(200,st.cd*(m.cd||1));
+    ws.timer-=dt;if(ws.timer>0)continue;ws.timer=Math.max(200,st.cd);  // st.cdはパッシブ適用済み
     if(id==='bolt'){
       const cands=[];
       for(const v of G.worms){if(v.done)continue;
@@ -1324,8 +1333,8 @@ function fireAll(dt){
         vx:dx/l*st.spd,vy:dy/l*st.spd,
         dmg:st.dmg,r:9,type:'burst',pen:false,
         hit:new Set(),age:0,
-        rad:st.rad*(m.area||1),
-        dot:st.dot, dotDmg:st.dmg*(m.dmg||1),
+        rad:st.rad,
+        dot:st.dot, dotDmg:st.dmg,
       });
       Audio2.play('shot');
     }else if(id==='home'){
@@ -1373,7 +1382,8 @@ function moveBullets(dt){
       b.life=(b.life||0)-dt;
       if(b.life<=0||b.y<-60)return false;
       // 幅拡大オプション
-      if(b.grow)b.sweepWidth=Math.min(b.sweepWidth*(1+0.008),b.sweepWidth*3);
+      // 60fps基準で毎フレーム+0.8%相当をdt換算（リフレッシュレート非依存）、最大で元の3倍
+      if(b.grow)b.sweepWidth=Math.min(b.sweepWidth*Math.pow(1.008,s),b.baseWidth*3);
       // 全貫通（hitSetで各セグ1回のみ）
       for(const v of G.worms){if(v.done)continue;
         for(let si=0;si<v.segs.length;si++){
@@ -1522,7 +1532,8 @@ function buildChoices(){
       pool.push({kind:'passive',pid:'pw_'+k,wid,w:passiveW});
     }
     // 特殊パッシブ
-    if(['wisp','bolt','boomer'].includes(wid)){
+    const wispFull=wid==='wisp'&&(WD.wisp.stats(G.weapons.wisp.lv).n+(G.weapons.wisp.m.count||0))>=10;
+    if(['wisp','bolt','boomer'].includes(wid)&&!wispFull){
       pool.push({kind:'passive',pid:'pw_count',wid,w:1.5});
     }
     if(wid==='wisp'){
@@ -1545,7 +1556,8 @@ function buildChoices(){
     let r=Math.random()*tot,pi=0;
     for(;pi<pool.length;pi++){r-=pool[pi].w;if(r<=0)break;}
     const c=pool.splice(Math.min(pi,pool.length-1),1)[0];
-    c.rarity=rollRarity();
+    // 剣気放出・剣気膨張・三叉槍はレア度で効果が変わらないため常に通常扱い
+    c.rarity=(c.kind==='passive'&&['pw_blade','pw_bladeGrow','pw_lance3'].includes(c.pid))?0:rollRarity();
     out.push(c);
   }
   return out;
@@ -1592,7 +1604,7 @@ function renderChoiceCards(choices){
     sg.fillRect(cx-1.5,cy+4,3,7);sg.strokeRect(cx-1.5,cy+4,3,7);
     // クロスガード
     sg.fillStyle='#e8b94a';
-    sg.beginPath();sg.roundRect(cx-6,cy+2,12,3.5,1.5);sg.fill();sg.stroke();
+    rr(sg,cx-6,cy+2,12,3.5,1.5);sg.fill();sg.stroke();  // roundRect非対応の旧iOS対策で自前のrrを使用
     gs.appendChild(sc);
   }
   const c=document.getElementById('upg-cards');c.innerHTML='';
@@ -1627,7 +1639,7 @@ function renderChoiceCards(choices){
       let descStr;
       if(pd.k==='count')descStr=`${tn}の数を+${val}体追加`;
       else if(pd.k==='wispR')descStr=`ゴーストのサイズを+${pct}%`;
-      else if(pd.k==='blade')descStr=`ソードアークから剣気を飛ばす`;
+      else if(pd.k==='blade'||pd.k==='bladeGrow'||pd.k==='lance3')descStr=pd.desc;
       else descStr=`${tn==='全体'?'':tn+'の'}${pd.desc}（${pd.k==='cd'?'−':'+'}${pct}%）`;
       info.innerHTML=`<div class="uname">${pd.name}｜${tn}${rar.label?' <span style="color:'+rar.col+';font-size:10px;">'+rar.label+'</span>':''}</div>
         <div class="udesc">${descStr}</div>`;
@@ -1654,6 +1666,7 @@ function renderChoiceCards(choices){
   function closePick(){
     G._curChoices=null;
     hide('upg-screen');G.paused=false;G.lastTime=performance.now();
+    Audio2.startBGM();  // 選択中に裏へ回ってBGMが止まっていた場合に再開（再生中なら何もしない）
     renderWbar();setTimeout(procChest,80);
   }
   show('upg-screen');
@@ -2132,6 +2145,9 @@ function updateWisps(dt){
   const ws=G.weapons.wisp;
   const st=WD.wisp.stats(ws.lv);
   const m=ws.m||{};
+  // パワーアップ／弾速アップのパッシブを反映
+  st.dmg*=(m.dmg||1);
+  st.spd*=(m.spd||1);
   // count mod: パッシブで追加した分を加算（上限10）
   const cnt=Math.min(10,(st.n||1)+(m.count||0));
   // size mod
@@ -2590,13 +2606,14 @@ function togglePause(){
   if(G._curChoices)return; // 武器選択画面表示中はポーズ操作を無効化
   G.paused=!G.paused;
   drawPauseIcon(G.paused);
-  if(!G.paused){G.lastTime=performance.now();}
+  if(!G.paused){G.lastTime=performance.now();Audio2.resume();Audio2.startBGM();}
 }
 // PWA/バックグラウンド対策: 最小化・タブ切替でBGMが鳴り続けるのを防ぐ
 // Web AudioはvisibilitychangeでAudioContextが自動停止しないため明示的に止める。
 // ゲイン0だけでなくAudioContext自体もsuspendして二重に確実化。
 // visibilitychangeに加えてblur/focusも監視（端末差でどちらかしか発火しないケースの保険）
 function onBackground(){
+  keys={};  // 押したまま離脱するとkeyupが届かず押しっぱなし扱いになるのを防ぐ
   Audio2.stopBGM();
   if(Audio2.ctx&&Audio2.ctx.state==='running')Audio2.ctx.suspend();
   if(G&&!G.over&&!G.paused){G._autoPaused=true;G.paused=true;drawPauseIcon(true);}
@@ -2708,8 +2725,10 @@ function hide(id){document.getElementById(id).style.display='none';}
 })();
 
 // ══ INPUT ══
-window.addEventListener('keydown',e=>{keys[e.key]=true;Audio2.resume();});
-window.addEventListener('keyup',e=>keys[e.key]=false);
+// CapsLock/Shift中でもA/Dが効くよう1文字キーは小文字に正規化
+const normKey=k=>k.length===1?k.toLowerCase():k;
+window.addEventListener('keydown',e=>{keys[normKey(e.key)]=true;Audio2.resume();});
+window.addEventListener('keyup',e=>{keys[normKey(e.key)]=false;});
 let lastTX=null;
 const DRAG_SENS=1.25; // finger px -> player px
 canvas.addEventListener('touchstart',e=>{
