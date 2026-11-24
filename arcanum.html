@@ -665,9 +665,10 @@ function clampAngle(vx,vy,minAng=0.28){
 function bounceBall(b, isExtra=false) {
   const r = ballR();
   // Walls
-  if(b.x-r<0){b.x=r; b.vx=Math.abs(b.vx); SFX.wall();}
-  if(b.x+r>FW){b.x=FW-r; b.vx=-Math.abs(b.vx); SFX.wall();}
-  if(b.y-r<0){b.y=r; b.vy=Math.abs(b.vy); SFX.wall();}
+  // 壁: 位置を端に吸着させず、めり込んだ分だけ折り返す（1ステップの移動距離を変えないため）
+  if(b.x-r<0){b.x=2*r-b.x; b.vx=Math.abs(b.vx); SFX.wall();}
+  if(b.x+r>FW){b.x=2*(FW-r)-b.x; b.vx=-Math.abs(b.vx); SFX.wall();}
+  if(b.y-r<0){b.y=2*r-b.y; b.vy=Math.abs(b.vy); SFX.wall();}
 
   // Paddle
   const pw=paddleW();
@@ -699,6 +700,26 @@ function bounceBall(b, isExtra=false) {
       else        { b.vy= Math.abs(b.vy); b.y=br.y+br.h+r; }
     }
   }
+  // ブロック反射: 進入前の位置から「どの面から入ったか」を判定し、めり込んだ分だけ折り返す。
+  // 端に吸着させる方式だと、角に当たった瞬間にボールが2倍近く飛んだり止まったりして見えていた。
+  function reflectOut(b, br, r){
+    const px=b.x-b.vx, py=b.y-b.vy;
+    const tx = b.vx>0 ? (br.x-r-px)/b.vx : b.vx<0 ? ((br.x+br.w+r)-px)/b.vx : -Infinity;
+    const ty = b.vy>0 ? (br.y-r-py)/b.vy : b.vy<0 ? ((br.y+br.h+r)-py)/b.vy : -Infinity;
+    let horizontal;
+    if(tx===-Infinity && ty===-Infinity) horizontal = bestAxis(b, br, r);
+    else horizontal = tx > ty; // 後から重なり始めた軸が衝突面
+    if(horizontal){
+      const edge = b.vx>0 ? br.x-r : br.x+br.w+r;
+      b.x = 2*edge - b.x; b.vx = b.vx>0 ? -Math.abs(b.vx) : Math.abs(b.vx);
+    } else {
+      const edge = b.vy>0 ? br.y-r : br.y+br.h+r;
+      b.y = 2*edge - b.y; b.vy = b.vy>0 ? -Math.abs(b.vy) : Math.abs(b.vy);
+    }
+    // 角や隣り合うブロックで折り返しすぎても、1ステップの移動は本来の速さを超えないようにする
+    const dx=b.x-px, dy=b.y-py, d=Math.hypot(dx,dy), sp=Math.hypot(b.vx,b.vy);
+    if(d>sp && d>0){ b.x=px+dx*sp/d; b.y=py+dy*sp/d; }
+  }
   function bestAxis(b, br, r){
     const oL2=(b.x+r)-br.x, oR2=(br.x+br.w)-(b.x-r);
     const oT2=(b.y+r)-br.y, oB2=(br.y+br.h)-(b.y-r);
@@ -718,13 +739,13 @@ function bounceBall(b, isExtra=false) {
 
     // メタル: 通常は反射のみ。BREAKERモード時はダメージあり
     if(br.isMetal && !breakerMode){
-      pushOut(b, br, r, bestAxis(b, br, r));
+      reflectOut(b, br, r);
       SFX.metal();
       break;
     }
     if(br.isMetal && breakerMode){
       if(throughLevel===0){
-        pushOut(b, br, r, bestAxis(b, br, r));
+        reflectOut(b, br, r);
         br.hp=1; hitBrick(br, atkLevel); SFX.metal();
         break;
       }
@@ -739,7 +760,7 @@ function bounceBall(b, isExtra=false) {
     }
     // アーマー: ダメージを与えて反射（貫通しない）。through∞なら通過
     if(br.isArmor && throughLevel<3){
-      pushOut(b, br, r, bestAxis(b, br, r));
+      reflectOut(b, br, r);
       hitBrick(br, atkLevel);
       SFX.armor();
       break;
@@ -751,7 +772,7 @@ function bounceBall(b, isExtra=false) {
     }
     hitBrick(br, atkLevel);
     // 通常: 反射＋押し出し
-    pushOut(b, br, r, bestAxis(b, br, r));
+    reflectOut(b, br, r);
     break;
   }
 }
@@ -836,7 +857,7 @@ function drawInterpolated(alpha){
 function loop(ts){
   raf=requestAnimationFrame(loop);
   if(lastTs===null) lastTs=ts;
-  acc += Math.min(ts-lastTs, 250); // タブ復帰時などの大きな飛びは切り捨て
+  acc += Math.min(ts-lastTs, 100); // タブ復帰時などの大きな飛びは切り捨て
   lastTs = ts;
   while(acc >= STEP_MS){ snapshotPrev(); step(); acc -= STEP_MS; }
   ctx.clearRect(0,0,FW,FH);
