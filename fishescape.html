@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DODGE!</title>
+<title>Fish Escape</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap');
 
@@ -369,7 +369,7 @@ document.addEventListener('pointerup', onUp);
 document.addEventListener('pointercancel', onUp);
 
 document.addEventListener('keydown', e => {
-  if(e.code==='Space'||e.code==='ArrowUp') { e.preventDefault(); pressing=true; }
+  if(e.code==='Space'||e.code==='ArrowUp') { e.preventDefault(); if(state==='play') pressing=true; }
   if(e.code==='Enter') {
     if(state==='title') startGame();
     else if(state==='gameover') retryGame();
@@ -386,6 +386,7 @@ function startGame() {
   document.getElementById('titleScreen').style.display = 'none';
   state = 'countdown';
   reset();
+  lastT = 0; acc = 0;
   loop();
 }
 function retryGame() {
@@ -614,7 +615,7 @@ function drawFloor() {
 function fmt(n) { return String(Math.floor(n)).padStart(5,'0'); }
 function updateScoreDisp() {
   document.getElementById('scoreDisp').textContent = fmt(score);
-  document.getElementById('hiDisp').textContent = fmt(hiScore);
+  document.getElementById('hiDisp').textContent = fmt(Math.max(hiScore, score));
 }
 
 // ── AABB collision ──
@@ -791,8 +792,18 @@ function showGameOverScreen() {
 }
 
 // ── Main loop ──
+// 画面のリフレッシュレート(60/120Hz等)に関わらず、1秒あたり60回だけ更新する
+let lastT = 0, acc = 0;
+const STEP = 1000 / 60;
 function loop() {
   raf = requestAnimationFrame(loop);
+  const t = performance.now();
+  if(!lastT) lastT = t;
+  acc += Math.min(100, t - lastT);
+  lastT = t;
+  if(acc < STEP - 1) return;
+  acc -= STEP;
+  if(acc > STEP) acc = 0;
   frame++;
 
   // Update stars
@@ -931,7 +942,6 @@ function loop() {
       ob.scored = true;
       score++;
       updateScoreDisp();
-      if(score > hiScore) { hiScore = score; }
       // tiny flash particle
       spawnParticle(PLAYER.x+20, PLAYER.y, '#ffcc00');
     }

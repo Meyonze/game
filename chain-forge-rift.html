@@ -583,7 +583,7 @@ html,body{overscroll-behavior:none}body{position:fixed;inset:0}
     if(shoutUntil&&now>=shoutUntil){$('shout').classList.remove('show');shoutUntil=0;}
     raf=requestAnimationFrame(frame);
   }
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){advanceGame();cancelPointer({type:'pointercancel'});cancelAnimationFrame(raf);raf=0;last=0;stopMusic();if(audio)audio.suspend().catch(()=>{});}else if(!raf){if(sound&&audioUnlocked&&audio&&run.phase==='running')audio.resume().catch(()=>{});last=0;raf=requestAnimationFrame(frame);}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){advanceGame();cancelPointer({type:'pointercancel'});cancelAnimationFrame(raf);raf=0;last=0;stopMusic();if(audio)audio.suspend().catch(()=>{});}else if(!raf){lastReal=clock();if(sound&&audioUnlocked&&audio&&run.phase==='running')audio.resume().catch(()=>{});last=0;raf=requestAnimationFrame(frame);}});
   window.addEventListener('resize',resize);
   window.visualViewport?.addEventListener?.('resize',resize);
   loadBoard();renderSound();resize();newWave();raf=requestAnimationFrame(frame);
